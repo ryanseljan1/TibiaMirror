@@ -15,7 +15,17 @@ public sealed class AppHost : IDisposable
     public event Action<Profile>? ProfileChanged;
     public void SetProfile(Profile p) { CurrentProfile = p; ProfileChanged?.Invoke(p); }
     public void ProfileEdited() { }      // Task 10 adds debounced autosave
-    public void ApplySettings() { }      // Tasks 7/8/10 add hotkey registration
+    public void ApplySettings() { ApplyMirrorHotkey(); }      // Tasks 7/8/10 add hotkey registration
+    public TibiaMirror.Mirrors.MirrorService? Mirrors { get; private set; }
+    public TibiaMirror.Mirrors.MirrorsViewModel MirrorsVm { get; } = new();
+    IDisposable? _mirrorHotkey;
+    public void ApplyMirrorHotkey()
+    {
+        _mirrorHotkey?.Dispose();
+        _mirrorHotkey = null;
+        if (Hotkeys is not null && Settings.ShowHideAllHotkey is { } hk)
+            _mirrorHotkey = Hotkeys.Register(this, hk, TibiaMirror.Hotkeys.HotkeyScope.Global, RequestToggleMirrors);
+    }
     public Func<bool> IsTibiaFocused { get; set; } = () => false;
     public TibiaMirror.Hotkeys.KeyboardHook? Keyboard { get; private set; }
     public TibiaMirror.Hotkeys.HotkeyService? Hotkeys { get; private set; }
@@ -42,10 +52,20 @@ public sealed class AppHost : IDisposable
             TibiaMirror.Controls.HotkeyBox.Service = Hotkeys;
             TibiaMirror.Controls.HotkeyBox.Source = Keyboard;
         }
+
+        Mirrors = new TibiaMirror.Mirrors.MirrorService(locator, () => Settings, ProfileEdited);
+        MirrorsVm.Attach(Mirrors);
+        Mirrors.Load(CurrentProfile);
+        MirrorsVm.Rebuild();
+        ToggleMirrorsRequested += () => Mirrors.AllHidden = !Mirrors.AllHidden;
+        ProfileChanged += p => { Mirrors.Load(p); MirrorsVm.Rebuild(); };
+        ApplySettings();
     }
     public void Dispose() // tasks add disposal here
     {
         _locatorTimer?.Stop();
+        _mirrorHotkey?.Dispose();
+        Mirrors?.Dispose();
         Hotkeys?.Dispose();
         Keyboard?.Dispose();
         (Sounds as IDisposable)?.Dispose();

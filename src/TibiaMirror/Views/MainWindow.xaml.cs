@@ -14,6 +14,9 @@ public partial class MainWindow : Window
         _host = host;
         _tray = tray;
         InitializeComponent();
+        MirrorsPage.DataContext = host.MirrorsVm;
+        ShowHideAllButton.Click += (_, _) => host.RequestToggleMirrors();
+        LockAllButton.Click += (_, _) => host.Mirrors?.LockAll();
         if (host.Locator is { } locator) ShowTibiaState(locator.State);
         host.TibiaStateChanged += s => Dispatcher.Invoke(() => ShowTibiaState(s));
     }
