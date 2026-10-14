@@ -126,10 +126,14 @@ public sealed class MirrorService : IDisposable
         _onChanged();
     }
 
+    /// <summary>Raised after a region was removed (id).</summary>
+    public event Action<Guid>? RegionRemoved;
+
     public void Remove(Guid id)
     {
         if (_windows.Remove(id, out var w)) w.CloseForReal();
         _profile.Regions.RemoveAll(r => r.Id == id);
+        RegionRemoved?.Invoke(id);
         _onChanged();
     }
 

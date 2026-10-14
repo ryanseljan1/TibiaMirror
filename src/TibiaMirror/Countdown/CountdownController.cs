@@ -11,6 +11,7 @@ public sealed class CountdownController : IDisposable
 {
     readonly AppHost _host;
     readonly MirrorService _mirrors;
+    readonly MirrorsViewModel _vm;
     readonly CountdownService _service;
     readonly CountdownHotkeyRegistrations _registrations;
     readonly Dictionary<Guid, (PixelRect Bounds, bool Shown)> _layouts = new();
@@ -19,13 +20,26 @@ public sealed class CountdownController : IDisposable
 
     public CountdownController(AppHost host, MirrorService mirrors, MirrorsViewModel vm)
     {
-        _host = host; _mirrors = mirrors;
+        _host = host; _mirrors = mirrors; _vm = vm;
         _service = new CountdownService(new SystemClock());
         _registrations = new CountdownHotkeyRegistrations(host.Hotkeys, Trigger);
         _service.Completed += OnCompleted;
         _timer.Tick += (_, _) => OnTick();
         mirrors.MirrorLayoutChanged += OnLayout;
+        mirrors.RegionRemoved += OnRegionRemoved;
         vm.CardCreated += OnCardCreated;
+    }
+
+    void OnRegionRemoved(Guid id)
+    {
+        _service.Stop(id);
+        DropBar(id);
+        _layouts.Remove(id);
+    }
+
+    void DropBar(Guid id)
+    {
+        if (_bars.Remove(id, out var b)) b.Close();
     }
 
     public CountdownService Service => _service;
@@ -61,7 +75,8 @@ public sealed class CountdownController : IDisposable
     void Trigger(Guid id)
     {
         if (Find(id) is not { } r || !r.Countdown.Enabled) return;
-        _service.Start(id, Math.Clamp(r.Countdown.DurationSeconds, 0.5, 3600));
+        var dur = double.IsNaN(r.Countdown.DurationSeconds) ? 0.5 : Math.Clamp(r.Countdown.DurationSeconds, 0.5, 3600);
+        _service.Start(id, dur);
         _timer.Start();
         UpdateBar(id);
     }
@@ -101,15 +116,16 @@ public sealed class CountdownController : IDisposable
 
     void OnCompleted(Guid id)
     {
+        if (Find(id) is not { } r) { DropBar(id); _layouts.Remove(id); return; }
         if (_bars.TryGetValue(id, out var bar)) bar.HideBar();
-        if (Find(id) is not { } r) return;
+        try { if (r.Countdown.FlashOnDone) _mirrors.Flash(id, 5, r.Countdown.Color); }
+        catch (Exception e) { Log.Error("Countdown flash failed", e); }
         try
         {
-            if (r.Countdown.FlashOnDone) _mirrors.Flash(id, 5, r.Countdown.Color);
             if (!string.IsNullOrEmpty(r.Countdown.Sound))
                 _host.Sounds.Play(r.Countdown.Sound, _host.CurrentProfile.MasterVolume / 100.0);
         }
-        catch (Exception e) { Log.Error("Countdown completion failed", e); }
+        catch (Exception e) { Log.Error("Countdown sound failed", e); }
     }
 
     public void Dispose()
@@ -117,6 +133,9 @@ public sealed class CountdownController : IDisposable
         _timer.Stop();
         _registrations.Dispose();
         _mirrors.MirrorLayoutChanged -= OnLayout;
+        _mirrors.RegionRemoved -= OnRegionRemoved;
+        _vm.CardCreated -= OnCardCreated;
+        _service.Completed -= OnCompleted;
         foreach (var b in _bars.Values) b.Close();
         _bars.Clear();
     }

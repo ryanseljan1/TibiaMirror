@@ -9,6 +9,7 @@ public static class CountdownBarLayout
     /// <summary>Bar rectangle just outside the mirror's given edge (touching it), in the mirror's coordinate space.</summary>
     public static PixelRect Compute(PixelRect mirror, BarSide side, BarShape shape, int thickness)
     {
+        thickness = Math.Clamp(thickness, 2, 40);
         bool horizontal = side is BarSide.Top or BarSide.Bottom;
         int edge = horizontal ? mirror.Width : mirror.Height;
         int length = edge, offset = 0;
