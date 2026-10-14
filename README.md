@@ -1,95 +1,105 @@
 # TibiaMirror
 
-[Português (Brasil)](README.pt-BR.md)
+[English](README.en.md)
 
-Mirror any part of your Tibia screen anywhere you want — health bars, cooldowns, the minimap — plus audio timers and countdown bars.
+Espelhe qualquer parte da tela do Tibia onde quiser — barras de vida, tempos de recarga, minimapa — e use temporizadores com som e barras de contagem regressiva.
 
-<!-- Screenshots are coming. Add docs/images/overview.png, then uncomment:
-![TibiaMirror overview](docs/images/overview.png)
+<!-- Capturas de tela em breve. Adicione docs/images/overview.png e descomente:
+![Visão geral do TibiaMirror](docs/images/overview.png)
 -->
 
-## ⬇ Install (3 steps)
+## ⬇ Instalação (3 passos)
 
-1. Go to the **[Releases page](../../releases)** and download `TibiaMirror-Setup-<version>.exe`.
-2. Run it. If Windows shows "Windows protected your PC", click **More info → Run anyway**. TibiaMirror is free and not code-signed (a signing certificate costs money every year), so Windows does not know the publisher yet.
-3. Open TibiaMirror from the Start menu, then start Tibia. The dot at the top turns green.
+1. Acesse a **[página de versões](../../releases)** e baixe `TibiaMirror-Setup-<versão>.exe`.
+2. Execute o instalador. Se o Windows mostrar “O Windows protegeu o computador”, clique em **Mais informações → Executar assim mesmo**. O TibiaMirror é gratuito e não tem assinatura de código; por isso, o Windows ainda não reconhece o editor.
+3. Abra o TibiaMirror pelo menu Iniciar e depois inicie o Tibia. O indicador na parte superior ficará verde.
 
-### No-install option
+### Opção sem instalação
 
-Download `TibiaMirror-Portable-<version>.zip` from the Releases page. Right-click it, choose **Extract All**, then run `TibiaMirror.exe`.
+Baixe `TibiaMirror-Portable-<versão>.zip` na página de versões. Clique nele com o botão direito, escolha **Extrair Tudo** e execute `TibiaMirror.exe`.
 
-## Quick start: your first mirror
+## Primeiros passos: seu primeiro espelho
 
-<!-- Screenshots are coming. Add docs/images/add-region.gif, then uncomment:
-![Adding a region](docs/images/add-region.gif)
+<!-- Capturas de tela em breve. Adicione docs/images/add-region.gif e descomente:
+![Adicionando uma região](docs/images/add-region.gif)
 -->
 
-1. Start Tibia and wait until the dot in TibiaMirror is green.
-2. On the **Mirrors** tab, click **＋ Add Region**.
-3. Drag a box around the part of Tibia you want to copy, for example your health bar. Press Esc or right-click to cancel.
-4. A new mirror window appears. Drag it where you want it and pull its edges to resize it.
-5. Click the lock (padlock) button on the mirror's card to make it click-through, so it never gets in your way.
+1. Inicie o Tibia e espere até o indicador do TibiaMirror ficar verde.
+2. Na aba **Mirrors**, clique em **＋ Add Region**.
+3. Arraste para selecionar a parte do Tibia que deseja copiar, como a barra de vida. Pressione Esc ou clique com o botão direito para cancelar.
+4. Uma nova janela de espelho aparecerá. Arraste-a para onde quiser e puxe as bordas para redimensioná-la.
+5. Clique no cadeado do cartão do espelho para permitir que os cliques atravessem a janela, sem atrapalhar o jogo.
 
-## Features
+## Recursos
 
-### Mirrors
-- Add as many regions as you like. Each one gets its own window and a card in the list.
-- Move and resize a mirror freely. Use **Re-crop** to pick a different area.
-- **Lock** makes a mirror click-through. **Lock all** locks every mirror at once.
-- The eye button shows or hides one mirror, and the pencil renames it. **Delete** removes it. The Opacity slider makes a mirror see-through.
-- **Show/Hide all** turns every mirror on or off. You can also set a hotkey for it in settings (⚙).
-- Tick "Only show mirrors while Tibia is focused" in settings (⚙) to hide mirrors when you switch to another program. Tibia or one of your mirror windows being active counts as focused; TibiaMirror's own main window, dialogs and settings do not.
-- Tick **Dark mode** in settings (⚙) and click **Save** to change the app theme. Your choice is restored when the app opens again.
+### Espelhos
 
-### Countdown bar
-- Each mirror can have a bar that shrinks over a time you choose. Open the **Countdown** section on the mirror's card and tick **Enable countdown**.
-- Pick a hotkey. It only works while Tibia (or one of your mirror windows) is the active window, never while you type in TibiaMirror itself. If the key is already used by a timer, a countdown or a global hotkey, you are asked before it is accepted.
-- Choose the side (left, right, top, bottom), the shape (**Full edge** or **Narrow strip**), the color and the thickness.
-- The bar follows the mirror when you move it. Pressing the key again restarts it.
-- When time is up, the border can flash and a sound can play.
+- Adicione quantas regiões quiser. Cada uma tem sua própria janela e um cartão na lista.
+- Mova e redimensione os espelhos livremente. Use **Re-crop** para selecionar outra área.
+- **Lock** permite clicar através do espelho. **Lock all** bloqueia todos de uma vez.
+- O botão de olho mostra ou oculta um espelho, e o lápis altera seu nome. **Delete** remove o espelho. O controle de opacidade ajusta sua transparência.
+- **Show/Hide all** mostra ou oculta todos os espelhos. Você também pode configurar uma tecla de atalho para isso nas configurações (⚙).
+- Marque “Only show mirrors while Tibia is focused” nas configurações (⚙) para ocultar os espelhos ao mudar para outro programa. O Tibia ou uma janela de espelho contam como ativos; a janela principal, os diálogos e as configurações do TibiaMirror não contam.
+- Marque **Dark mode** nas configurações (⚙) e clique em **Save** para alterar o tema do aplicativo. A escolha será restaurada na próxima abertura.
 
-### Audio timers
-- On the **Audio Timers** tab, click **＋ Add Timer**. Pick a hotkey and a duration.
-- Press the key in Tibia and the timer starts. When it ends, you hear a sound.
-- Use a built-in sound or your own audio file. **Test** plays the sound.
-- Choose what happens if you press the key while the timer runs: restart it, or ignore the key.
-- **Listening: ON/OFF** switches all timer hotkeys on or off. There is also a master volume.
-- "Start listening when the app opens" decides the Listening state each time the app starts: ticked means ON, unticked means OFF (whatever it was when you last closed the app).
+### Barra de contagem regressiva
 
-### Profiles
-- A profile is a full setup: mirrors, timers and countdowns. Use **New**, **Rename**, **Duplicate** and **Delete** on the **Profiles** tab, and **Switch** to change.
-- Set a "Next profile" hotkey in settings (⚙) to switch fast. Settings warns you if a global hotkey clashes with a timer, a countdown or the other global hotkey. A small message shows the new profile name.
-- **Export...** saves a profile to a file. **Import...** loads one. This is how you share a setup with a friend or move to a new PC.
+- Cada espelho pode ter uma barra que diminui durante o período escolhido. Abra a seção **Countdown** no cartão do espelho e marque **Enable countdown**.
+- Escolha uma tecla de atalho. Ela funciona apenas quando o Tibia ou um espelho está ativo, nunca enquanto você digita no TibiaMirror. Se a tecla já estiver em uso, o aplicativo pedirá confirmação.
+- Escolha o lado (esquerda, direita, em cima ou embaixo), o formato (**Full edge** ou **Narrow strip**), a cor e a espessura.
+- A barra acompanha o espelho quando você o move. Pressionar a tecla novamente reinicia a contagem.
+- Ao terminar, a borda pode piscar e um som pode tocar.
 
-## Is this safe / allowed?
+### Temporizadores com som
 
-TibiaMirror only shows a live picture of your Tibia window (the same Windows feature that powers the taskbar previews) and listens for the hotkeys you choose. It never reads or changes the game, never presses keys for you and never blocks your keys.
+- Na aba **Audio Timers**, clique em **＋ Add Timer**. Escolha uma tecla de atalho e uma duração.
+- Pressione a tecla no Tibia para iniciar o temporizador. Quando ele terminar, um som tocará.
+- Use um som incluído no aplicativo ou um arquivo de áudio seu. **Test** reproduz o som.
+- Escolha o que acontece ao pressionar a tecla durante a contagem: reiniciar ou ignorar o comando.
+- **Listening: ON/OFF** ativa ou desativa todas as teclas de atalho dos temporizadores. Também há um controle de volume geral.
+- “Start listening when the app opens” define o estado de **Listening** a cada abertura: marcado inicia em ON; desmarcado inicia em OFF, independentemente do estado ao fechar o aplicativo.
 
-Please follow Tibia's rules and use TibiaMirror at your own risk.
+### Perfis
 
-## FAQ / troubleshooting
+- Um perfil guarda uma configuração completa: espelhos, temporizadores e contagens regressivas. Na aba **Profiles**, use **New**, **Rename**, **Duplicate** e **Delete**; use **Switch** para trocar de perfil.
+- Configure a tecla “Next profile” nas configurações (⚙) para trocar rapidamente. O aplicativo avisa se ela conflitar com outra tecla de atalho e mostra brevemente o nome do novo perfil.
+- **Export...** salva um perfil em um arquivo; **Import...** carrega um arquivo. Assim você pode compartilhar configurações ou transferi-las para outro PC.
 
-**My mirrors are black or missing.**
-Tibia must be running and must not be minimized. Run TibiaMirror and Tibia at the same permission level (both normal, or both as administrator).
+## É seguro? É permitido?
 
-**My hotkeys do not work.**
-Tibia (or one of your mirror windows) must be the active window; TibiaMirror's own window does not count. **Listening** must be ON on the Audio Timers tab. Another program may already use that key, so try a different one. If you see "Hotkeys are unavailable.", click **Retry**.
+O TibiaMirror mostra apenas uma imagem ao vivo da janela do Tibia, usando o mesmo recurso do Windows empregado nas prévias da barra de tarefas, e monitora as teclas de atalho que você escolheu. Ele não lê nem altera o jogo, não pressiona teclas por você e não bloqueia suas teclas.
 
-**I use more than one monitor.**
-Mirrors can sit on any monitor. If a monitor is gone the next time you start the app, its mirrors move to your main monitor.
+Siga as regras do Tibia e use o TibiaMirror por sua conta e risco.
 
-**Where are my settings?**
-In `%APPDATA%\TibiaMirror`. Open the settings (⚙) and click **Open data folder** to get there.
+## Perguntas frequentes e solução de problemas
 
-**How do I move my settings to a new PC?**
-On the Profiles tab, click **Export...** on the old PC and **Import...** on the new one.
+**Meus espelhos estão pretos ou não aparecem.**
 
-**How do I uninstall?**
-Windows Settings → Apps → TibiaMirror → Uninstall. Your settings are kept. Delete the folder `%APPDATA%\TibiaMirror` to remove them too. For the portable version, delete its folder.
+O Tibia precisa estar aberto e não pode estar minimizado. Execute o TibiaMirror e o Tibia com o mesmo nível de permissão: ambos normalmente ou ambos como administrador.
 
-## For developers
+**Minhas teclas de atalho não funcionam.**
 
-You need the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) on Windows.
+O Tibia ou um espelho precisa estar ativo; a janela principal do TibiaMirror não conta. **Listening** precisa estar em ON na aba **Audio Timers**. Outro programa pode estar usando a tecla; tente outra. Se aparecer “Hotkeys are unavailable.”, clique em **Retry**.
+
+**Uso mais de um monitor.**
+
+Os espelhos podem ficar em qualquer monitor. Se um monitor não estiver disponível na próxima abertura, os espelhos dele serão movidos para o monitor principal.
+
+**Onde ficam minhas configurações?**
+
+Em `%APPDATA%\TibiaMirror`. Abra as configurações (⚙) e clique em **Open data folder** para acessar a pasta.
+
+**Como transfiro minhas configurações para outro PC?**
+
+Na aba **Profiles**, clique em **Export...** no PC antigo e em **Import...** no novo.
+
+**Como desinstalo?**
+
+Acesse Configurações do Windows → Aplicativos → TibiaMirror → Desinstalar. Suas configurações são mantidas; exclua `%APPDATA%\TibiaMirror` para removê-las também. Para a versão portátil, exclua a pasta extraída.
+
+## Para desenvolvedores
+
+Você precisa do [SDK do .NET 8](https://dotnet.microsoft.com/download/dotnet/8.0) no Windows.
 
 ```
 dotnet build TibiaMirror.sln -c Debug
@@ -97,28 +107,28 @@ dotnet test tests/TibiaMirror.Tests -c Debug
 dotnet run --project src/TibiaMirror
 ```
 
-Project layout:
+Estrutura do projeto:
 
-- `src/TibiaMirror` — the WPF app (Mirrors, Timers, Countdown, Profiles, Settings, Hotkeys, Detection, Interop).
-- `tests/TibiaMirror.Tests` — unit tests.
-- `installer` — the Inno Setup script.
-- `tools` — helper scripts (`make-icon.ps1` builds the app icon).
-- `docs` — the manual test checklist and design notes.
+- `src/TibiaMirror` — aplicativo WPF (espelhos, temporizadores, contagem regressiva, perfis, configurações, atalhos, detecção e integração com o Windows).
+- `tests/TibiaMirror.Tests` — testes automatizados.
+- `installer` — script do Inno Setup.
+- `tools` — scripts auxiliares (`make-icon.ps1` cria o ícone do aplicativo).
+- `docs` — checklist de testes manuais e notas de design.
 
-To make a release, tag a version and push the tag. GitHub Actions builds, tests and publishes the installer and the portable zip.
+Para criar uma versão, crie uma tag e envie-a ao GitHub. O GitHub Actions compila, testa e publica o instalador e o arquivo ZIP portátil.
 
 ```
 git tag v1.2.3 && git push --tags
 ```
 
-## Contributing
+## Como contribuir
 
-Issues and pull requests are welcome.
+Issues e pull requests são bem-vindos.
 
-- Run `dotnet test tests/TibiaMirror.Tests` before you open a pull request, and add tests for new logic.
-- Clean-room rule: do not copy code or assets from other tools. Write your own code, and keep sounds and images original.
-- Game-safety rule: TibiaMirror must never read or write the game's memory, inject anything into it, send or post input to it, or block keys. Changes that do any of this will not be accepted.
+- Execute `dotnet test tests/TibiaMirror.Tests` antes de abrir um pull request e adicione testes para novas regras de funcionamento.
+- Regra de desenvolvimento independente: não copie código nem recursos de outras ferramentas. Escreva seu próprio código e mantenha sons e imagens originais.
+- Regra de segurança do jogo: o TibiaMirror nunca deve ler nem alterar a memória do jogo, injetar código, enviar comandos de entrada ou bloquear teclas. Mudanças desse tipo não serão aceitas.
 
-## Credits & license
+## Créditos e licença
 
-Released under the MIT license (see `LICENSE`). The sounds are original and synthesized. TibiaMirror is not affiliated with CipSoft. "Tibia" is a trademark of CipSoft GmbH.
+Publicado sob a licença MIT (consulte `LICENSE`). Os sons são originais e sintetizados. O TibiaMirror não é afiliado à CipSoft. “Tibia” é uma marca registrada da CipSoft GmbH.
