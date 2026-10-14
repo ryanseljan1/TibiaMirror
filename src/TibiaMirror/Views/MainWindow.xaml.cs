@@ -14,7 +14,12 @@ public partial class MainWindow : Window
         _host = host;
         _tray = tray;
         InitializeComponent();
+        if (host.Locator is { } locator) ShowTibiaState(locator.State);
+        host.TibiaStateChanged += s => Dispatcher.Invoke(() => ShowTibiaState(s));
     }
+
+    void ShowTibiaState(TibiaMirror.Detection.TibiaState s) => StatusText.Text =
+        !s.IsFound ? "⚪ Waiting for Tibia…" : s.IsMinimized ? "🟡 Tibia minimized" : "🟢 Tibia detected";
 
     protected override void OnClosing(CancelEventArgs e)
     {
