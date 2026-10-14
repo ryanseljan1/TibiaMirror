@@ -1,4 +1,4 @@
-# Generates src/TibiaMirror/Assets/Icons/app.ico (16/32/48/256 px, PNG-compressed frames).
+# Generates src/TibiaMirror/Assets/Icons/app.ico (16/32/48/256 px, 32-bpp DIB frames for 16/32/48, PNG for 256).
 # Run with Windows PowerShell: powershell -File tools/make-icon.ps1
 Add-Type -AssemblyName System.Drawing
 
@@ -29,7 +29,26 @@ function New-Frame([int]$s) {
     $g.FillRectangle((New-Object System.Drawing.SolidBrush $orange), [single]($s * 0.40), [single]($s * 0.40), [single]$w, [single]$h)
     $g.Dispose()
     $ms = New-Object System.IO.MemoryStream
-    $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
+    if ($s -ge 256) {
+        # 256 px frame: PNG-compressed
+        $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
+    } else {
+        # small frames: classic 32-bpp DIB (BITMAPINFOHEADER + bottom-up BGRA pixels + AND mask)
+        $bw2 = New-Object System.IO.BinaryWriter $ms
+        $bw2.Write([uint32]40); $bw2.Write([int32]$s); $bw2.Write([int32]($s * 2))
+        $bw2.Write([uint16]1); $bw2.Write([uint16]32); $bw2.Write([uint32]0)
+        $bw2.Write([uint32]0); $bw2.Write([int32]0); $bw2.Write([int32]0)
+        $bw2.Write([uint32]0); $bw2.Write([uint32]0)
+        for ($y = $s - 1; $y -ge 0; $y--) {
+            for ($x = 0; $x -lt $s; $x++) {
+                $c = $bmp.GetPixel($x, $y)
+                $bw2.Write([byte]$c.B); $bw2.Write([byte]$c.G); $bw2.Write([byte]$c.R); $bw2.Write([byte]$c.A)
+            }
+        }
+        $maskRow = [int]([Math]::Ceiling($s / 32.0) * 4)
+        $bw2.Write((New-Object byte[] ($maskRow * $s)))
+        $bw2.Flush()
+    }
     $bmp.Dispose()
     return ,$ms.ToArray()
 }

@@ -13,10 +13,10 @@ jobs:
         with: { dotnet-version: '8.0.x' }
       - name: Version from tag
         shell: pwsh
-        run: echo "TM_VERSION=$('${{ github.ref_name }}'.TrimStart('v'))" >> $env:GITHUB_ENV
+        run: echo "TM_VERSION=$($env:GITHUB_REF_NAME.TrimStart('v'))" >> $env:GITHUB_ENV
       - run: dotnet test tests/TibiaMirror.Tests -c Release
       - name: Publish
-        run: dotnet publish src/TibiaMirror/TibiaMirror.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:Version=${{ env.TM_VERSION }} -o publish
+        run: dotnet publish src/TibiaMirror/TibiaMirror.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:Version=${{ env.TM_VERSION }} -p:DebugType=None -p:DebugSymbols=false -o publish
       - name: Portable zip
         shell: pwsh
         run: |
