@@ -4,9 +4,11 @@ public class DebouncerTests
 {
     [Fact] public void Many_triggers_run_once_after_delay()
     {
-        int n = 0; using var d = new Debouncer(TimeSpan.FromMilliseconds(100), () => Interlocked.Increment(ref n));
+        using var fired = new ManualResetEventSlim();
+        int n = 0; using var d = new Debouncer(TimeSpan.FromMilliseconds(100), () => { Interlocked.Increment(ref n); fired.Set(); });
         for (int i = 0; i < 5; i++) d.Trigger();
-        Thread.Sleep(400); Assert.Equal(1, n);
+        Assert.True(fired.Wait(TimeSpan.FromSeconds(5)), "Debounced action did not run");
+        Assert.Equal(1, Volatile.Read(ref n));
     }
     [Fact] public void Flush_runs_pending_immediately_and_only_once()
     {
