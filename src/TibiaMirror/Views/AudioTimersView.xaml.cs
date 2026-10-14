@@ -19,15 +19,24 @@ public partial class AudioTimersView : UserControl
     void Add_Click(object sender, RoutedEventArgs e)
     {
         if (Vm is not { } vm) return;
+        var profile = vm.Host.CurrentProfile;
         var dlg = new TimerEditDialog(null, vm.Host.Hotkeys, vm.Service) { Owner = Window.GetWindow(this) };
-        if (dlg.ShowDialog() == true && dlg.Result is { } m) vm.AddTimer(m);
+        if (dlg.ShowDialog() == true && dlg.Result is { } m && SameProfile(profile, vm)) vm.AddTimer(m);
     }
 
     void Edit_Click(object sender, RoutedEventArgs e)
     {
         if (Vm is not { } vm || Card(sender) is not { } card) return;
+        var profile = vm.Host.CurrentProfile;
         var dlg = new TimerEditDialog(card.Model, vm.Host.Hotkeys, vm.Service) { Owner = Window.GetWindow(this) };
-        if (dlg.ShowDialog() == true && dlg.Result is { } m) vm.UpdateTimer(card.Model, m);
+        if (dlg.ShowDialog() == true && dlg.Result is { } m && SameProfile(profile, vm)) vm.UpdateTimer(card.Model, m);
+    }
+
+    static bool SameProfile(TibiaMirror.Models.Profile started, AudioTimersViewModel vm)
+    {
+        if (ReferenceEquals(started, vm.Host.CurrentProfile)) return true;
+        TibiaMirror.Logging.Log.Warn("Profile changed while the timer dialog was open; the edit was discarded.");
+        return false;
     }
 
     void Delete_Click(object sender, RoutedEventArgs e)

@@ -2,7 +2,9 @@
 
 Mirror any part of your Tibia screen anywhere you want — health bars, cooldowns, the minimap — plus audio timers and countdown bars.
 
+<!-- Screenshots are coming. Add docs/images/overview.png, then uncomment:
 ![TibiaMirror overview](docs/images/overview.png)
+-->
 
 ## ⬇ Install (3 steps)
 
@@ -16,7 +18,9 @@ Download `TibiaMirror-Portable-<version>.zip` from the Releases page. Right-clic
 
 ## Quick start: your first mirror
 
+<!-- Screenshots are coming. Add docs/images/add-region.gif, then uncomment:
 ![Adding a region](docs/images/add-region.gif)
+-->
 
 1. Start Tibia and wait until the dot in TibiaMirror is green.
 2. On the **Mirrors** tab, click **＋ Add Region**.
@@ -32,11 +36,11 @@ Download `TibiaMirror-Portable-<version>.zip` from the Releases page. Right-clic
 - **Lock** makes a mirror click-through. **Lock all** locks every mirror at once.
 - The eye button shows or hides one mirror, and the pencil renames it. **Delete** removes it. The Opacity slider makes a mirror see-through.
 - **Show/Hide all** turns every mirror on or off. You can also set a hotkey for it in settings (⚙).
-- Tick "Only show mirrors while Tibia is focused" in settings (⚙) to hide mirrors when you switch to another program.
+- Tick "Only show mirrors while Tibia is focused" in settings (⚙) to hide mirrors when you switch to another program. Tibia or one of your mirror windows being active counts as focused; TibiaMirror's own main window, dialogs and settings do not.
 
 ### Countdown bar
 - Each mirror can have a bar that shrinks over a time you choose. Open the **Countdown** section on the mirror's card and tick **Enable countdown**.
-- Pick a hotkey. It only works while Tibia is the active window.
+- Pick a hotkey. It only works while Tibia (or one of your mirror windows) is the active window, never while you type in TibiaMirror itself. If the key is already used by a timer, a countdown or a global hotkey, you are asked before it is accepted.
 - Choose the side (left, right, top, bottom), the shape (**Full edge** or **Narrow strip**), the color and the thickness.
 - The bar follows the mirror when you move it. Pressing the key again restarts it.
 - When time is up, the border can flash and a sound can play.
@@ -47,10 +51,11 @@ Download `TibiaMirror-Portable-<version>.zip` from the Releases page. Right-clic
 - Use a built-in sound or your own audio file. **Test** plays the sound.
 - Choose what happens if you press the key while the timer runs: restart it, or ignore the key.
 - **Listening: ON/OFF** switches all timer hotkeys on or off. There is also a master volume.
+- "Start listening when the app opens" decides the Listening state each time the app starts: ticked means ON, unticked means OFF (whatever it was when you last closed the app).
 
 ### Profiles
 - A profile is a full setup: mirrors, timers and countdowns. Use **New**, **Rename**, **Duplicate** and **Delete** on the **Profiles** tab, and **Switch** to change.
-- Set a "Next profile" hotkey in settings (⚙) to switch fast. A small message shows the new profile name.
+- Set a "Next profile" hotkey in settings (⚙) to switch fast. Settings warns you if a global hotkey clashes with a timer, a countdown or the other global hotkey. A small message shows the new profile name.
 - **Export...** saves a profile to a file. **Import...** loads one. This is how you share a setup with a friend or move to a new PC.
 
 ## Is this safe / allowed?
@@ -65,7 +70,7 @@ Please follow Tibia's rules and use TibiaMirror at your own risk.
 Tibia must be running and must not be minimized. Run TibiaMirror and Tibia at the same permission level (both normal, or both as administrator).
 
 **My hotkeys do not work.**
-Tibia must be the active window. **Listening** must be ON on the Audio Timers tab. Another program may already use that key, so try a different one. If you see "Hotkeys are unavailable.", click **Retry**.
+Tibia (or one of your mirror windows) must be the active window; TibiaMirror's own window does not count. **Listening** must be ON on the Audio Timers tab. Another program may already use that key, so try a different one. If you see "Hotkeys are unavailable.", click **Retry**.
 
 **I use more than one monitor.**
 Mirrors can sit on any monitor. If a monitor is gone the next time you start the app, its mirrors move to your main monitor.
@@ -103,6 +108,14 @@ To make a release, tag a version and push the tag. GitHub Actions builds, tests 
 git tag v1.2.3 && git push --tags
 ```
 
+## Contributing
+
+Issues and pull requests are welcome.
+
+- Run `dotnet test tests/TibiaMirror.Tests` before you open a pull request, and add tests for new logic.
+- Clean-room rule: do not copy code or assets from other tools. Write your own code, and keep sounds and images original.
+- Game-safety rule: TibiaMirror must never read or write the game's memory, inject anything into it, send or post input to it, or block keys. Changes that do any of this will not be accepted.
+
 ## Credits & license
 
-Released under the MIT license (see `LICENSE`). The sounds are original and synthesized. TibiaMirror is not affiliated with CipSoft or TibiaVision. "Tibia" is a trademark of CipSoft GmbH.
+Released under the MIT license (see `LICENSE`). The sounds are original and synthesized. TibiaMirror is not affiliated with CipSoft. "Tibia" is a trademark of CipSoft GmbH.

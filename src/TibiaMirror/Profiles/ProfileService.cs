@@ -12,15 +12,23 @@ public sealed class ProfileService(AppPaths paths)
 
     public void LoadInitial()
     {
-        string? last = null;
-        try { if (File.Exists(paths.LastProfileFile)) last = File.ReadAllText(paths.LastProfileFile).Trim(); }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
-        var names = List();
-        var pick = names.FirstOrDefault(n => string.Equals(n, last, StringComparison.OrdinalIgnoreCase))
-                   ?? names.FirstOrDefault() ?? "Default";
-        Current = LoadProfile(pick);
-        JsonStore.Save(paths.ProfileFile(Current.Name), Current);   // creates Default on first run
-        WriteLast();
+        try
+        {
+            string? last = null;
+            try { if (File.Exists(paths.LastProfileFile)) last = File.ReadAllText(paths.LastProfileFile).Trim(); }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+            var names = List();
+            var pick = names.FirstOrDefault(n => string.Equals(n, last, StringComparison.OrdinalIgnoreCase))
+                       ?? names.FirstOrDefault() ?? "Default";
+            Current = LoadProfile(pick);
+            JsonStore.Save(paths.ProfileFile(Current.Name), Current);   // creates Default on first run
+            WriteLast();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            _loadFailed = true;   // any failed startup IO leaves Current untrusted; autosave must not overwrite a healthy file
+            throw;
+        }
     }
 
     public IReadOnlyList<string> List()
@@ -31,7 +39,13 @@ public sealed class ProfileService(AppPaths paths)
             .OrderBy(n => n, StringComparer.OrdinalIgnoreCase).ToList();
     }
 
-    public void SaveCurrent() => JsonStore.Save(paths.ProfileFile(Current.Name), Current);
+    bool _loadFailed;   // startup read failed: Current is a placeholder and must not overwrite the real file
+
+    public void SaveCurrent()
+    {
+        if (_loadFailed) return;
+        JsonStore.Save(paths.ProfileFile(Current.Name), Current);
+    }
 
     public Profile Create(string name)
     {
@@ -50,6 +64,7 @@ public sealed class ProfileService(AppPaths paths)
         var loaded = LoadProfile(src);
         var copy = JsonSerializer.Deserialize<Profile>(JsonSerializer.Serialize(loaded, JsonStore.Options), JsonStore.Options)!;
         copy.Name = newName;
+        copy.SchemaVersion = SchemaInfo.Current;   // the copy is a new file written by this version
         foreach (var r in copy.Regions) r.Id = Guid.NewGuid();
         foreach (var t in copy.Timers) t.Id = Guid.NewGuid();
         JsonStore.Save(paths.ProfileFile(newName), copy);
@@ -109,9 +124,10 @@ public sealed class ProfileService(AppPaths paths)
     {
         Profile? p;
         try { p = JsonSerializer.Deserialize<Profile>(File.ReadAllText(jsonPath), JsonStore.Options); }
-        catch (JsonException) { p = null; }
+        catch (Exception e) when (e is JsonException or NotSupportedException) { p = null; }
         if (p is null) throw new ArgumentException("That file isn't a valid TibiaMirror profile.");
-        Normalize(p);
+        if (SchemaInfo.IsNewer(p)) throw new ArgumentException("That profile was made by a newer version of TibiaMirror. Please update the app to import it.");
+        ProfileNormalizer.Normalize(p);
         var name = (string.IsNullOrWhiteSpace(p.Name) ? Path.GetFileNameWithoutExtension(jsonPath) : p.Name).Trim();
         var existing = List();
         var err = ProfileNameRules.Validate(name, Array.Empty<string>());
@@ -151,6 +167,7 @@ public sealed class ProfileService(AppPaths paths)
     Profile MakeCurrent(Profile p)
     {
         Current = p;
+        _loadFailed = false;
         WriteLast();
         CurrentChanged?.Invoke(p);
         return p;
@@ -163,13 +180,13 @@ public sealed class ProfileService(AppPaths paths)
         { TibiaMirror.Logging.Log.Error("Could not write last_profile", e); }
     }
 
-    static void Normalize(Profile p) { p.Regions ??= new(); p.Timers ??= new(); }
-
     Profile LoadProfile(string name)
     {
         var r = JsonStore.Load(paths.ProfileFile(name), () => new Profile { Name = name });
         r.Value.Name = name;
-        Normalize(r.Value);
+        ProfileNormalizer.Normalize(r.Value);
+        if (SchemaInfo.IsNewer(r.Value))
+            Notice?.Invoke($"Profile '{name}' was made by a newer version of TibiaMirror. You can use it, but changes to it will not be saved.");
         if (r.Status == LoadStatus.RestoredFromBackup)
             Notice?.Invoke($"Profile '{name}' was damaged and has been restored from its backup.");
         else if (r.Status == LoadStatus.Corrupt)

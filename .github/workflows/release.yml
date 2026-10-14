@@ -11,12 +11,32 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with: { dotnet-version: '8.0.x' }
-      - name: Version from tag
+      - name: Validate tag and set version
         shell: pwsh
-        run: echo "TM_VERSION=$($env:GITHUB_REF_NAME.TrimStart('v'))" >> $env:GITHUB_ENV
+        run: |
+          if ($env:GITHUB_REF_NAME -notmatch '^v\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$') { throw "Tag '$env:GITHUB_REF_NAME' is not a valid version tag (expected vMAJOR.MINOR.PATCH or vMAJOR.MINOR.PATCH-suffix)." }
+          "TM_VERSION=$($env:GITHUB_REF_NAME.Substring(1))" >> $env:GITHUB_ENV
+      - name: Release notes from CHANGELOG
+        shell: pwsh
+        run: |
+          # v0.1.0-rc.1 uses the [0.1.0] section: strip any -suffix from the version
+          $base = ($env:TM_VERSION -split '-')[0]
+          $header = '^##\s+\[' + [regex]::Escape($base) + '\]'
+          $notes = New-Object System.Collections.Generic.List[string]
+          $inside = $false
+          foreach ($line in Get-Content CHANGELOG.md) {
+            if ($inside -and $line -match '^##\s+\[') { break }
+            if ($line -match $header) { $inside = $true; continue }
+            if ($inside) { $notes.Add($line) }
+          }
+          if (-not $inside) { throw "CHANGELOG.md has no '## [$base]' section." }
+          $text = ($notes -join "`n").Trim()
+          if ($text.Length -eq 0) { throw "The '## [$base]' section of CHANGELOG.md is empty." }
+          Set-Content -Path release-notes.md -Value $text -Encoding utf8
       - run: dotnet test tests/TibiaMirror.Tests -c Release
       - name: Publish
-        run: dotnet publish src/TibiaMirror/TibiaMirror.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:Version=${{ env.TM_VERSION }} -p:DebugType=None -p:DebugSymbols=false -o publish
+        shell: pwsh
+        run: dotnet publish src/TibiaMirror/TibiaMirror.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true "-p:Version=$env:TM_VERSION" -p:DebugType=None -p:DebugSymbols=false -o publish
       - name: Portable zip
         shell: pwsh
         run: |
@@ -30,4 +50,5 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: artifacts/*
-          generate_release_notes: true
+          body_path: release-notes.md
+          prerelease: ${{ contains(github.ref_name, '-') }}

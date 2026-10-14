@@ -1,6 +1,6 @@
 namespace TibiaMirror.Models;
 
-public sealed class Profile
+public sealed class Profile : TibiaMirror.Persistence.IVersioned
 {
     public int SchemaVersion { get; set; } = 1;
     public string Name { get; set; } = "Default";

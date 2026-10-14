@@ -17,11 +17,14 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
         _registrations = new TimerHotkeyRegistrations(host.Hotkeys, id => service.Trigger(id));
         host.ProfileChanged += OnProfileChanged;
         host.HotkeysReady += OnHotkeysReady;
-        // StartListeningOnOpen applies once, to the profile active at startup.
+        // StartListeningOnOpen applies once, to the profile active at startup (it can also turn listening off).
         var p = host.CurrentProfile;
-        if (p.StartListeningOnOpen) p.IsListening = true;
+        ApplyStartupListening(p);
         LoadProfile(p);
     }
+
+    /// <summary>Startup only (not on profile switch): listening follows StartListeningOnOpen, on or off.</summary>
+    public static void ApplyStartupListening(Profile p) => p.IsListening = p.StartListeningOnOpen;
 
     public ObservableCollection<AudioTimerCardViewModel> Cards { get; } = new();
     public AppHost Host => _host;

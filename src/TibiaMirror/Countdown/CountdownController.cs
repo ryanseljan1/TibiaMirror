@@ -57,7 +57,7 @@ public sealed class CountdownController : IDisposable
     void OnCardCreated(MirrorCardViewModel card)
     {
         if (Find(card.Id) is not { } region) return;
-        card.CountdownEditor = new CountdownEditor(region, _host.Hotkeys,() => OnEdited(region));
+        card.CountdownEditor = new CountdownEditor(region, _host.Hotkeys, () => OnEdited(region), _host.Sounds.CanPlay);
     }
 
     /// <summary>Called after the profile's mirrors were reloaded: stops the previous profile's countdowns and re-registers hotkeys.</summary>

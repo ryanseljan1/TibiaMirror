@@ -22,13 +22,14 @@ public partial class CountdownEditor : UserControl
     readonly CountdownSettings _s;
     readonly HotkeyService? _hotkeys;
     readonly Action _changed;
+    readonly Func<string, bool>? _canPlay;
     SoundChoice? _lastChoice;
     bool _loading = true, _revert;
 
-    public CountdownEditor(RegionModel region, HotkeyService? hotkeys, Action changed)
+    public CountdownEditor(RegionModel region, HotkeyService? hotkeys, Action changed, Func<string, bool>? canPlay = null)
     {
         InitializeComponent();
-        _region = region; _s = region.Countdown; _hotkeys = hotkeys; _changed = changed;
+        _region = region; _s = region.Countdown; _hotkeys = hotkeys; _changed = changed; _canPlay = canPlay;
         foreach (var side in Enum.GetValues<BarSide>()) SideBox.Items.Add(side);
         foreach (var hex in Swatches)
         {
@@ -124,6 +125,13 @@ public partial class CountdownEditor : UserControl
         Notify();
     }
 
+    void UpdateSoundWarning()
+    {
+        var text = _canPlay is null ? "" : CountdownSoundWarning.For(_s.Sound, _canPlay);
+        SoundWarning.Text = text;
+        SoundWarning.Visibility = text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     void SelectSound(string? id)
     {
         SoundChoice? found = string.IsNullOrEmpty(id)
@@ -138,6 +146,7 @@ public partial class CountdownEditor : UserControl
         SoundBox.SelectedItem = found;
         _revert = false;
         _lastChoice = found;
+        UpdateSoundWarning();
     }
 
     void SoundBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -151,6 +160,7 @@ public partial class CountdownEditor : UserControl
         }
         _lastChoice = c;
         _s.Sound = c.Id;
+        UpdateSoundWarning();
         Notify();
     }
 }

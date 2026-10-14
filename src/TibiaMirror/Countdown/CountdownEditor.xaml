@@ -24,5 +24,6 @@
         <CheckBox x:Name="FlashBox" Content="Flash border when done" Margin="0,6,0,0" Checked="Changed" Unchecked="Changed"/>
         <TextBlock Text="Sound when done" Margin="0,6,0,0"/>
         <ComboBox x:Name="SoundBox" DisplayMemberPath="Name" Margin="0,2,0,4" SelectionChanged="SoundBox_SelectionChanged"/>
+        <TextBlock x:Name="SoundWarning" Foreground="DarkOrange" TextWrapping="Wrap" Visibility="Collapsed"/>
     </StackPanel>
 </UserControl>

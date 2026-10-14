@@ -16,7 +16,7 @@ public sealed class TibiaLocator(IWindowEnumerator windows, Func<AppSettings> se
             && string.Equals(w.ProcessName, s.TibiaProcessName, StringComparison.OrdinalIgnoreCase)
             && w.Title.StartsWith(s.TibiaTitlePrefix, StringComparison.Ordinal));
         var fg = windows.GetForegroundWindow();
-        var focused = match is not null && (fg == match.Handle || isOwnWindow(fg));
+        var focused = FocusRule.IsFocused(fg, match?.Handle, isOwnWindow);
         var next = new TibiaState(match, focused);
         if (next == State) return;
         State = next;

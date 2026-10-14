@@ -46,6 +46,7 @@ public partial class MirrorWindow : Window
     }
 
     public Guid RegionId => _region.Id;
+    public nint Handle => _hwnd;
     public bool IsShown => IsVisible;
     public PixelRect Bounds => WindowStyles.GetBoundsPhysical(_hwnd);
     /// <summary>Raised on move/resize/show/hide.</summary>

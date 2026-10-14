@@ -1,6 +1,6 @@
 namespace TibiaMirror.Models;
 
-public sealed class AppSettings
+public sealed class AppSettings : TibiaMirror.Persistence.IVersioned
 {
     public int SchemaVersion { get; set; } = 1;
     public Hotkey? ShowHideAllHotkey { get; set; }

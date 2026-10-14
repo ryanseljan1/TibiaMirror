@@ -20,6 +20,7 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
+AppMutex=Local\TibiaMirror.SingleInstance
 CloseApplications=yes
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; Flags: unchecked
@@ -29,6 +30,6 @@ Source: "..\publish\*"; DestDir: "{app}"; Flags: recursesubdirs ignoreversion
 [Icons]
 Name: "{group}\TibiaMirror"; Filename: "{app}\TibiaMirror.exe"
 Name: "{autodesktop}\TibiaMirror"; Filename: "{app}\TibiaMirror.exe"; Tasks: desktopicon
-Name: "{userstartup}\TibiaMirror"; Filename: "{app}\TibiaMirror.exe"; Tasks: startup
+Name: "{autostartup}\TibiaMirror"; Filename: "{app}\TibiaMirror.exe"; Tasks: startup
 [Run]
 Filename: "{app}\TibiaMirror.exe"; Description: "Launch TibiaMirror"; Flags: nowait postinstall skipifsilent

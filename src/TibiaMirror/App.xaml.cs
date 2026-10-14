@@ -53,8 +53,9 @@ public partial class App : Application
         _tray.ToggleMirrorsRequested += _host.RequestToggleMirrors;
         _tray.ExitRequested += ExitApp;
         _single.ListenForShowRequests(() => Dispatcher.Invoke(ShowMain));
-        _host.Start();
-        ShowMain();
+        try { _host.Start(); }
+        catch (Exception ex) { Log.Error("Startup failed", ex); }   // still show the window so the user is not left with a tray-only app
+        finally { ShowMain(); }
     }
 
     static void ShowCrashMessage(AppPaths paths) =>

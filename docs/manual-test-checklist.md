@@ -21,8 +21,10 @@ Run this against real Tibia before each release. Tick every box. Items marked (k
 - [ ] Rename and delete a mirror. Re-crop a mirror. Use the eye button to hide and show one mirror.
 - [ ] Opacity slider changes the mirror transparency.
 - [ ] Show/Hide all works from the button and from its hotkey (key).
-- [ ] "Only show mirrors while Tibia is focused" hides mirrors when you alt-tab away.
+- [ ] "Only show mirrors while Tibia is focused" hides mirrors when you alt-tab to the app or another program; Tibia and a mirror window count as focused.
+- [ ] A timer or countdown hotkey works immediately after focusing Tibia, and does nothing immediately after focusing TibiaMirror's main window, settings or a dialog (key).
 - [ ] Settings window: empty process name or title prefix is rejected, Save works, "Open data folder" opens the folder.
+- [ ] Assign either global hotkey to a timer, countdown or the other global hotkey: Settings names the conflict and lets you decline it (key).
 - [ ] The "Hotkeys are unavailable." banner appears when hotkeys cannot start. Retry restores them, including audio-timer and countdown hotkeys.
 
 ## Multi-monitor & DPI
@@ -45,10 +47,12 @@ Run this against real Tibia before each release. Tick every box. Items marked (k
 - [ ] Timer finishes and plays its sound; pressing the key again restarts it or is ignored, per its setting.
 - [ ] Listening OFF: hotkeys do nothing and running timers are cancelled. Listening ON: they work again.
 - [ ] "Start listening when the app opens" is respected after restart.
+- [ ] With Listening ON, untick "Start listening when the app opens" and restart: Listening starts OFF. Switching profiles during a session preserves each profile's current Listening state.
 - [ ] Custom mp3 sound plays. A missing mp3 shows a warning and plays the Chime.
 - [ ] Test button plays the sound. Master and per-timer volume work.
 - [ ] HotkeyBox: alt-tab while capturing cancels cleanly.
 - [ ] Assigning a key already in use shows the conflict prompt.
+- [ ] Switch profiles while a timer edit dialog is open, then confirm: the result does not modify either profile.
 
 ## Countdown bar
 - [ ] Each side (left, right, top, bottom) with both shapes (Full edge, Narrow strip) draws correctly.
@@ -59,6 +63,8 @@ Run this against real Tibia before each release. Tick every box. Items marked (k
 - [ ] Tibia not focused: the countdown hotkey is ignored.
 - [ ] Switching profile closes the bars.
 - [ ] Deleting a mirror during a countdown removes its bar.
+- [ ] Choose a missing custom countdown sound: the editor shows a warning and playback falls back to Chime.
+- [ ] Switch profiles while the Add Region or Re-crop selector is open: confirming the selection does not modify the new profile.
 
 ## Persistence
 - [ ] Close and restart the app: mirrors, timers, profiles and settings are restored.

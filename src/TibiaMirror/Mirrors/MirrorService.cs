@@ -12,6 +12,8 @@ public sealed class MirrorService : IDisposable
     readonly Func<AppSettings> _settings;
     readonly Action _onChanged;
     readonly Dictionary<Guid, MirrorWindow> _windows = new();
+    readonly HashSet<nint> _handles = new();
+    readonly object _handlesGate = new();
     Profile _profile = new();
     bool _allHidden;
 
@@ -42,6 +44,9 @@ public sealed class MirrorService : IDisposable
         RefreshAll();
     }
 
+    /// <summary>True if <paramref name="hwnd"/> is one of our mirror windows. O(1) and thread-safe (used from the hotkey focus gate).</summary>
+    public bool IsMirrorWindow(nint hwnd) { lock (_handlesGate) return _handles.Contains(hwnd); }
+
     void OnTibiaState(TibiaState s) => RefreshAll();
 
     /// <summary>Re-applies visibility for the current Tibia state and settings.</summary>
@@ -61,6 +66,7 @@ public sealed class MirrorService : IDisposable
         var w = new MirrorWindow(r, _onChanged);
         w.LayoutChanged += () => MirrorLayoutChanged?.Invoke(r.Id, w.Bounds, w.IsShown);
         _windows[r.Id] = w;
+        lock (_handlesGate) _handles.Add(w.Handle);
         Refresh(w);
     }
 
@@ -68,6 +74,7 @@ public sealed class MirrorService : IDisposable
     {
         foreach (var w in _windows.Values) w.CloseForReal();
         _windows.Clear();
+        lock (_handlesGate) _handles.Clear();
     }
 
     RegionModel? Find(Guid id) => _profile.Regions.FirstOrDefault(r => r.Id == id);
@@ -82,14 +89,20 @@ public sealed class MirrorService : IDisposable
             return null;
         }
         _selecting = true;
+        var startProfile = _profile;   // the profile can change (Next-profile hotkey) while the selector is open
         PixelRect? crop;
         try { crop = await RegionSelectorWindow.SelectAsync(state); }
         finally { _selecting = false; }
         if (crop is not { } c) return null;
+        if (!ReferenceEquals(startProfile, _profile))
+        {
+            TibiaMirror.Logging.Log.Warn("Profile changed while selecting a region; the new region was discarded.");
+            return null;
+        }
         var client = _locator.State.Window?.ClientBounds ?? state.Window!.ClientBounds;
         var region = new RegionModel
         {
-            Name = "Region " + (_profile.Regions.Count + 1),
+            Name = RegionNaming.NextName(_profile.Regions.Select(x => x.Name)),
             Crop = c,
             Mirror = PlaceMirror(c, client),
         };
@@ -115,9 +128,15 @@ public sealed class MirrorService : IDisposable
             return;
         }
         _selecting = true;
+        var startProfile = _profile;
         PixelRect? crop;
         try { crop = await RegionSelectorWindow.SelectAsync(state); }
         finally { _selecting = false; }
+        if (!ReferenceEquals(startProfile, _profile))
+        {
+            TibiaMirror.Logging.Log.Warn("Profile changed while re-cropping a region; the selection was discarded.");
+            return;
+        }
         if (crop is not { } c || !_windows.TryGetValue(id, out var w)) return;
         region.Crop = c;
         // keep the mirror's position, adopt the new crop's size at 1:1
@@ -131,7 +150,7 @@ public sealed class MirrorService : IDisposable
 
     public void Remove(Guid id)
     {
-        if (_windows.Remove(id, out var w)) w.CloseForReal();
+        if (_windows.Remove(id, out var w)) { lock (_handlesGate) _handles.Remove(w.Handle); w.CloseForReal(); }
         _profile.Regions.RemoveAll(r => r.Id == id);
         RegionRemoved?.Invoke(id);
         _onChanged();

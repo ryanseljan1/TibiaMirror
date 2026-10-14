@@ -75,6 +75,8 @@ public sealed class AppHost : IDisposable
     // --- Task 8: profiles ---
     public TibiaMirror.Profiles.ProfileService? Profiles { get; private set; }
     IDisposable? _profileHotkeyReg;
+    public TibiaMirror.Hotkeys.GlobalHotkeyOwner ShowHideOwner { get; } = new("Show/Hide all mirrors");
+    public TibiaMirror.Hotkeys.GlobalHotkeyOwner NextProfileOwner { get; } = new("Next profile");
     readonly List<string> _pendingNotices = new();
     bool _noticesReady;
 
@@ -83,7 +85,7 @@ public sealed class AppHost : IDisposable
         _profileHotkeyReg?.Dispose();
         _profileHotkeyReg = null;
         if (Settings.NextProfileHotkey is { } hk && Hotkeys != null)
-            _profileHotkeyReg = Hotkeys.Register(this, hk, TibiaMirror.Hotkeys.HotkeyScope.Global, () =>
+            _profileHotkeyReg = Hotkeys.Register(NextProfileOwner, hk, TibiaMirror.Hotkeys.HotkeyScope.Global, () =>
             {
                 try { Profiles?.SwitchNext(); }
                 catch (Exception e) { TibiaMirror.Logging.Log.Error("Next-profile hotkey failed", e); }
@@ -120,7 +122,7 @@ public sealed class AppHost : IDisposable
         _mirrorHotkey?.Dispose();
         _mirrorHotkey = null;
         if (Hotkeys is not null && Settings.ShowHideAllHotkey is { } hk)
-            _mirrorHotkey = Hotkeys.Register(this, hk, TibiaMirror.Hotkeys.HotkeyScope.Global, RequestToggleMirrors);
+            _mirrorHotkey = Hotkeys.Register(ShowHideOwner, hk, TibiaMirror.Hotkeys.HotkeyScope.Global, RequestToggleMirrors);
     }
     public Func<bool> IsTibiaFocused { get; set; } = () => false;
     public TibiaMirror.Hotkeys.KeyboardHook? Keyboard { get; private set; }
@@ -151,9 +153,9 @@ public sealed class AppHost : IDisposable
         System.Windows.Application.Current.Dispatcher.BeginInvoke(FlushNotices, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         var enumerator = new Win32WindowEnumerator();
-        var locator = Locator = new TibiaLocator(enumerator, () => Settings, h => enumerator.GetWindowProcessId(h) == Environment.ProcessId);
+        var locator = Locator = new TibiaLocator(enumerator, () => Settings, h => Mirrors?.IsMirrorWindow(h) == true);
         locator.StateChanged += s => TibiaStateChanged?.Invoke(s);
-        IsTibiaFocused = () => locator.State.IsFocused;
+        IsTibiaFocused = () => FocusRule.IsFocused(NativeMethods.GetForegroundWindow(), locator.State.Window?.Handle, h => Mirrors?.IsMirrorWindow(h) == true);   // live foreground, O(1)
         _locatorTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
         _locatorTimer.Tick += (_, _) => locator.Poll();
         _locatorTimer.Start();
