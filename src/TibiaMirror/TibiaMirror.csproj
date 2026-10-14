@@ -7,6 +7,7 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\Icons\app.ico</ApplicationIcon>
     <AssemblyName>TibiaMirror</AssemblyName>
     <RootNamespace>TibiaMirror</RootNamespace>
     <NoWarn>$(NoWarn);WFAC010</NoWarn>
@@ -15,6 +16,9 @@
     <Using Remove="System.Windows.Forms" />
     <Using Remove="System.Drawing" />
     <Using Include="System.IO" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Icons\app.ico" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="TibiaMirror.Tests" />

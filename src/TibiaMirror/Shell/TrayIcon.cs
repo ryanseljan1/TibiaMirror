@@ -17,12 +17,30 @@ public sealed class TrayIcon : IDisposable
         _menu.Items.Add("Exit", null, (_, _) => ExitRequested?.Invoke());
         _icon = new WinForms.NotifyIcon
         {
-            Icon = System.Drawing.SystemIcons.Application, // real icon arrives in Task 12
+            Icon = LoadAppIcon(),
             Text = AppInfo.Name,
             ContextMenuStrip = _menu,
             Visible = true,
         };
         _icon.DoubleClick += (_, _) => ShowRequested?.Invoke();
+    }
+
+    static System.Drawing.Icon LoadAppIcon()
+    {
+        try
+        {
+            var info = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Assets/Icons/app.ico"));
+            if (info != null)
+            {
+                using var stream = info.Stream;
+                return new System.Drawing.Icon(stream);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logging.Log.Warn($"Could not load app icon: {ex.Message}");
+        }
+        return System.Drawing.SystemIcons.Application;
     }
 
     public void ShowBalloon(string title, string text) =>
