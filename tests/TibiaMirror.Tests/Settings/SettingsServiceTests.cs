@@ -18,6 +18,17 @@ public class SettingsServiceTests : IDisposable
         var s2 = new SettingsService(new AppPaths(_root)); s2.Load();
         Assert.Equal(new Hotkey(0x7B, HotkeyModifiers.Ctrl), s2.Current.ShowHideAllHotkey); Assert.True(s2.Current.OnlyShowWhenTibiaFocused);
     }
+
+    [Fact] public void Dark_mode_choice_survives_settings_load_and_save()
+    {
+        var paths = new AppPaths(_root);
+        File.WriteAllText(paths.SettingsFile, "{ \"DarkMode\": true }");
+        var settings = new SettingsService(paths);
+        settings.Load();
+        settings.Save();
+        using var json = System.Text.Json.JsonDocument.Parse(File.ReadAllText(paths.SettingsFile));
+        Assert.True(json.RootElement.GetProperty("DarkMode").GetBoolean());
+    }
 }
 
 public class RestoreClampTests

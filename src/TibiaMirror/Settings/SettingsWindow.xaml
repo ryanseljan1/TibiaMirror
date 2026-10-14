@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:TibiaMirror.Controls"
         Title="Settings" Width="440" SizeToContent="Height" ResizeMode="NoResize"
-        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Style="{StaticResource AppWindowStyle}">
     <StackPanel Margin="16">
         <Grid>
             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -14,6 +14,7 @@
             <controls:HotkeyBox Grid.Row="1" Grid.Column="1" x:Name="NextProfileBox" HorizontalAlignment="Left" Margin="0,0,0,8"/>
         </Grid>
         <CheckBox x:Name="OnlyFocusedCheck" Content="Only show mirrors while Tibia is focused" Margin="0,4,0,12"/>
+        <CheckBox x:Name="DarkModeCheck" Content="Dark mode" Margin="0,0,0,12"/>
         <Expander Header="Advanced">
             <StackPanel Margin="0,8,0,0">
                 <TextBlock Text="Tibia process name (without .exe)"/>
@@ -23,13 +24,13 @@
                 <Button x:Name="OpenFolderButton" Content="Open data folder" HorizontalAlignment="Left" Padding="8,2"/>
             </StackPanel>
         </Expander>
-        <TextBlock x:Name="ErrorText" Foreground="#B00020" Margin="0,8,0,0" TextWrapping="Wrap" Visibility="Collapsed"/>
+        <TextBlock x:Name="ErrorText" Foreground="{DynamicResource ThemeErrorBrush}" Margin="0,8,0,0" TextWrapping="Wrap" Visibility="Collapsed"/>
         <DockPanel Margin="0,16,0,0">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                 <Button x:Name="SaveButton" Content="Save" IsDefault="True" Width="72" Margin="0,0,8,0"/>
                 <Button Content="Cancel" IsCancel="True" Width="72"/>
             </StackPanel>
-            <TextBlock x:Name="VersionText" VerticalAlignment="Center" Foreground="Gray"/>
+            <TextBlock x:Name="VersionText" VerticalAlignment="Center" Foreground="{DynamicResource ThemeMutedBrush}"/>
         </DockPanel>
     </StackPanel>
 </Window>

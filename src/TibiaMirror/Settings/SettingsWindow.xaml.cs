@@ -17,6 +17,7 @@ public partial class SettingsWindow : Window
         ShowHideBox.Hotkey = s.ShowHideAllHotkey;
         NextProfileBox.Hotkey = s.NextProfileHotkey;
         OnlyFocusedCheck.IsChecked = s.OnlyShowWhenTibiaFocused;
+        DarkModeCheck.IsChecked = s.DarkMode;
         ProcessBox.Text = s.TibiaProcessName;
         TitleBox.Text = s.TibiaTitlePrefix;
         VersionText.Text = "Version " + AppInfo.Version;
@@ -81,6 +82,7 @@ public partial class SettingsWindow : Window
         s.ShowHideAllHotkey = ShowHideBox.Hotkey;
         s.NextProfileHotkey = NextProfileBox.Hotkey;
         s.OnlyShowWhenTibiaFocused = OnlyFocusedCheck.IsChecked == true;
+        s.DarkMode = DarkModeCheck.IsChecked == true;
         s.TibiaProcessName = ProcessBox.Text.Trim();
         s.TibiaTitlePrefix = TitleBox.Text.Trim();
         try { _host.SettingsService?.Save(); }

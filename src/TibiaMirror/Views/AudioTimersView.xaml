@@ -11,12 +11,13 @@
                 <ToggleButton x:Name="ListenToggle" IsChecked="{Binding IsListening, Mode=TwoWay}" HorizontalAlignment="Left"
                               FontSize="16" FontWeight="Bold" Padding="16,6" MinWidth="130">
                     <ToggleButton.Style>
-                        <Style TargetType="ToggleButton">
+                        <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
                             <Setter Property="Content" Value="Listening: OFF"/>
                             <Style.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter Property="Content" Value="Listening: ON"/>
                                     <Setter Property="Background" Value="#FF9BE39B"/>
+                                    <Setter Property="Foreground" Value="#FF183018"/>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
@@ -31,12 +32,12 @@
             </DockPanel>
         </StackPanel>
         <TextBlock DockPanel.Dock="Top" Text="No timers yet. Click Add Timer, pick a key and a duration."
-                   Visibility="{Binding IsEmpty, Converter={StaticResource B2V}}" Foreground="Gray" Margin="0,16,0,0" TextWrapping="Wrap"/>
+                   Visibility="{Binding IsEmpty, Converter={StaticResource B2V}}" Foreground="{DynamicResource ThemeMutedBrush}" Margin="0,16,0,0" TextWrapping="Wrap"/>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Cards}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,6">
+                        <Border BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,6">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>

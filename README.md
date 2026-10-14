@@ -37,6 +37,7 @@ Download `TibiaMirror-Portable-<version>.zip` from the Releases page. Right-clic
 - The eye button shows or hides one mirror, and the pencil renames it. **Delete** removes it. The Opacity slider makes a mirror see-through.
 - **Show/Hide all** turns every mirror on or off. You can also set a hotkey for it in settings (⚙).
 - Tick "Only show mirrors while Tibia is focused" in settings (⚙) to hide mirrors when you switch to another program. Tibia or one of your mirror windows being active counts as focused; TibiaMirror's own main window, dialogs and settings do not.
+- Tick **Dark mode** in settings (⚙) and click **Save** to change the app theme. Your choice is restored when the app opens again.
 
 ### Countdown bar
 - Each mirror can have a bar that shrinks over a time you choose. Open the **Countdown** section on the mirror's card and tick **Enable countdown**.

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:TibiaMirror.Controls"
         Title="Audio timer" Width="400" SizeToContent="Height" ResizeMode="NoResize"
-        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Style="{StaticResource AppWindowStyle}">
     <StackPanel Margin="12">
         <TextBlock Text="Name"/>
         <TextBox x:Name="NameBox" MaxLength="40" Margin="0,2,0,8"/>
@@ -23,7 +23,7 @@
             <RadioButton x:Name="RestartRadio" Content="Restart the timer" IsChecked="True"/>
             <RadioButton x:Name="IgnoreRadio" Content="Ignore while running"/>
         </StackPanel>
-        <TextBlock x:Name="ErrorText" Foreground="Firebrick" TextWrapping="Wrap" Margin="0,0,0,8"/>
+        <TextBlock x:Name="ErrorText" Foreground="{DynamicResource ThemeErrorBrush}" TextWrapping="Wrap" Margin="0,0,0,8"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Save" IsDefault="True" Width="80" Margin="0,0,6,0" Click="Save_Click"/>
             <Button Content="Cancel" IsCancel="True" Width="80"/>

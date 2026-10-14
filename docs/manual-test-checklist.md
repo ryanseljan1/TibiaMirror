@@ -24,6 +24,7 @@ Run this against real Tibia before each release. Tick every box. Items marked (k
 - [ ] "Only show mirrors while Tibia is focused" hides mirrors when you alt-tab to the app or another program; Tibia and a mirror window count as focused.
 - [ ] A timer or countdown hotkey works immediately after focusing Tibia, and does nothing immediately after focusing TibiaMirror's main window, settings or a dialog (key).
 - [ ] Settings window: empty process name or title prefix is rejected, Save works, "Open data folder" opens the folder.
+- [ ] Settings: turn Dark mode on and off; the main window, tabs, controls and dialogs stay readable. Restart and confirm the saved theme returns.
 - [ ] Assign either global hotkey to a timer, countdown or the other global hotkey: Settings names the conflict and lets you decline it (key).
 - [ ] The "Hotkeys are unavailable." banner appears when hotkeys cannot start. Retry restores them, including audio-timer and countdown hotkeys.
 

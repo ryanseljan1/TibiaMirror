@@ -9,13 +9,13 @@
                 HorizontalAlignment="Left" Padding="12,4" Margin="0,0,0,8"/>
         <Grid>
             <TextBlock Text="No mirrors yet. Start Tibia and click Add Region." HorizontalAlignment="Center"
-                       VerticalAlignment="Top" Margin="0,24,0,0" Foreground="Gray"
+                       VerticalAlignment="Top" Margin="0,24,0,0" Foreground="{DynamicResource ThemeMutedBrush}"
                        Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}"/>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Cards}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="#FFBBBBBB" BorderThickness="1" CornerRadius="3" Padding="8" Margin="0,0,0,8">
+                            <Border BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="3" Padding="8" Margin="0,0,0,8">
                                 <StackPanel>
                                     <DockPanel>
                                         <ToggleButton DockPanel.Dock="Right" Content="&#x1F512;" ToolTip="Lock" Width="30" Margin="4,0,0,0"
