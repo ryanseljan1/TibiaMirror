@@ -14,6 +14,7 @@ public partial class MainWindow : Window
         _host = host;
         _tray = tray;
         InitializeComponent();
+        TimersView.Attach(host);
         if (host.Locator is { } locator) ShowTibiaState(locator.State);
         host.TibiaStateChanged += s => Dispatcher.Invoke(() => ShowTibiaState(s));
     }

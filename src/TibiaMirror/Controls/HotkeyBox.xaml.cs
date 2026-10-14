@@ -24,11 +24,13 @@ public partial class HotkeyBox : UserControl
 
     bool _recording;
     IKeyboardSource? _recordingSource;
+    Window? _recordingWindow;
 
     public HotkeyBox()
     {
         InitializeComponent();
         LostFocus += (_, _) => StopRecording();
+        LostKeyboardFocus += (_, _) => StopRecording();
         Unloaded += (_, _) => StopRecording();
         UpdateText();
     }
@@ -44,6 +46,8 @@ public partial class HotkeyBox : UserControl
         service.IsSuspended = true;
         _recordingSource = source;
         source.KeyDown += OnRecordedKey;
+        _recordingWindow = Window.GetWindow(this);
+        if (_recordingWindow is not null) _recordingWindow.Deactivated += OnWindowDeactivated;
         Focus();
         UpdateText();
     }
@@ -63,12 +67,16 @@ public partial class HotkeyBox : UserControl
         });
     }
 
+    void OnWindowDeactivated(object? sender, EventArgs e) => StopRecording();
+
     void StopRecording()
     {
         if (!_recording) return;
         _recording = false;
         if (_recordingSource is not null) _recordingSource.KeyDown -= OnRecordedKey;
         _recordingSource = null;
+        if (_recordingWindow is not null) _recordingWindow.Deactivated -= OnWindowDeactivated;
+        _recordingWindow = null;
         if (Service is { } s) s.IsSuspended = false;
         UpdateText();
     }
