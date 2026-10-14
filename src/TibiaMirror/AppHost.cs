@@ -7,6 +7,7 @@ public sealed class AppHost : IDisposable
     public AppPaths Paths { get; }
     public AppSettings Settings { get; set; } = new();
     public Profile CurrentProfile { get; set; } = new();
+    public TibiaMirror.Abstractions.ISoundPlayer Sounds { get; } = new TibiaMirror.Audio.SoundPlayer();
     public event Action? ToggleMirrorsRequested;   // raised by tray; MirrorService subscribes (Task 7)
     public void RequestToggleMirrors() => ToggleMirrorsRequested?.Invoke();
     public event Action<Profile>? ProfileChanged;
@@ -14,5 +15,5 @@ public sealed class AppHost : IDisposable
     public void ProfileEdited() { }      // Task 10 adds debounced autosave
     public void ApplySettings() { }      // Tasks 7/8/10 add hotkey registration
     public void Start() { }   // tasks add service startup here
-    public void Dispose() { } // tasks add disposal here
+    public void Dispose() { (Sounds as IDisposable)?.Dispose(); } // tasks add disposal here
 }
