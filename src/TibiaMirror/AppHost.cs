@@ -1,3 +1,5 @@
+using TibiaMirror.Detection;
+using TibiaMirror.Interop;
 using TibiaMirror.Models;
 
 namespace TibiaMirror;
@@ -13,6 +15,23 @@ public sealed class AppHost : IDisposable
     public void SetProfile(Profile p) { CurrentProfile = p; ProfileChanged?.Invoke(p); }
     public void ProfileEdited() { }      // Task 10 adds debounced autosave
     public void ApplySettings() { }      // Tasks 7/8/10 add hotkey registration
-    public void Start() { }   // tasks add service startup here
-    public void Dispose() { } // tasks add disposal here
+    public Func<bool> IsTibiaFocused { get; set; } = () => false;
+    public TibiaLocator? Locator { get; private set; }
+    public event Action<TibiaState>? TibiaStateChanged;
+    System.Windows.Threading.DispatcherTimer? _locatorTimer;
+    public void Start()   // tasks add service startup here
+    {
+        var enumerator = new Win32WindowEnumerator();
+        var locator = Locator = new TibiaLocator(enumerator, () => Settings, h => enumerator.GetWindowProcessId(h) == Environment.ProcessId);
+        locator.StateChanged += s => TibiaStateChanged?.Invoke(s);
+        IsTibiaFocused = () => locator.State.IsFocused;
+        _locatorTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+        _locatorTimer.Tick += (_, _) => locator.Poll();
+        _locatorTimer.Start();
+        locator.Poll();
+    }
+    public void Dispose() // tasks add disposal here
+    {
+        _locatorTimer?.Stop();
+    }
 }
