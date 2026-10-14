@@ -45,4 +45,51 @@ public class HotkeyServiceTests
 
     [Fact] public void Callback_exception_does_not_stop_other_callbacks()
     { int n = 0; using var s = Svc(); s.Register("a", new Hotkey(F1, 0), HotkeyScope.Global, () => throw new Exception("x")); s.Register("b", new Hotkey(F1, 0), HotkeyScope.Global, () => n++); _kb.Press(F1); Assert.Equal(1, n); }
+
+    [Fact] public void Reregistering_with_a_different_key_fires_only_the_new_key()
+    {
+        int a = 0, b = 0; using var s = Svc();
+        var r = s.Register(this, new Hotkey(F1, 0), HotkeyScope.Global, () => a++); r.Dispose();
+        s.Register(this, new Hotkey(F1 + 1, 0), HotkeyScope.Global, () => b++);
+        _kb.Press(F1); _kb.Press(F1 + 1);
+        Assert.Equal(0, a); Assert.Equal(1, b);
+    }
+
+    [Fact] public void Disposing_all_owner_registrations_then_reregistering_does_not_double_fire()
+    {
+        int n = 0; using var s = Svc();
+        var first = new[] { s.Register(this, new Hotkey(F1, 0), HotkeyScope.Global, () => n++), s.Register(this, new Hotkey(F1 + 1, 0), HotkeyScope.Global, () => n++) };
+        foreach (var r in first) r.Dispose();
+        s.Register(this, new Hotkey(F1, 0), HotkeyScope.Global, () => n++);
+        _kb.Press(F1); _kb.Press(F1 + 1);
+        Assert.Equal(1, n);
+    }
+
+    [Fact] public void Timer_registrations_reload_replaces_previous_registrations()
+    {
+        using var s = Svc(); var fired = new List<Guid>();
+        var t1 = new AudioTimerModel { Hotkey = new Hotkey(F1, 0) }; var t2 = new AudioTimerModel { Hotkey = new Hotkey(F1 + 1, 0) };
+        var p = new Profile(); p.Timers.Add(t1); p.Timers.Add(t2);
+        using var regs = new TibiaMirror.Timers.TimerHotkeyRegistrations(s, fired.Add);
+        regs.Reload(p); regs.Reload(p);                 // reload must not duplicate
+        _kb.Press(F1); _kb.Press(F1 + 1);
+        Assert.Equal(new[] { t1.Id, t2.Id }, fired);
+        fired.Clear(); t1.Hotkey = new Hotkey(F1 + 2, 0); p.Timers.Remove(t2); regs.Reload(p);
+        _kb.Press(F1); _kb.Press(F1 + 1); _kb.Press(F1 + 2);
+        Assert.Equal(new[] { t1.Id }, fired);
+    }
+
+    [Fact] public void Timer_registrations_with_no_hotkey_service_is_a_noop()
+    {
+        var p = new Profile(); p.Timers.Add(new AudioTimerModel { Hotkey = new Hotkey(F1, 0) });
+        using var regs = new TibiaMirror.Timers.TimerHotkeyRegistrations(null, _ => { });
+        regs.Reload(p);
+    }
+
+    [Fact] public void Conflicts_exclude_timer_being_edited()
+    {
+        using var s = Svc(); var t = new AudioTimerModel { Hotkey = new Hotkey(F1, 0) }; var other = new AudioTimerModel { Hotkey = new Hotkey(F1, 0) };
+        s.Register(t, t.Hotkey, HotkeyScope.Global, () => { }); s.Register(other, other.Hotkey, HotkeyScope.Global, () => { });
+        Assert.Equal(new object[] { other }, s.FindConflicts(new Hotkey(F1, 0), t));
+    }
 }

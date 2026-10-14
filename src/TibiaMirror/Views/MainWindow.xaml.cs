@@ -16,6 +16,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         ProfilesTab.Init(host);
         host.ProfileChanged += p => Dispatcher.Invoke(() => ProfileText.Text = "Profile: " + p.Name);
+        TimersView.Attach(host);
         if (host.Locator is { } locator) ShowTibiaState(locator.State);
         host.TibiaStateChanged += s => Dispatcher.Invoke(() => ShowTibiaState(s));
     }

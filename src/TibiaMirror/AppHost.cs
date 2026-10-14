@@ -62,6 +62,9 @@ public sealed class AppHost : IDisposable
     public TibiaLocator? Locator { get; private set; }
     public event Action<TibiaState>? TibiaStateChanged;
     System.Windows.Threading.DispatcherTimer? _locatorTimer;
+    public TibiaMirror.Timers.AudioTimerService? Timers { get; private set; }
+    public TibiaMirror.Timers.AudioTimersViewModel? TimersVm { get; private set; }
+    System.Windows.Threading.DispatcherTimer? _timersTimer;
     public void Start()   // tasks add service startup here
     {
         Profiles = new TibiaMirror.Profiles.ProfileService(Paths);
@@ -90,12 +93,20 @@ public sealed class AppHost : IDisposable
             TibiaMirror.Controls.HotkeyBox.Service = Hotkeys;
             TibiaMirror.Controls.HotkeyBox.Source = Keyboard;
         }
+
+        Timers = new TibiaMirror.Timers.AudioTimerService(new TibiaMirror.Abstractions.SystemClock(), Sounds);
+        TimersVm = new TibiaMirror.Timers.AudioTimersViewModel(this, Timers);
+        _timersTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+        _timersTimer.Tick += (_, _) => { Timers.Tick(); TimersVm.Refresh(); };
+        _timersTimer.Start();
         ApplyProfileHotkey();
     }
     public void Dispose() // tasks add disposal here
     {
         _locatorTimer?.Stop();
         _profileHotkeyReg?.Dispose();
+        _timersTimer?.Stop();
+        TimersVm?.Dispose();
         Hotkeys?.Dispose();
         Keyboard?.Dispose();
         (Sounds as IDisposable)?.Dispose();
