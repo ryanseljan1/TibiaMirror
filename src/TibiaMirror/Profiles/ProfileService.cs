@@ -111,12 +111,17 @@ public sealed class ProfileService(AppPaths paths)
         try { p = JsonSerializer.Deserialize<Profile>(File.ReadAllText(jsonPath), JsonStore.Options); }
         catch (JsonException) { p = null; }
         if (p is null) throw new ArgumentException("That file isn't a valid TibiaMirror profile.");
+        Normalize(p);
         var name = (string.IsNullOrWhiteSpace(p.Name) ? Path.GetFileNameWithoutExtension(jsonPath) : p.Name).Trim();
         var existing = List();
         var err = ProfileNameRules.Validate(name, Array.Empty<string>());
         if (err != null) throw new ArgumentException(err);
         var final = name;
-        for (var i = 2; existing.Contains(final, StringComparer.OrdinalIgnoreCase); i++) final = $"{name} ({i})";
+        for (var i = 2; existing.Contains(final, StringComparer.OrdinalIgnoreCase); i++)
+        {
+            var suffix = $" ({i})";
+            final = name[..Math.Min(name.Length, ProfileNameRules.MaxLength - suffix.Length)].TrimEnd() + suffix;
+        }
         err = ProfileNameRules.Validate(final, existing);
         if (err != null) throw new ArgumentException(err);
         p.Name = final;
@@ -158,10 +163,13 @@ public sealed class ProfileService(AppPaths paths)
         { TibiaMirror.Logging.Log.Error("Could not write last_profile", e); }
     }
 
+    static void Normalize(Profile p) { p.Regions ??= new(); p.Timers ??= new(); }
+
     Profile LoadProfile(string name)
     {
         var r = JsonStore.Load(paths.ProfileFile(name), () => new Profile { Name = name });
         r.Value.Name = name;
+        Normalize(r.Value);
         if (r.Status == LoadStatus.RestoredFromBackup)
             Notice?.Invoke($"Profile '{name}' was damaged and has been restored from its backup.");
         else if (r.Status == LoadStatus.Corrupt)
@@ -172,3 +180,4 @@ public sealed class ProfileService(AppPaths paths)
         return r.Value;
     }
 }
+

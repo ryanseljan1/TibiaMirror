@@ -46,9 +46,16 @@ public partial class Toast : Window
     void FadeOut()
     {
         var a = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(300));
-        a.Completed += (_, _) => Close();
+        a.Completed += (_, _) =>
+        {
+            if (_closed) return;
+            try { Close(); } catch (Exception e) { TibiaMirror.Logging.Log.Warn("Toast close failed: " + e.Message); }
+        };
         BeginAnimation(OpacityProperty, a);
     }
 
-    protected override void OnClosed(EventArgs e) { _hold.Stop(); base.OnClosed(e); }
+    bool _closed;
+    protected override void OnClosed(EventArgs e) { _closed = true; _hold.Stop(); base.OnClosed(e); }
 }
+
+

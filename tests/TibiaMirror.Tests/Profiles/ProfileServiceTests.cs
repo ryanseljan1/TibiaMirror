@@ -65,4 +65,47 @@ public class ProfileServiceTests : IDisposable
         var s2 = new ProfileService(new AppPaths(_root)); string? msg = null; s2.Notice += m => msg = m; s2.LoadInitial();
         Assert.NotNull(msg);
     }
+
+    [Fact] public void Import_max_length_collision_stays_valid()
+    {
+        var s = Make(); var name = new string('a', 40); s.Create(name);
+        var f = Path.Combine(_root, "exp.json"); s.Export(name, f);
+        var r = s.Import(f);
+        Assert.True(r.Length <= 40); Assert.NotEqual(name, r); Assert.Contains(r, s.List());
+    }
+
+    [Fact] public void Import_null_lists_become_empty()
+    {
+        var s = Make(); var f = Path.Combine(_root, "n.json"); File.WriteAllText(f, "{\"Name\":\"X\",\"Regions\":null,\"Timers\":null}");
+        Assert.Equal("X", s.Import(f)); s.Switch("X");
+        Assert.Empty(s.Current.Regions); Assert.Empty(s.Current.Timers);
+    }
+
+    [Fact] public void Import_malformed_json_throws()
+    {
+        var s = Make(); var f = Path.Combine(_root, "bad.json"); File.WriteAllText(f, "{bad");
+        Assert.Throws<ArgumentException>(() => s.Import(f));
+    }
+
+    [Fact] public void Duplicate_assigns_new_timer_ids()
+    {
+        var s = Make(); s.Current.Timers.Add(new AudioTimerModel { Name = "T" }); s.SaveCurrent();
+        s.Duplicate("Default", "Copy"); var copyId = s.Current.Timers[0].Id; s.Switch("Default");
+        Assert.NotEqual(copyId, s.Current.Timers[0].Id);
+    }
+
+    [Fact] public void Delete_current_updates_last_profile()
+    {
+        var s = Make(); s.Create("Knight"); s.Delete("Knight");
+        Assert.Equal("Default", Make().Current.Name);
+    }
+
+    [Fact] public void SwitchNext_with_one_profile_keeps_it() { var s = Make(); s.SwitchNext(); Assert.Equal("Default", s.Current.Name); }
+
+    [Fact] public void Case_only_rename_keeps_one_file()
+    {
+        var s = Make(); s.Rename("Default", "default");
+        Assert.Equal("default", s.Current.Name);
+        Assert.Single(Directory.GetFiles(Path.Combine(_root, "profiles"), "*.json"));
+    }
 }

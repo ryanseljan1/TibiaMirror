@@ -17,6 +17,7 @@ public partial class ProfileNameDialog : Window
         NameBox.Text = initial;
         NameBox.SelectAll();
         Loaded += (_, _) => NameBox.Focus();
+        NameBox_TextChanged(this, null!);
     }
 
     public string ResultName { get; private set; } = "";
@@ -38,3 +39,4 @@ public partial class ProfileNameDialog : Window
         return d.ShowDialog() == true ? d.ResultName : null;
     }
 }
+
