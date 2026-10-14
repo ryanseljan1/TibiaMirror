@@ -34,8 +34,12 @@ public sealed class Debouncer : IDisposable
         {
             if (!_pending) return;
             _pending = false;
-            _timer.Change(Timeout.Infinite, Timeout.Infinite);
-            _action();
+        }
+        try { _action(); }
+        catch (Exception e)
+        {
+            Logging.Log.Error("Debounced action failed", e);
+            lock (_lock) { if (!_disposed) _pending = true; }   // re-armed; next Trigger/Flush retries
         }
     }
 

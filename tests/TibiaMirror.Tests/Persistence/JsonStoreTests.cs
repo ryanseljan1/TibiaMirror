@@ -64,4 +64,14 @@ public class JsonStoreTests : IDisposable
         JsonStore.Save(P("t.json"), new Profile { Name = "T" });
         Assert.Equal("T", JsonStore.Load(P("t.json"), () => new Profile()).Value.Name);
     }
+
+    [Fact] public void Quarantine_move_failure_falls_back_to_default()
+    {
+        // access-denied is not portable to simulate; hold the file open (FileShare.Read) so the move fails instead
+        File.WriteAllText(P("l.json"), "garbage");
+        using var h = new FileStream(P("l.json"), FileMode.Open, FileAccess.Read, FileShare.Read);
+        var r = JsonStore.Load(P("l.json"), () => new Profile { Name = "Fresh" });
+        Assert.Equal(LoadStatus.Corrupt, r.Status); Assert.Equal("Fresh", r.Value.Name);
+        Assert.Equal(P("l.json"), r.CorruptPath);
+    }
 }

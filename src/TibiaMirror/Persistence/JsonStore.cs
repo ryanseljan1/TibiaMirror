@@ -18,7 +18,7 @@ public static class JsonStore
                 : new(createDefault(), LoadStatus.Missing, null);
         if (TryRead<T>(path, out var v)) return new(v!, LoadStatus.Ok, null);
         var corrupt = path + "." + DateTime.Now.ToString("yyyyMMddHHmmss") + ".corrupt";
-        try { File.Move(path, corrupt, overwrite: true); } catch (IOException) { corrupt = path; }
+        try { File.Move(path, corrupt, overwrite: true); } catch (Exception e) when (e is IOException or UnauthorizedAccessException) { corrupt = path; }
         if (File.Exists(path + ".bak") && TryRead<T>(path + ".bak", out var bak))
             return new(bak!, LoadStatus.RestoredFromBackup, corrupt);
         return new(createDefault(), LoadStatus.Corrupt, corrupt);
@@ -27,7 +27,7 @@ public static class JsonStore
     static bool TryRead<T>(string path, out T? value) where T : class
     {
         try { value = JsonSerializer.Deserialize<T>(File.ReadAllText(path), Options); return value is not null; }
-        catch (Exception e) when (e is JsonException or IOException or NotSupportedException) { value = null; return false; }
+        catch (Exception e) when (e is JsonException or IOException or UnauthorizedAccessException or NotSupportedException) { value = null; return false; }
     }
 
     public static void Save<T>(string path, T value)
