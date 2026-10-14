@@ -1,4 +1,4 @@
-﻿using TibiaMirror.Abstractions; using TibiaMirror.Models; using TibiaMirror.Timers;
+using TibiaMirror.Abstractions; using TibiaMirror.Models; using TibiaMirror.Timers;
 namespace TibiaMirror.Tests.Timers;
 
 internal sealed class FakeClock : IClock { public DateTime UtcNow { get; set; } = new(2026, 1, 1); public void Advance(double s) => UtcNow = UtcNow.AddSeconds(s); }
@@ -51,4 +51,6 @@ public class AudioTimerServiceTests
     [Fact] public void Unknown_timer_id_is_ignored() { var s = Make(); s.Trigger(Guid.NewGuid()); s.Tick(); Assert.Empty(_snd.Played); }
 
     [Fact] public void Load_clears_running() { var s = Make(); s.Trigger(_t.Id); s.Load(new Profile { IsListening = true }); Assert.False(s.IsRunning(_t.Id)); }
+
+    [Fact] public void CancelAll_stops_every_timer_without_sound() { var s = Make(); s.Trigger(_t.Id); s.CancelAll(); _clock.Advance(20); s.Tick(); Assert.False(s.IsRunning(_t.Id)); Assert.Empty(_snd.Played); }
 }

@@ -1,4 +1,4 @@
-﻿using TibiaMirror.Abstractions;
+using TibiaMirror.Abstractions;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Timers;
@@ -24,6 +24,8 @@ public sealed class AudioTimerService(IClock clock, ISoundPlayer sounds)
     }
 
     public void Cancel(Guid timerId) => _endsAt.Remove(timerId);
+
+    public void CancelAll() => _endsAt.Clear();
 
     public bool IsRunning(Guid id) => _endsAt.ContainsKey(id);
 

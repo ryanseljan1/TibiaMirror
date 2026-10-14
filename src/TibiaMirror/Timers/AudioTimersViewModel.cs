@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TibiaMirror.Hotkeys;
 using TibiaMirror.Models;
@@ -9,11 +9,12 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
 {
     readonly AppHost _host;
     readonly AudioTimerService _service;
-    readonly List<IDisposable> _registrations = new();
+    readonly TimerHotkeyRegistrations _registrations;
 
     public AudioTimersViewModel(AppHost host, AudioTimerService service)
     {
         _host = host; _service = service;
+        _registrations = new TimerHotkeyRegistrations(host.Hotkeys, id => service.Trigger(id));
         host.ProfileChanged += OnProfileChanged;
         // StartListeningOnOpen applies once, to the profile active at startup.
         var p = host.CurrentProfile;
@@ -29,7 +30,7 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
     public bool IsListening
     {
         get => _host.CurrentProfile.IsListening;
-        set { if (_host.CurrentProfile.IsListening == value) return; _host.CurrentProfile.IsListening = value; OnPropertyChanged(); _host.ProfileEdited(); }
+        set { if (_host.CurrentProfile.IsListening == value) return; _host.CurrentProfile.IsListening = value; if (!value) _service.CancelAll(); OnPropertyChanged(); _host.ProfileEdited(); }
     }
 
     public bool StartListeningOnOpen
@@ -53,37 +54,25 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
     void LoadProfile(Profile p)
     {
         _service.Load(p);
-        RegisterHotkeys();
-        Cards.Clear();
-        foreach (var t in p.Timers) Cards.Add(new AudioTimerCardViewModel(t, _service, _host.Sounds));
-        OnPropertyChanged(nameof(IsEmpty));
+        Repopulate(p);
         OnPropertyChanged(nameof(IsListening));
         OnPropertyChanged(nameof(StartListeningOnOpen));
         OnPropertyChanged(nameof(MasterVolume));
     }
 
-    void RegisterHotkeys()
+    void Repopulate(Profile p)
     {
-        foreach (var r in _registrations) r.Dispose();
-        _registrations.Clear();
-        if (_host.Hotkeys is not { } hk) return;
-        foreach (var t in _host.CurrentProfile.Timers)
-        {
-            if (t.Hotkey is not { } key) continue;
-            var id = t.Id;
-            _registrations.Add(hk.Register(t, key, HotkeyScope.WhenTibiaFocused, () => _service.Trigger(id)));
-        }
+        _registrations.Reload(p);
+        Cards.Clear();
+        foreach (var t in p.Timers) Cards.Add(new AudioTimerCardViewModel(t, _service, _host.Sounds));
+        OnPropertyChanged(nameof(IsEmpty));
     }
 
     void Rebuild()
     {
-        RegisterHotkeys();
-        Cards.Clear();
-        foreach (var t in _host.CurrentProfile.Timers) Cards.Add(new AudioTimerCardViewModel(t, _service, _host.Sounds));
-        OnPropertyChanged(nameof(IsEmpty));
+        Repopulate(_host.CurrentProfile);
         _host.ProfileEdited();
     }
-
     public void AddTimer(AudioTimerModel model) { _host.CurrentProfile.Timers.Add(model); Rebuild(); }
 
     public void UpdateTimer(AudioTimerModel existing, AudioTimerModel edited)
@@ -109,7 +98,6 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _host.ProfileChanged -= OnProfileChanged;
-        foreach (var r in _registrations) r.Dispose();
-        _registrations.Clear();
+        _registrations.Dispose();
     }
 }

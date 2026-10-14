@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
@@ -66,7 +66,7 @@ public partial class TimerEditDialog : Window
         seconds = 0;
         text = text?.Trim();
         if (string.IsNullOrEmpty(text)) return false;
-        var styles = NumberStyles.Float | NumberStyles.AllowThousands & ~NumberStyles.AllowThousands;
+        var styles = NumberStyles.Float;
         double v;
         if (!double.TryParse(text, styles, CultureInfo.CurrentCulture, out v) && !double.TryParse(text, styles, CultureInfo.InvariantCulture, out v))
         {
