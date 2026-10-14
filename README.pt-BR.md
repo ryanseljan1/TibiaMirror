@@ -73,22 +73,28 @@ Siga as regras do Tibia e use o TibiaMirror por sua conta e risco.
 
 ## Perguntas frequentes e solução de problemas
 
-**Meus espelhos estão pretos ou não aparecem.**  
+**Meus espelhos estão pretos ou não aparecem.**
+
 O Tibia precisa estar aberto e não pode estar minimizado. Execute o TibiaMirror e o Tibia com o mesmo nível de permissão: ambos normalmente ou ambos como administrador.
 
-**Minhas teclas de atalho não funcionam.**  
+**Minhas teclas de atalho não funcionam.**
+
 O Tibia ou um espelho precisa estar ativo; a janela principal do TibiaMirror não conta. **Listening** precisa estar em ON na aba **Audio Timers**. Outro programa pode estar usando a tecla; tente outra. Se aparecer “Hotkeys are unavailable.”, clique em **Retry**.
 
-**Uso mais de um monitor.**  
+**Uso mais de um monitor.**
+
 Os espelhos podem ficar em qualquer monitor. Se um monitor não estiver disponível na próxima abertura, os espelhos dele serão movidos para o monitor principal.
 
-**Onde ficam minhas configurações?**  
+**Onde ficam minhas configurações?**
+
 Em `%APPDATA%\TibiaMirror`. Abra as configurações (⚙) e clique em **Open data folder** para acessar a pasta.
 
-**Como transfiro minhas configurações para outro PC?**  
+**Como transfiro minhas configurações para outro PC?**
+
 Na aba **Profiles**, clique em **Export...** no PC antigo e em **Import...** no novo.
 
-**Como desinstalo?**  
+**Como desinstalo?**
+
 Acesse Configurações do Windows → Aplicativos → TibiaMirror → Desinstalar. Suas configurações são mantidas; exclua `%APPDATA%\TibiaMirror` para removê-las também. Para a versão portátil, exclua a pasta extraída.
 
 ## Para desenvolvedores
