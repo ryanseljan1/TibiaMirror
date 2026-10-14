@@ -77,6 +77,7 @@ public sealed class AppHost : IDisposable
     public TibiaMirror.Timers.AudioTimerService? Timers { get; private set; }
     public TibiaMirror.Timers.AudioTimersViewModel? TimersVm { get; private set; }
     System.Windows.Threading.DispatcherTimer? _timersTimer;
+    public TibiaMirror.Countdown.CountdownController? Countdowns { get; private set; }   // Task 11
     public void Start()   // tasks add service startup here
     {
         Profiles = new TibiaMirror.Profiles.ProfileService(Paths);
@@ -113,10 +114,13 @@ public sealed class AppHost : IDisposable
         _timersTimer.Start();
 
         Mirrors = new TibiaMirror.Mirrors.MirrorService(locator, () => Settings, ProfileEdited);
+        Countdowns = new TibiaMirror.Countdown.CountdownController(this, Mirrors, MirrorsVm);   // Task 11: before Load/Attach so it sees layouts and cards
         Mirrors.Load(CurrentProfile);
         MirrorsVm.Attach(Mirrors);
         ToggleMirrorsRequested += () => Mirrors.AllHidden = !Mirrors.AllHidden;
         ProfileChanged += p => { Mirrors.Load(p); MirrorsVm.Rebuild(); };
+        ProfileChanged += Countdowns.OnProfileChanged;
+        Countdowns.OnProfileChanged(CurrentProfile);
         ApplySettings();
     }
     public void Dispose() // tasks add disposal here
@@ -126,6 +130,7 @@ public sealed class AppHost : IDisposable
         _timersTimer?.Stop();
         TimersVm?.Dispose();
         _mirrorHotkey?.Dispose();
+        Countdowns?.Dispose();
         Mirrors?.Dispose();
         Hotkeys?.Dispose();
         Keyboard?.Dispose();
