@@ -41,6 +41,8 @@ public partial class MirrorWindow : Window
         MouseLeftButtonDown += OnBodyMouseDown;
         foreach (var h in new[] { HandleTL, HandleTR, HandleBL, HandleBR }) WireHandle(h);
         SizeChanged += (_, _) => { if (IsVisible) { UpdateThumbnail(); } };
+        // lets dependents (countdown bar) follow while dragging/resizing
+        LocationChanged += (_, _) => { if (IsVisible) LayoutChanged?.Invoke(); };
     }
 
     public Guid RegionId => _region.Id;
