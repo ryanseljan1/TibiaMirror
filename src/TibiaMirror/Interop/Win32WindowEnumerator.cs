@@ -10,11 +10,13 @@ public sealed class Win32WindowEnumerator : IWindowEnumerator
 {
     const int MaxCache = 256;
     readonly Dictionary<int, string> _names = new();
+    readonly HashSet<nint> _reported = new();
 
     public IReadOnlyList<WindowInfo> GetTopLevelWindows()
     {
         var result = new List<WindowInfo>();
         var seenPids = new HashSet<int>();
+        var failing = new HashSet<nint>();
         NativeMethods.EnumWindows((hwnd, _) =>
         {
             try
@@ -44,10 +46,13 @@ public sealed class Win32WindowEnumerator : IWindowEnumerator
             }
             catch (Exception ex)
             {
-                Logging.Log.Warn($"Window enumeration skipped {hwnd}: {ex.Message}");
+                failing.Add(hwnd);
+                if (_reported.Add(hwnd)) Logging.Log.Warn($"Window enumeration skipped {hwnd}: {ex.Message}");
             }
             return true;
         }, 0);
+
+        _reported.IntersectWith(failing); // forget handles that vanished or recovered
 
         // Evict exited pids; also cap size.
         if (_names.Count > MaxCache) _names.Clear();

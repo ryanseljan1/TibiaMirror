@@ -14,9 +14,14 @@ public static class WindowStyles
     public static void SetClickThrough(nint hwnd, bool enabled)
     {
         var ex = NativeMethods.GetWindowLongPtr(hwnd, NativeMethods.GWL_EXSTYLE);
-        nint flags = (nint)(NativeMethods.WS_EX_TRANSPARENT | NativeMethods.WS_EX_LAYERED);
-        NativeMethods.SetWindowLongPtr(hwnd, NativeMethods.GWL_EXSTYLE, enabled ? ex | flags : ex & ~flags);
+        NativeMethods.SetWindowLongPtr(hwnd, NativeMethods.GWL_EXSTYLE, (nint)ComputeExStyle(ex, enabled));
     }
+
+    /// <summary>Enable adds TRANSPARENT|LAYERED; disable clears only TRANSPARENT (WPF owns LAYERED).</summary>
+    internal static long ComputeExStyle(long current, bool clickThrough) =>
+        clickThrough
+            ? current | NativeMethods.WS_EX_TRANSPARENT | NativeMethods.WS_EX_LAYERED
+            : current & ~NativeMethods.WS_EX_TRANSPARENT;
 
     public static void SetBoundsPhysical(nint hwnd, PixelRect rect) =>
         NativeMethods.SetWindowPos(hwnd, NativeMethods.HWND_TOPMOST, rect.X, rect.Y, rect.Width, rect.Height, NativeMethods.SWP_NOACTIVATE);
