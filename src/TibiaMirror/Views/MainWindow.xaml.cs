@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Windows;
 using TibiaMirror.Shell;
 
@@ -72,6 +72,7 @@ public partial class MainWindow : Window
         {
             _tray.ShowBalloon(AppInfo.Name, "Still running in the tray. Right-click the tray icon to exit.");
             _host.Settings.TrayHintShown = true;
+            _host.ProfileEdited();
         }
     }
 }

@@ -7,7 +7,8 @@ public sealed class AppHost : IDisposable
 {
     public AppHost(AppPaths paths) { Paths = paths; _autosave = new TibiaMirror.Persistence.Debouncer(TimeSpan.FromSeconds(1), SaveAll); }
     public AppPaths Paths { get; }
-    public AppSettings Settings { get; set; } = new();
+    readonly AppSettings _defaultSettings = new();   // used until SettingsService.Load() has run
+    public AppSettings Settings => SettingsService?.Current ?? _defaultSettings;
     public Profile CurrentProfile { get; set; } = new();
     public TibiaMirror.Abstractions.ISoundPlayer Sounds { get; } = new TibiaMirror.Audio.SoundPlayer();
     public event Action? ToggleMirrorsRequested;   // raised by tray; MirrorService subscribes (Task 7)
@@ -18,7 +19,7 @@ public sealed class AppHost : IDisposable
     public void ApplySettings() { ApplyMirrorHotkey(); ApplyProfileHotkey(); Mirrors?.Refresh(); }      // Task 10 extends
 
     // --- Task 10: autosave, restore, hotkey retry ---
-    public TibiaMirror.Settings.SettingsService? SettingsStore { get; private set; }
+    public TibiaMirror.Settings.SettingsService? SettingsService { get; private set; }
     readonly TibiaMirror.Persistence.Debouncer _autosave;
     public event Action? HotkeysReady;              // raised after Retry recreated the hook + HotkeyService
     public event Action? HotkeysUnavailableChanged;
@@ -43,13 +44,8 @@ public sealed class AppHost : IDisposable
         else d.Invoke(SaveNow);   // UI-thread snapshot of profile + settings
     }
 
-    void SaveNow()
-    {
-        try { Profiles?.SaveCurrent(); }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { TibiaMirror.Logging.Log.Error("Autosave of profile failed", e); }
-        try { SettingsStore?.Save(); }
-        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { TibiaMirror.Logging.Log.Error("Autosave of settings failed", e); }
-    }
+    /// <summary>Saves profile and settings; throws if either failed so the Debouncer logs it and re-arms (a later Trigger/Flush retries).</summary>
+    void SaveNow() => TibiaMirror.Settings.AutosaveRunner.SaveBoth(() => Profiles?.SaveCurrent(), () => SettingsService?.Save());
 
     /// <summary>Recreates the keyboard hook and hotkey service and re-registers every consumer. Returns success.</summary>
     public bool RetryHotkeys()
@@ -138,13 +134,12 @@ public sealed class AppHost : IDisposable
     System.Windows.Threading.DispatcherTimer? _timersTimer;
     public void Start()   // tasks add service startup here
     {
-        SettingsStore = new TibiaMirror.Settings.SettingsService(Paths);
-        SettingsStore.Load();
-        Settings = SettingsStore.Current;
-        if (SettingsStore.LastLoadStatus == TibiaMirror.Persistence.LoadStatus.RestoredFromBackup)
+        SettingsService = new TibiaMirror.Settings.SettingsService(Paths);
+        SettingsService.Load();
+        if (SettingsService.LastLoadStatus == TibiaMirror.Persistence.LoadStatus.RestoredFromBackup)
             QueueNotice("Your settings file was damaged, so the last backup was restored.");
-        else if (SettingsStore.LastLoadStatus == TibiaMirror.Persistence.LoadStatus.Corrupt)
-            QueueNotice("Your settings file was damaged and could not be restored, so default settings are in use. The damaged file was kept as: " + SettingsStore.CorruptPath);
+        else if (SettingsService.LastLoadStatus == TibiaMirror.Persistence.LoadStatus.Corrupt)
+            QueueNotice("Your settings file was damaged and could not be restored, so default settings are in use. The damaged file was kept as: " + SettingsService.CorruptPath);
         Profiles = new TibiaMirror.Profiles.ProfileService(Paths);
         Profiles.Notice += QueueNotice;
         try { Profiles.LoadInitial(); }

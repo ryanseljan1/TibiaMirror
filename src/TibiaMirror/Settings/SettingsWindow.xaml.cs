@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using TibiaMirror.Logging;
@@ -56,7 +56,7 @@ public partial class SettingsWindow : Window
         s.OnlyShowWhenTibiaFocused = OnlyFocusedCheck.IsChecked == true;
         s.TibiaProcessName = ProcessBox.Text.Trim();
         s.TibiaTitlePrefix = TitleBox.Text.Trim();
-        try { _host.SettingsStore?.Save(); }
+        try { _host.SettingsService?.Save(); }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             Log.Error("Saving settings failed", e);
