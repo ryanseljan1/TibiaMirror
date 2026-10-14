@@ -15,7 +15,46 @@ public sealed class AppHost : IDisposable
     public event Action<Profile>? ProfileChanged;
     public void SetProfile(Profile p) { CurrentProfile = p; ProfileChanged?.Invoke(p); }
     public void ProfileEdited() { }      // Task 10 adds debounced autosave
-    public void ApplySettings() { }      // Tasks 7/8/10 add hotkey registration
+    public void ApplySettings() { ApplyProfileHotkey(); }      // Tasks 7/8/10 add hotkey registration
+
+    // --- Task 8: profiles ---
+    public TibiaMirror.Profiles.ProfileService? Profiles { get; private set; }
+    IDisposable? _profileHotkeyReg;
+    readonly List<string> _pendingNotices = new();
+    bool _noticesReady;
+
+    public void ApplyProfileHotkey()
+    {
+        _profileHotkeyReg?.Dispose();
+        _profileHotkeyReg = null;
+        if (Settings.NextProfileHotkey is { } hk && Hotkeys != null)
+            _profileHotkeyReg = Hotkeys.Register(this, hk, TibiaMirror.Hotkeys.HotkeyScope.Global, () =>
+            {
+                try { Profiles?.SwitchNext(); }
+                catch (Exception e) { TibiaMirror.Logging.Log.Error("Next-profile hotkey failed", e); }
+            });
+    }
+
+    /// <summary>Notices raised before the main window is shown are queued, then shown once the UI is idle.</summary>
+    void QueueNotice(string message)
+    {
+        if (_noticesReady) System.Windows.MessageBox.Show(message, AppInfo.Name, System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+        else _pendingNotices.Add(message);
+    }
+
+    void FlushNotices()
+    {
+        _noticesReady = true;
+        var pending = _pendingNotices.ToList();
+        _pendingNotices.Clear();
+        foreach (var m in pending) QueueNotice(m);
+    }
+
+    void ShowToast(string name) => System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
+    {
+        try { TibiaMirror.Profiles.Toast.ShowToast("Profile: " + name); }
+        catch (Exception e) { TibiaMirror.Logging.Log.Error("Toast failed", e); }
+    });
     public Func<bool> IsTibiaFocused { get; set; } = () => false;
     public TibiaMirror.Hotkeys.KeyboardHook? Keyboard { get; private set; }
     public TibiaMirror.Hotkeys.HotkeyService? Hotkeys { get; private set; }
@@ -25,6 +64,15 @@ public sealed class AppHost : IDisposable
     System.Windows.Threading.DispatcherTimer? _locatorTimer;
     public void Start()   // tasks add service startup here
     {
+        Profiles = new TibiaMirror.Profiles.ProfileService(Paths);
+        Profiles.Notice += QueueNotice;
+        try { Profiles.LoadInitial(); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        { TibiaMirror.Logging.Log.Error("Profile load failed", e); QueueNotice("Could not read or write your profiles: " + e.Message); }
+        SetProfile(Profiles.Current);
+        Profiles.CurrentChanged += p => { SetProfile(p); ShowToast(p.Name); };
+        System.Windows.Application.Current.Dispatcher.BeginInvoke(FlushNotices, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
         var enumerator = new Win32WindowEnumerator();
         var locator = Locator = new TibiaLocator(enumerator, () => Settings, h => enumerator.GetWindowProcessId(h) == Environment.ProcessId);
         locator.StateChanged += s => TibiaStateChanged?.Invoke(s);
@@ -42,10 +90,12 @@ public sealed class AppHost : IDisposable
             TibiaMirror.Controls.HotkeyBox.Service = Hotkeys;
             TibiaMirror.Controls.HotkeyBox.Source = Keyboard;
         }
+        ApplyProfileHotkey();
     }
     public void Dispose() // tasks add disposal here
     {
         _locatorTimer?.Stop();
+        _profileHotkeyReg?.Dispose();
         Hotkeys?.Dispose();
         Keyboard?.Dispose();
         (Sounds as IDisposable)?.Dispose();

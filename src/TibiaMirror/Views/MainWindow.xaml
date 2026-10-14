@@ -16,7 +16,7 @@
         <TabControl>
             <TabItem Header="Mirrors"><views:MirrorsView/></TabItem>
             <TabItem Header="Audio Timers"><views:AudioTimersView/></TabItem>
-            <TabItem Header="Profiles"><views:ProfilesView/></TabItem>
+            <TabItem Header="Profiles"><views:ProfilesView x:Name="ProfilesTab"/></TabItem>
         </TabControl>
     </DockPanel>
 </Window>
