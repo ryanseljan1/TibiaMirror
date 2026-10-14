@@ -54,8 +54,8 @@ public sealed class AppHost : IDisposable
         }
 
         Mirrors = new TibiaMirror.Mirrors.MirrorService(locator, () => Settings, ProfileEdited);
-        MirrorsVm.Attach(Mirrors);
         Mirrors.Load(CurrentProfile);
+        MirrorsVm.Attach(Mirrors);
         ToggleMirrorsRequested += () => Mirrors.AllHidden = !Mirrors.AllHidden;
         ProfileChanged += p => { Mirrors.Load(p); MirrorsVm.Rebuild(); };
         ApplySettings();
