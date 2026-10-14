@@ -15,11 +15,13 @@ public sealed class CountdownHotkeyOwner(RegionModel region)
 /// <summary>Owns the hotkey registrations of a profile's countdowns; Reload disposes all old ones first.</summary>
 public sealed class CountdownHotkeyRegistrations : IDisposable
 {
-    readonly HotkeyService? _hotkeys;
+    HotkeyService? _hotkeys;
     readonly Action<Guid> _trigger;
     readonly List<IDisposable> _registrations = new();
 
     public CountdownHotkeyRegistrations(HotkeyService? hotkeys, Action<Guid> trigger) { _hotkeys = hotkeys; _trigger = trigger; }
+
+    public void SetHotkeys(HotkeyService? hotkeys) { Dispose(); _hotkeys = hotkeys; }
 
     public void Reload(Profile profile)
     {

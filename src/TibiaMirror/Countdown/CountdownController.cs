@@ -28,6 +28,14 @@ public sealed class CountdownController : IDisposable
         mirrors.MirrorLayoutChanged += OnLayout;
         mirrors.RegionRemoved += OnRegionRemoved;
         vm.CardCreated += OnCardCreated;
+        host.HotkeysReady += OnHotkeysReady;
+    }
+
+    /// <summary>Hotkey Retry recreated the HotkeyService: register the countdowns with the new one.</summary>
+    void OnHotkeysReady()
+    {
+        void Apply() { _registrations.SetHotkeys(_host.Hotkeys); _registrations.Reload(_host.CurrentProfile); }
+        if (System.Windows.Application.Current?.Dispatcher is { } d && !d.CheckAccess()) d.Invoke(Apply); else Apply();
     }
 
     void OnRegionRemoved(Guid id)
@@ -135,6 +143,7 @@ public sealed class CountdownController : IDisposable
         _mirrors.MirrorLayoutChanged -= OnLayout;
         _mirrors.RegionRemoved -= OnRegionRemoved;
         _vm.CardCreated -= OnCardCreated;
+        _host.HotkeysReady -= OnHotkeysReady;
         _service.Completed -= OnCompleted;
         foreach (var b in _bars.Values) b.Close();
         _bars.Clear();
