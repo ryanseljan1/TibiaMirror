@@ -1,5 +1,7 @@
 # TibiaMirror
 
+[Português (Brasil)](README.pt-BR.md)
+
 Mirror any part of your Tibia screen anywhere you want — health bars, cooldowns, the minimap — plus audio timers and countdown bars.
 
 <!-- Screenshots are coming. Add docs/images/overview.png, then uncomment:
@@ -8,7 +10,7 @@ Mirror any part of your Tibia screen anywhere you want — health bars, cooldown
 
 ## ⬇ Install (3 steps)
 
-1. Go to the **[Releases page](../../releases/latest)** and download `TibiaMirror-Setup-<version>.exe`.
+1. Go to the **[Releases page](../../releases)** and download `TibiaMirror-Setup-<version>.exe`.
 2. Run it. If Windows shows "Windows protected your PC", click **More info → Run anyway**. TibiaMirror is free and not code-signed (a signing certificate costs money every year), so Windows does not know the publisher yet.
 3. Open TibiaMirror from the Start menu, then start Tibia. The dot at the top turns green.
 
