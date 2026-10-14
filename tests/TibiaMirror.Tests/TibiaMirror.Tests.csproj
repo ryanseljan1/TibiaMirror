@@ -13,6 +13,8 @@
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="System.IO" />
+    <Using Include="System.Threading" />
     <ProjectReference Include="..\..\src\TibiaMirror\TibiaMirror.csproj" />
   </ItemGroup>
 </Project>
