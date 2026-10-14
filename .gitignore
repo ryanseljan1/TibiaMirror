@@ -5,6 +5,7 @@ obj/
 *.suo
 artifacts/
 publish/
+local-validation/
 TestResults/
 .superpowers/
 .claude/worktrees/
