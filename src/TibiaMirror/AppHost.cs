@@ -5,7 +5,7 @@ using TibiaMirror.Models;
 namespace TibiaMirror;
 public sealed class AppHost : IDisposable
 {
-    public AppHost(AppPaths paths) { Paths = paths; }
+    public AppHost(AppPaths paths) { Paths = paths; _autosave = new TibiaMirror.Persistence.Debouncer(TimeSpan.FromSeconds(1), SaveAll); }
     public AppPaths Paths { get; }
     public AppSettings Settings { get; set; } = new();
     public Profile CurrentProfile { get; set; } = new();
@@ -13,9 +13,68 @@ public sealed class AppHost : IDisposable
     public event Action? ToggleMirrorsRequested;   // raised by tray; MirrorService subscribes (Task 7)
     public void RequestToggleMirrors() => ToggleMirrorsRequested?.Invoke();
     public event Action<Profile>? ProfileChanged;
-    public void SetProfile(Profile p) { CurrentProfile = p; ProfileChanged?.Invoke(p); }
-    public void ProfileEdited() { }      // Task 10 adds debounced autosave
+    public void SetProfile(Profile p) { ClampToMonitors(p); CurrentProfile = p; ProfileChanged?.Invoke(p); }
+    public void ProfileEdited() => _autosave.Trigger();
     public void ApplySettings() { ApplyMirrorHotkey(); ApplyProfileHotkey(); Mirrors?.Refresh(); }      // Task 10 extends
+
+    // --- Task 10: autosave, restore, hotkey retry ---
+    public TibiaMirror.Settings.SettingsService? SettingsStore { get; private set; }
+    readonly TibiaMirror.Persistence.Debouncer _autosave;
+    public event Action? HotkeysReady;              // raised after Retry recreated the hook + HotkeyService
+    public event Action? HotkeysUnavailableChanged;
+
+    void ClampToMonitors(Profile p)
+    {
+        try { TibiaMirror.Settings.RestoreClamp.ClampProfile(p, Monitors.WorkAreas(), Monitors.PrimaryWorkArea()); }
+        catch (Exception e) { TibiaMirror.Logging.Log.Error("Monitor clamp failed", e); }
+    }
+
+    /// <summary>Clamps a saved window rectangle (physical px) onto the current monitors.</summary>
+    public PixelRect ClampToMonitors(PixelRect r)
+    {
+        try { return TibiaMirror.Settings.RestoreClamp.Clamp(r, Monitors.WorkAreas(), Monitors.PrimaryWorkArea()); }
+        catch (Exception e) { TibiaMirror.Logging.Log.Error("Monitor clamp failed", e); return r; }
+    }
+
+    void SaveAll()
+    {
+        var d = System.Windows.Application.Current?.Dispatcher;
+        if (d is null || d.CheckAccess() || d.HasShutdownStarted) SaveNow();
+        else d.Invoke(SaveNow);   // UI-thread snapshot of profile + settings
+    }
+
+    void SaveNow()
+    {
+        try { Profiles?.SaveCurrent(); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { TibiaMirror.Logging.Log.Error("Autosave of profile failed", e); }
+        try { SettingsStore?.Save(); }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException) { TibiaMirror.Logging.Log.Error("Autosave of settings failed", e); }
+    }
+
+    /// <summary>Recreates the keyboard hook and hotkey service and re-registers every consumer. Returns success.</summary>
+    public bool RetryHotkeys()
+    {
+        try
+        {
+            var kb = new TibiaMirror.Hotkeys.KeyboardHook();
+            Hotkeys?.Dispose();
+            Keyboard?.Dispose();
+            Keyboard = kb;
+            Hotkeys = new TibiaMirror.Hotkeys.HotkeyService(kb, () => IsTibiaFocused(), a => System.Windows.Application.Current.Dispatcher.BeginInvoke(a));
+            TibiaMirror.Controls.HotkeyBox.Service = Hotkeys;
+            TibiaMirror.Controls.HotkeyBox.Source = Keyboard;
+            HotkeysUnavailable = false;
+            ApplySettings();
+            HotkeysReady?.Invoke();
+            HotkeysUnavailableChanged?.Invoke();
+            return true;
+        }
+        catch (Exception e)
+        {
+            TibiaMirror.Logging.Log.Error("Keyboard hook retry failed", e);
+            return false;
+        }
+    }
 
     // --- Task 8: profiles ---
     public TibiaMirror.Profiles.ProfileService? Profiles { get; private set; }
@@ -79,6 +138,13 @@ public sealed class AppHost : IDisposable
     System.Windows.Threading.DispatcherTimer? _timersTimer;
     public void Start()   // tasks add service startup here
     {
+        SettingsStore = new TibiaMirror.Settings.SettingsService(Paths);
+        SettingsStore.Load();
+        Settings = SettingsStore.Current;
+        if (SettingsStore.LastLoadStatus == TibiaMirror.Persistence.LoadStatus.RestoredFromBackup)
+            QueueNotice("Your settings file was damaged, so the last backup was restored.");
+        else if (SettingsStore.LastLoadStatus == TibiaMirror.Persistence.LoadStatus.Corrupt)
+            QueueNotice("Your settings file was damaged and could not be restored, so default settings are in use. The damaged file was kept as: " + SettingsStore.CorruptPath);
         Profiles = new TibiaMirror.Profiles.ProfileService(Paths);
         Profiles.Notice += QueueNotice;
         try { Profiles.LoadInitial(); }
@@ -118,9 +184,12 @@ public sealed class AppHost : IDisposable
         ToggleMirrorsRequested += () => Mirrors.AllHidden = !Mirrors.AllHidden;
         ProfileChanged += p => { Mirrors.Load(p); MirrorsVm.Rebuild(); };
         ApplySettings();
+        HotkeysUnavailableChanged?.Invoke();
     }
     public void Dispose() // tasks add disposal here
     {
+        _autosave.Flush();
+        _autosave.Dispose();
         _locatorTimer?.Stop();
         _profileHotkeyReg?.Dispose();
         _timersTimer?.Stop();

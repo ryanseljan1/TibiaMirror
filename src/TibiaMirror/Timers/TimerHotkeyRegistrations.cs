@@ -6,11 +6,14 @@ namespace TibiaMirror.Timers;
 /// <summary>Owns the hotkey registrations of a profile's timers; Reload disposes all old ones first.</summary>
 public sealed class TimerHotkeyRegistrations : IDisposable
 {
-    readonly HotkeyService? _hotkeys;
+    HotkeyService? _hotkeys;
     readonly Action<Guid> _trigger;
     readonly List<IDisposable> _registrations = new();
 
     public TimerHotkeyRegistrations(HotkeyService? hotkeys, Action<Guid> trigger) { _hotkeys = hotkeys; _trigger = trigger; }
+
+    /// <summary>Points at a recreated HotkeyService (after a hook retry); call Reload afterwards.</summary>
+    public void SetHotkeys(HotkeyService? hotkeys) { Dispose(); _hotkeys = hotkeys; }
 
     public void Reload(Profile profile)
     {

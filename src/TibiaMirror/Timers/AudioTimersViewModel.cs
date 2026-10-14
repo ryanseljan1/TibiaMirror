@@ -16,6 +16,7 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
         _host = host; _service = service;
         _registrations = new TimerHotkeyRegistrations(host.Hotkeys, id => service.Trigger(id));
         host.ProfileChanged += OnProfileChanged;
+        host.HotkeysReady += OnHotkeysReady;
         // StartListeningOnOpen applies once, to the profile active at startup.
         var p = host.CurrentProfile;
         if (p.StartListeningOnOpen) p.IsListening = true;
@@ -43,6 +44,12 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
     {
         get => _host.CurrentProfile.MasterVolume;
         set { value = Math.Clamp(value, 0, 100); if (_host.CurrentProfile.MasterVolume == value) return; _host.CurrentProfile.MasterVolume = value; OnPropertyChanged(); _host.ProfileEdited(); }
+    }
+
+    void OnHotkeysReady()
+    {
+        void Apply() { _registrations.SetHotkeys(_host.Hotkeys); _registrations.Reload(_host.CurrentProfile); }
+        if (System.Windows.Application.Current?.Dispatcher is { } d && !d.CheckAccess()) d.Invoke(Apply); else Apply();
     }
 
     void OnProfileChanged(Profile p)
@@ -98,6 +105,7 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _host.ProfileChanged -= OnProfileChanged;
+        _host.HotkeysReady -= OnHotkeysReady;
         _registrations.Dispose();
     }
 }

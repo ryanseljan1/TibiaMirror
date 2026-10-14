@@ -4,6 +4,12 @@
         xmlns:views="clr-namespace:TibiaMirror.Views"
         Title="TibiaMirror" Width="520" Height="640" MinWidth="420">
     <DockPanel>
+        <Border x:Name="HotkeyBanner" DockPanel.Dock="Top" Background="#FFF3CD" BorderBrush="#E0C36A" BorderThickness="0,0,0,1" Padding="8,4" Visibility="Collapsed">
+            <DockPanel>
+                <Button x:Name="RetryHotkeysButton" DockPanel.Dock="Right" Content="Retry" Padding="8,1"/>
+                <TextBlock Text="Hotkeys are unavailable." VerticalAlignment="Center" Foreground="#664D03"/>
+            </DockPanel>
+        </Border>
         <DockPanel DockPanel.Dock="Top" Margin="8">
             <Button x:Name="SettingsButton" DockPanel.Dock="Right" Content="⚙" Width="32" Margin="4,0,0,0"/>
             <Button x:Name="LockAllButton" DockPanel.Dock="Right" Content="Lock all" Padding="8,2" Margin="4,0,0,0"/>

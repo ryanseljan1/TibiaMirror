@@ -68,9 +68,31 @@ public partial class App : Application
         _main.Activate();
     }
 
+    protected override void OnSessionEnding(SessionEndingCancelEventArgs e)
+    {
+        base.OnSessionEnding(e);
+        ExitApp();   // flushes autosave; the main window must not veto the shutdown
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        DisposeHost();
+        base.OnExit(e);
+    }
+
+    bool _hostDisposed;
+    void DisposeHost()
+    {
+        if (_hostDisposed) return;
+        _hostDisposed = true;
+        try { _host?.Dispose(); }
+        catch (Exception ex) { Log.Error("Host dispose failed", ex); }
+    }
+
     void ExitApp()
     {
-        _host?.Dispose();
+        if (_main is not null) _main.AllowClose = true;
+        DisposeHost();
         _tray?.Dispose();
         _single?.Dispose();
         _single = null;
