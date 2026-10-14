@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using TibiaMirror.Detection;
 using TibiaMirror.Geometry;
 using TibiaMirror.Interop;
@@ -44,6 +44,11 @@ public sealed class MirrorService : IDisposable
 
     void OnTibiaState(TibiaState s) => RefreshAll();
 
+    /// <summary>Re-applies visibility for the current Tibia state and settings.</summary>
+    public void Refresh() => RefreshAll();
+
+    bool _selecting;
+
     void RefreshAll()
     {
         foreach (var w in _windows.Values.ToList()) Refresh(w);
@@ -69,13 +74,17 @@ public sealed class MirrorService : IDisposable
 
     public async Task<RegionModel?> AddRegionAsync()
     {
+        if (_selecting) return null;
         var state = _locator.State;
         if (!state.IsFound || state.IsMinimized)
         {
             MessageBox.Show("Start Tibia first, then click Add Region.");
             return null;
         }
-        var crop = await RegionSelectorWindow.SelectAsync(state);
+        _selecting = true;
+        PixelRect? crop;
+        try { crop = await RegionSelectorWindow.SelectAsync(state); }
+        finally { _selecting = false; }
         if (crop is not { } c) return null;
         var client = _locator.State.Window?.ClientBounds ?? state.Window!.ClientBounds;
         var region = new RegionModel
@@ -96,6 +105,7 @@ public sealed class MirrorService : IDisposable
 
     public async Task RecropAsync(Guid id)
     {
+        if (_selecting) return;
         var region = Find(id);
         var state = _locator.State;
         if (region is null) return;
@@ -104,7 +114,10 @@ public sealed class MirrorService : IDisposable
             MessageBox.Show("Start Tibia first, then click Re-crop.");
             return;
         }
-        var crop = await RegionSelectorWindow.SelectAsync(state);
+        _selecting = true;
+        PixelRect? crop;
+        try { crop = await RegionSelectorWindow.SelectAsync(state); }
+        finally { _selecting = false; }
         if (crop is not { } c || !_windows.TryGetValue(id, out var w)) return;
         region.Crop = c;
         // keep the mirror's position, adopt the new crop's size at 1:1

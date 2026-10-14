@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -24,6 +24,7 @@ public partial class MirrorWindow : Window
     DwmThumbnail? _thumb;
     nint _thumbSource;
     bool _failureLogged;
+    bool _closingForReal, _closed;
     bool _wantShown;
     DispatcherTimer? _flashTimer;
     TibiaState _state = new(null, false);
@@ -72,6 +73,7 @@ public partial class MirrorWindow : Window
     {
         _state = state;
         _wantShown = MirrorVisibility.ShouldShow(_region, state, allHidden, onlyWhenFocused);
+        if (_closed) return;
         if (_wantShown && !IsVisible)
         {
             Show();
@@ -90,6 +92,7 @@ public partial class MirrorWindow : Window
 
     void UpdateThumbnail()
     {
+        if (_closed) return;
         var w = _state.Window;
         if (w is null || !_wantShown) { ShowPlaceholder(false); return; }
         try
@@ -103,10 +106,13 @@ public partial class MirrorWindow : Window
             }
             var src = CropMath.ToThumbnailSource(_region.Crop, w.WindowBounds, w.ClientBounds);
             var b = Bounds;
-            var dest = new PixelRect(Inset, Inset, Math.Max(1, b.Width - 2 * Inset), Math.Max(1, b.Height - 2 * Inset));
-            if (src.IsEmpty)
+            var interior = new PixelRect(Inset, Inset, Math.Max(1, b.Width - 2 * Inset), Math.Max(1, b.Height - 2 * Inset));
+            var dest = MirrorLayout.DestinationFor(_region.Crop, new PixelRect(0, 0, w.ClientBounds.Width, w.ClientBounds.Height), interior);
+            if (src.IsEmpty || dest.IsEmpty)
             {
-                _thumb.Update(new PixelRect(0, 0, 1, 1), dest, _region.Opacity, false);
+                // crop entirely outside the client area: drop the thumbnail (re-registered when it is visible again)
+                _thumb.Dispose();
+                _thumb = null;
                 ShowPlaceholder(true);
             }
             else
@@ -210,8 +216,21 @@ public partial class MirrorWindow : Window
     Brush RestingBrush() => _region.IsLocked ? NoBrush : Accent;
     void RestoreBorder() => Frame.BorderBrush = RestingBrush();
 
+    protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+    {
+        if (!_closingForReal) { e.Cancel = true; return; }
+        base.OnClosing(e);
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _closed = true;
+        base.OnClosed(e);
+    }
+
     public void CloseForReal()
     {
+        _closingForReal = true;
         _flashTimer?.Stop();
         _thumb?.Dispose();
         _thumb = null;
