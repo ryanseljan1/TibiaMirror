@@ -21,6 +21,7 @@
             <Button x:Name="TestButton" DockPanel.Dock="Right" Content="Test" Padding="10,2" Margin="6,0,0,0" Click="Test_Click"/>
             <ComboBox x:Name="SoundBox" DisplayMemberPath="Name" SelectionChanged="SoundBox_SelectionChanged"/>
         </DockPanel>
+        <TextBlock x:Name="SoundWarning" Foreground="DarkOrange" TextWrapping="Wrap" Margin="0,-4,0,8" Visibility="Collapsed"/>
         <TextBlock Text="Volume"/>
         <Slider x:Name="VolumeSlider" Minimum="0" Maximum="100" Margin="0,2,0,8" IsSnapToTickEnabled="True" TickFrequency="1"/>
         <TextBlock Text="When the key is pressed again while running"/>

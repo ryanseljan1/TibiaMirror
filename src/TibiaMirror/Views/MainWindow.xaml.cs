@@ -27,26 +27,47 @@ public partial class MainWindow : Window
             if (!host.RetryHotkeys()) MessageBox.Show(this, "Hotkeys are still unavailable. Details were saved to the log folder.", AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
         };
         host.HotkeysUnavailableChanged += () => Dispatcher.Invoke(UpdateBanner);
+        // WPF performs its own initial placement (default cascade position, DIP width/height) after SourceInitialized, and its
+        // LocationChanged/SizeChanged then saved those defaults over the stored bounds. So: restore early (no flicker), re-apply once
+        // the window is rendered, and only allow saving after that.
         SourceInitialized += (_, _) => RestoreSavedBounds();
+        ContentRendered += (_, _) => { RestoreSavedBounds(); _restoreComplete = true; };
         LocationChanged += (_, _) => SaveBounds();
         SizeChanged += (_, _) => SaveBounds();
         if (host.Locator is { } locator) ShowTibiaState(locator.State);
         host.TibiaStateChanged += s => Dispatcher.Invoke(() => ShowTibiaState(s));
     }
 
-    void ShowTibiaState(TibiaMirror.Detection.TibiaState s) => StatusText.Text =
-        !s.IsFound ? "⚪ Waiting for Tibia…" : s.IsMinimized ? "🟡 Tibia minimized" : "🟢 Tibia detected";
+    static readonly System.Windows.Media.Brush WaitingDot = Frozen("#FF9AA3AE"), MinimizedDot = Frozen("#FFE0A100"), DetectedDot = Frozen("#FF2EAD4F");
+    static System.Windows.Media.Brush Frozen(string hex)
+    {
+        var b = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex)!);
+        b.Freeze();
+        return b;
+    }
+
+    void ShowTibiaState(TibiaMirror.Detection.TibiaState s)
+    {
+        var (text, dot) = !s.IsFound ? ("Waiting for Tibia…", WaitingDot) : s.IsMinimized ? ("Tibia minimized", MinimizedDot) : ("Tibia detected", DetectedDot);
+        StatusText.Text = text;
+        StatusDot.Fill = dot;
+        System.Windows.Automation.AutomationProperties.SetName(StatusText, text);
+    }
 
     /// <summary>Set by App when the process is really exiting (tray Exit, session end) so Closing is not turned into hide-to-tray.</summary>
     public bool AllowClose { get; set; }
 
     void UpdateBanner() => HotkeyBanner.Visibility = _host.HotkeysUnavailable ? Visibility.Visible : Visibility.Collapsed;
 
+    bool _restoreComplete;
+
     void RestoreSavedBounds()
     {
-        if (_host.Settings.MainWindowBounds is not { } saved || saved.IsEmpty) return;
-        var r = _host.ClampToMonitors(saved);
+        if (TibiaMirror.Settings.MainWindowBoundsPolicy.Target(_host.Settings.MainWindowBounds, _host.ClampToMonitors) is not { } r) return;
         var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+        if (hwnd == 0) return;
+        if (TibiaMirror.Interop.NativeMethods.GetWindowRect(hwnd, out var rc)
+            && !TibiaMirror.Settings.MainWindowBoundsPolicy.NeedsApply(r, new TibiaMirror.Models.PixelRect(rc.Left, rc.Top, rc.Right - rc.Left, rc.Bottom - rc.Top))) return;
         TibiaMirror.Interop.NativeMethods.SetWindowPos(hwnd, 0, r.X, r.Y, r.Width, r.Height, 0x0004 | TibiaMirror.Interop.NativeMethods.SWP_NOACTIVATE);
     }
 
@@ -56,7 +77,7 @@ public partial class MainWindow : Window
         var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
         if (hwnd == 0 || !TibiaMirror.Interop.NativeMethods.GetWindowRect(hwnd, out var rc)) return false;
         var r = new TibiaMirror.Models.PixelRect(rc.Left, rc.Top, rc.Right - rc.Left, rc.Bottom - rc.Top);
-        if (r.IsEmpty || r == _host.Settings.MainWindowBounds) return false;
+        if (!TibiaMirror.Settings.MainWindowBoundsPolicy.ShouldSave(_restoreComplete, r, _host.Settings.MainWindowBounds)) return false;
         _host.Settings.MainWindowBounds = r;
         return true;
     }

@@ -110,6 +110,9 @@ public sealed class AudioTimerService(IClock clock, ISoundPlayer sounds)
     /// <summary>Plays a not-yet-saved timer's sound at its effective volume (used by the edit dialog).</summary>
     public void TestSound(string sound, int volume) => sounds.Play(sound, Effective(volume));
 
+    /// <summary>Whether the sound can be played as configured (built-in known, or a supported file that exists).</summary>
+    public bool CanPlay(string sound) => sounds.CanPlay(sound);
+
     void Play(AudioTimerModel t) => sounds.Play(t.Sound, Effective(t.Volume));
 
     double Effective(int volume) => _profile.MasterVolume / 100.0 * volume / 100.0;

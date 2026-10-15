@@ -16,7 +16,10 @@
             <Button x:Name="LockAllButton" DockPanel.Dock="Right" Content="Lock all" Padding="8,2" Margin="4,0,0,0"/>
             <Button x:Name="ShowHideAllButton" DockPanel.Dock="Right" Content="Show/Hide all" Padding="8,2" Margin="4,0,0,0"/>
             <StackPanel VerticalAlignment="Center">
-                <TextBlock x:Name="StatusText" Text="⚪ Waiting for Tibia…"/>
+                <StackPanel Orientation="Horizontal" x:Name="StatusPanel">
+                    <Ellipse x:Name="StatusDot" Width="10" Height="10" Margin="0,0,6,0" VerticalAlignment="Center" StrokeThickness="1" Stroke="{DynamicResource ThemeMutedBrush}" Fill="#FF9AA3AE"/>
+                    <TextBlock x:Name="StatusText" Text="Waiting for Tibia…" AutomationProperties.Name="Waiting for Tibia…"/>
+                </StackPanel>
                 <TextBlock x:Name="ProfileText"/>
             </StackPanel>
         </DockPanel>

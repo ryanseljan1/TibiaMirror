@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using TibiaMirror.Abstractions;
-using TibiaMirror.Audio;
+using TibiaMirror.Countdown;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Timers;
@@ -9,12 +9,12 @@ public sealed class AudioTimerCardViewModel : ObservableObject
 {
     readonly AudioTimerService _service;
     string _remainingText = "Ready";
-    readonly bool _soundMissing;
+    readonly string _warning;
 
     public AudioTimerCardViewModel(AudioTimerModel model, AudioTimerService service, ISoundPlayer sounds)
     {
         Model = model; _service = service;
-        _soundMissing = !sounds.CanPlay(model.Sound);
+        _warning = CountdownSoundWarning.For(model.Sound, sounds.CanPlay);
         Refresh();
     }
 
@@ -26,10 +26,9 @@ public sealed class AudioTimerCardViewModel : ObservableObject
     public string LoopText => $"↻ every {Model.EffectiveIntervalSeconds:0.##} s";
     public bool IsRunning => _service.IsRunning(Model.Id);
     public string RemainingText { get => _remainingText; private set => SetProperty(ref _remainingText, value); }
-    public bool SoundMissing => _soundMissing;
-    public string WarningText => _soundMissing
-        ? $"\u26A0 Sound file not found \u2014 using {BuiltInSounds.All.First(s => s.Id == BuiltInSounds.DefaultId).DisplayName}"
-        : "";
+    public bool SoundMissing => _warning.Length > 0;
+    /// <summary>Same wording as the countdown editor; empty when the sound can play.</summary>
+    public string WarningText => _warning;
 
     public void Refresh()
     {

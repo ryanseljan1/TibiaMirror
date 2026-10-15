@@ -4,15 +4,15 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
-    <!-- Inverted theme colours (text on window background) so it stands out in light and dark mode. -->
-    <Border Background="{DynamicResource ThemeTextBrush}" CornerRadius="4" Padding="14,8" MaxWidth="460"
+    <!-- Themed surface with a border and shadow so it follows light and dark mode. -->
+    <Border Background="{DynamicResource ThemeSurfaceBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="14,8" MaxWidth="460"
             Visibility="{Binding IsVisible, Converter={StaticResource BoolToVis}}">
         <Border.Effect>
             <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.35"/>
         </Border.Effect>
         <DockPanel>
             <Button DockPanel.Dock="Right" Command="{Binding UndoCommand}" Content="Undo" Margin="16,0,0,0" Padding="4,0"
-                    Cursor="Hand" FontWeight="SemiBold" Foreground="{DynamicResource ThemeWindowBrush}" Background="Transparent" BorderThickness="0">
+                    Cursor="Hand" FontWeight="SemiBold" Foreground="{DynamicResource ThemeTextBrush}" Background="Transparent" BorderThickness="0">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <TextBlock x:Name="Label" Text="{TemplateBinding Content}" Padding="{TemplateBinding Padding}"
@@ -26,7 +26,7 @@
                 </Button.Template>
             </Button>
             <TextBlock Text="{Binding Message}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                       Foreground="{DynamicResource ThemeWindowBrush}"/>
+                       Foreground="{DynamicResource ThemeTextBrush}"/>
         </DockPanel>
     </Border>
 </UserControl>

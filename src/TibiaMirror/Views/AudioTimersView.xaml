@@ -17,8 +17,8 @@
                             <Style.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter Property="Content" Value="Listening: ON"/>
-                                    <Setter Property="Background" Value="#FF9BE39B"/>
-                                    <Setter Property="Foreground" Value="#FF183018"/>
+                                    <Setter Property="Background" Value="{DynamicResource ThemeSuccessBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource ThemeOnSuccessBrush}"/>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>

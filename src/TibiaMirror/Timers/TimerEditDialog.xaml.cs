@@ -52,12 +52,20 @@ public partial class TimerEditDialog : Window
         }
         SoundBox.SelectedItem = found;
         _lastChoice = found;
+        UpdateSoundWarning(found);
+    }
+
+    void UpdateSoundWarning(SoundChoice c)
+    {
+        var text = Countdown.CountdownSoundWarning.For(c == CustomChoice ? null : c.Id, _service.CanPlay);
+        SoundWarning.Text = text;
+        SoundWarning.Visibility = text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     void SoundBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_revert || SoundBox.SelectedItem is not SoundChoice c) return;
-        if (c != CustomChoice) { _lastChoice = c; return; }
+        if (c != CustomChoice) { _lastChoice = c; UpdateSoundWarning(c); return; }
         var dlg = new OpenFileDialog { Filter = SoundFormats.DialogFilter };
         if (dlg.ShowDialog(this) == true) SelectSound(dlg.FileName);
         else { _revert = true; SoundBox.SelectedItem = _lastChoice; _revert = false; }
