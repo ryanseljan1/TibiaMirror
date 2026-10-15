@@ -2,12 +2,15 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using TibiaMirror.Logging;
+using TibiaMirror.Models;
 
 namespace TibiaMirror.Settings;
 
 public partial class SettingsWindow : Window
 {
     readonly AppHost _host;
+    readonly StartupRegistration _startup = new(new RegistryRunKey(), Environment.ProcessPath ?? "");
+    bool _startupWasEnabled;
 
     public SettingsWindow(AppHost host)
     {
@@ -16,8 +19,11 @@ public partial class SettingsWindow : Window
         var s = host.Settings;
         ShowHideBox.Hotkey = s.ShowHideAllHotkey;
         NextProfileBox.Hotkey = s.NextProfileHotkey;
+        LockAllBox.Hotkey = s.LockAllHotkey;
         OnlyFocusedCheck.IsChecked = s.OnlyShowWhenTibiaFocused;
         DarkModeCheck.IsChecked = s.DarkMode;
+        _startupWasEnabled = ReadStartupEnabled();
+        StartWithWindowsCheck.IsChecked = _startupWasEnabled;
         ProcessBox.Text = s.TibiaProcessName;
         TitleBox.Text = s.TibiaTitlePrefix;
         VersionText.Text = "Version " + AppInfo.Version;
@@ -26,6 +32,12 @@ public partial class SettingsWindow : Window
         OpenFolderButton.Click += (_, _) => OpenDataFolder();
         SaveButton.Click += (_, _) => Save();
         Validate();
+    }
+
+    bool ReadStartupEnabled()
+    {
+        try { return _startup.IsEnabled(); }
+        catch (Exception e) { Log.Error("Reading the startup entry failed", e); return false; }
     }
 
     /// <summary>Process name and title prefix must be non-empty.</summary>
@@ -48,30 +60,46 @@ public partial class SettingsWindow : Window
         catch (Exception e) { Log.Error("Open data folder failed", e); }
     }
 
-    /// <summary>Warns (Yes/No) when a changed global hotkey is used by a timer, a countdown, or by the other global hotkey.</summary>
+    /// <summary>Warns (Yes/No) when a changed global hotkey is used by a timer, a countdown, or by another global hotkey.</summary>
     bool ConfirmHotkeyConflicts()
     {
         var s = _host.Settings;
         var showHide = ShowHideBox.Hotkey;
         var nextProfile = NextProfileBox.Hotkey;
-        var checks = new[]
+        var lockAll = LockAllBox.Hotkey;
+        var boxes = new (Hotkey? Key, bool Changed, object Owner)[]
         {
-            (Key: showHide, Changed: showHide != s.ShowHideAllHotkey, Owner: (object)_host.ShowHideOwner, Other: (object)_host.NextProfileOwner, OtherKey: nextProfile),
-            (Key: nextProfile, Changed: nextProfile != s.NextProfileHotkey, Owner: (object)_host.NextProfileOwner, Other: (object)_host.ShowHideOwner, OtherKey: showHide),
+            (showHide, showHide != s.ShowHideAllHotkey, _host.ShowHideOwner),
+            (nextProfile, nextProfile != s.NextProfileHotkey, _host.NextProfileOwner),
+            (lockAll, lockAll != s.LockAllHotkey, _host.LockAllOwner),
         };
-        foreach (var c in checks)
+        foreach (var c in boxes)
         {
             if (c.Key is not { } hk || !c.Changed) continue;
-            // The other global hotkey is judged from the box (its new value), not from its current registration.
+            // The other global hotkeys are judged from the boxes (their new values), not from their current registrations.
+            var siblings = boxes.Where(b => !ReferenceEquals(b.Owner, c.Owner)).ToList();
             var others = (_host.Hotkeys?.FindConflicts(hk, c.Owner) ?? Array.Empty<object>())
-                .Where(o => !ReferenceEquals(o, c.Other)).ToList();
-            if (c.OtherKey is { } ok && ok == hk) others.Add(c.Other);
+                .Where(o => !siblings.Any(b => ReferenceEquals(b.Owner, o))).ToList();
+            others.AddRange(siblings.Where(b => b.Key == hk).Select(b => b.Owner));
             if (others.Count == 0) continue;
             var names = string.Join(", ", others.Select(o => o is Models.AudioTimerModel t ? t.Name : o.ToString()));
             if (MessageBox.Show(this, $"This key is already used by: {names}. Use it anyway?", "Key already in use",
                     MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return false;
         }
         return true;
+    }
+
+    /// <summary>Writes the Run entry only when the checkbox changed, so an installer-made entry is left alone.</summary>
+    void ApplyStartup()
+    {
+        var want = StartWithWindowsCheck.IsChecked == true;
+        if (want == _startupWasEnabled) return;
+        try { _startup.Apply(want); }
+        catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+        {
+            Log.Error("Updating the startup entry failed", e);
+            MessageBox.Show(this, "Could not change the Start with Windows setting: " + e.Message, AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     void Save()
@@ -81,6 +109,7 @@ public partial class SettingsWindow : Window
         var s = _host.Settings;
         s.ShowHideAllHotkey = ShowHideBox.Hotkey;
         s.NextProfileHotkey = NextProfileBox.Hotkey;
+        s.LockAllHotkey = LockAllBox.Hotkey;
         s.OnlyShowWhenTibiaFocused = OnlyFocusedCheck.IsChecked == true;
         s.DarkMode = DarkModeCheck.IsChecked == true;
         s.TibiaProcessName = ProcessBox.Text.Trim();
@@ -91,6 +120,7 @@ public partial class SettingsWindow : Window
             Log.Error("Saving settings failed", e);
             MessageBox.Show(this, "Your settings were applied but could not be saved to disk: " + e.Message, AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
+        ApplyStartup();
         _host.ApplySettings();
         DialogResult = true;
     }

@@ -63,3 +63,41 @@ public class TibiaLocatorTests
         _w.Windows.Add(Win(1, "Tibia", "client", min: true)); var l = Make(); l.Poll(); Assert.True(l.State.IsMinimized);
     }
 }
+
+public class TibiaLocatorBrowserRegressionTests
+{
+    static WindowInfo Win(nint h, string title, string proc) =>
+        new(h, title, proc, true, false, new PixelRect(0, 0, 800, 600), new PixelRect(8, 31, 784, 561));
+    readonly FakeWindows _w = new();
+    readonly AppSettings _s = new();
+    TibiaLocator Make() => new(_w, () => _s, _ => false);
+
+    [Theory]
+    [InlineData("Tibia - TibiaWiki - Google Chrome", "chrome")]
+    [InlineData("Tibia - Mozilla Firefox", "firefox")]
+    [InlineData("Tibia - Microsoft Edge", "msedge")]
+    [InlineData("Tibia - Brave", "brave")]
+    [InlineData("Tibia http://tibia.com/news", "chrome")]
+    [InlineData("Tibia.com - Official Site", "opera")]
+    public void Browser_windows_are_never_the_tibia_window(string title, string process)
+    {
+        _w.Windows.Add(Win(1, title, process));
+        var l = Make(); l.Poll();
+        Assert.False(l.State.IsFound);
+    }
+
+    [Fact] public void Non_client_process_titled_Tibia_is_rejected()
+    {
+        _w.Windows.Add(Win(1, "Tibia", "notepad"));
+        var l = Make(); l.Poll();
+        Assert.False(l.State.IsFound);
+    }
+
+    [Fact] public void Real_client_is_still_picked_when_browser_tab_is_listed_first()
+    {
+        _w.Windows.Add(Win(1, "Tibia - TibiaWiki - Google Chrome", "chrome"));
+        _w.Windows.Add(Win(2, "Tibia - Knight Bob", "client"));
+        var l = Make(); l.Poll();
+        Assert.Equal((nint?)2, l.State.Window?.Handle);
+    }
+}

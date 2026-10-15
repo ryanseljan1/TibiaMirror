@@ -7,14 +7,17 @@
     <StackPanel Margin="16">
         <Grid>
             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Show/Hide all mirrors" VerticalAlignment="Center" Margin="0,0,12,8"/>
             <controls:HotkeyBox Grid.Row="0" Grid.Column="1" x:Name="ShowHideBox" HorizontalAlignment="Left" Margin="0,0,0,8"/>
             <TextBlock Grid.Row="1" Text="Next profile" VerticalAlignment="Center" Margin="0,0,12,8"/>
             <controls:HotkeyBox Grid.Row="1" Grid.Column="1" x:Name="NextProfileBox" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+            <TextBlock Grid.Row="2" Text="Lock/Unlock all mirrors" VerticalAlignment="Center" Margin="0,0,12,8"/>
+            <controls:HotkeyBox Grid.Row="2" Grid.Column="1" x:Name="LockAllBox" HorizontalAlignment="Left" Margin="0,0,0,8"/>
         </Grid>
         <CheckBox x:Name="OnlyFocusedCheck" Content="Only show mirrors while Tibia is focused" Margin="0,4,0,12"/>
         <CheckBox x:Name="DarkModeCheck" Content="Dark mode" Margin="0,0,0,12"/>
+        <CheckBox x:Name="StartWithWindowsCheck" Content="Start with Windows (in the tray)" Margin="0,0,0,12"/>
         <Expander Header="Advanced">
             <StackPanel Margin="0,8,0,0">
                 <TextBlock Text="Tibia process name (without .exe)"/>

@@ -55,7 +55,11 @@ public partial class App : Application
         _single.ListenForShowRequests(() => Dispatcher.Invoke(ShowMain));
         try { _host.Start(); }
         catch (Exception ex) { Log.Error("Startup failed", ex); }   // still show the window so the user is not left with a tray-only app
-        finally { ShowMain(); }
+        finally
+        {
+            // Launched by the Windows Run key: stay in the tray; the tray icon or a second launch shows the window.
+            if (!Settings.StartupRegistration.IsStartupLaunch(e.Args)) ShowMain();
+        }
     }
 
     static void ShowCrashMessage(AppPaths paths) =>

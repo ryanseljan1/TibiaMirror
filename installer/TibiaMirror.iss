@@ -30,6 +30,11 @@ Source: "..\publish\*"; DestDir: "{app}"; Flags: recursesubdirs ignoreversion
 [Icons]
 Name: "{group}\TibiaMirror"; Filename: "{app}\TibiaMirror.exe"
 Name: "{autodesktop}\TibiaMirror"; Filename: "{app}\TibiaMirror.exe"; Tasks: desktopicon
-Name: "{autostartup}\TibiaMirror"; Filename: "{app}\TibiaMirror.exe"; Tasks: startup
+[InstallDelete]
+; Pre-release builds autostarted via a Startup-folder shortcut; the Run value below replaces it
+Type: files; Name: "{autostartup}\TibiaMirror.lnk"
+[Registry]
+; Same value the in-app "Start with Windows" toggle writes, so both stay in sync
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "TibiaMirror"; ValueData: """{app}\TibiaMirror.exe"" --startup"; Flags: uninsdeletevalue; Tasks: startup
 [Run]
 Filename: "{app}\TibiaMirror.exe"; Description: "Launch TibiaMirror"; Flags: nowait postinstall skipifsilent

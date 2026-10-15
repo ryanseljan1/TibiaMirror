@@ -18,7 +18,7 @@ public sealed class AppHost : IDisposable
     public event Action<Profile>? ProfileChanged;
     public void SetProfile(Profile p) { ClampToMonitors(p); CurrentProfile = p; ProfileChanged?.Invoke(p); }
     public void ProfileEdited() => _autosave.Trigger();
-    public void ApplySettings() { ApplyMirrorHotkey(); ApplyProfileHotkey(); Mirrors?.Refresh(); TibiaMirror.Settings.ThemeManager.Apply(Settings.DarkMode); }
+    public void ApplySettings() { ApplyMirrorHotkey(); ApplyLockAllHotkey(); ApplyProfileHotkey(); Mirrors?.Refresh(); TibiaMirror.Settings.ThemeManager.Apply(Settings.DarkMode); }
 
     // --- Task 10: autosave, restore, hotkey retry ---
     public TibiaMirror.Settings.SettingsService? SettingsService { get; private set; }
@@ -79,6 +79,7 @@ public sealed class AppHost : IDisposable
     IDisposable? _profileHotkeyReg;
     public TibiaMirror.Hotkeys.GlobalHotkeyOwner ShowHideOwner { get; } = new("Show/Hide all mirrors");
     public TibiaMirror.Hotkeys.GlobalHotkeyOwner NextProfileOwner { get; } = new("Next profile");
+    public TibiaMirror.Hotkeys.GlobalHotkeyOwner LockAllOwner { get; } = new("Lock/Unlock all mirrors");
     readonly List<string> _pendingNotices = new();
     bool _noticesReady;
 
@@ -125,6 +126,14 @@ public sealed class AppHost : IDisposable
         _mirrorHotkey = null;
         if (Hotkeys is not null && Settings.ShowHideAllHotkey is { } hk)
             _mirrorHotkey = Hotkeys.Register(ShowHideOwner, hk, TibiaMirror.Hotkeys.HotkeyScope.Global, RequestToggleMirrors);
+    }
+    IDisposable? _lockAllHotkey;
+    public void ApplyLockAllHotkey()
+    {
+        _lockAllHotkey?.Dispose();
+        _lockAllHotkey = null;
+        if (Hotkeys is not null && Settings.LockAllHotkey is { } hk)
+            _lockAllHotkey = Hotkeys.Register(LockAllOwner, hk, TibiaMirror.Hotkeys.HotkeyScope.Global, () => Mirrors?.ToggleLockAll());
     }
     public Func<bool> IsTibiaFocused { get; set; } = () => false;
     public TibiaMirror.Hotkeys.KeyboardHook? Keyboard { get; private set; }
@@ -200,6 +209,7 @@ public sealed class AppHost : IDisposable
         _timersTimer?.Stop();
         TimersVm?.Dispose();
         _mirrorHotkey?.Dispose();
+        _lockAllHotkey?.Dispose();
         Countdowns?.Dispose();
         Mirrors?.Dispose();
         Hotkeys?.Dispose();

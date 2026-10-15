@@ -233,18 +233,30 @@ public sealed class MirrorService : IDisposable
     }
 
     /// <summary>Locks every mirror. Raises <see cref="LockedAll"/> so cards can update.</summary>
-    public void LockAll()
+    public void LockAll() => SetAllLocked(true);
+
+    public void UnlockAll() => SetAllLocked(false);
+
+    /// <summary>Hotkey behaviour: locks all if any visible mirror is unlocked, otherwise unlocks all. Returns the new state (true = locked).</summary>
+    public bool ToggleLockAll()
     {
-        foreach (var r in _profile.Regions) SetLockedNoSave(r);
+        var lockThem = MirrorLockToggle.ShouldLock(_profile.Regions);
+        SetAllLocked(lockThem);
+        return lockThem;
+    }
+
+    void SetAllLocked(bool locked)
+    {
+        foreach (var r in _profile.Regions) SetLockedNoSave(r, locked);
         LockedAll?.Invoke();
         _onChanged();
     }
 
     public event Action? LockedAll;
 
-    void SetLockedNoSave(RegionModel r)
+    void SetLockedNoSave(RegionModel r, bool locked)
     {
-        r.IsLocked = true;
+        r.IsLocked = locked;
         if (_windows.TryGetValue(r.Id, out var w)) w.ApplyLocked();
     }
 
