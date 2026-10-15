@@ -99,7 +99,7 @@ public sealed class MirrorService : IDisposable
 
     void Open(RegionModel r)
     {
-        var w = new MirrorWindow(r, _onChanged);
+        var w = new MirrorWindow(r, _onChanged, this);
         w.LayoutChanged += () => MirrorLayoutChanged?.Invoke(r.Id, w.Bounds, w.IsShown);
         _windows[r.Id] = w;
         lock (_handlesGate) _handles.Add(w.Handle);
@@ -201,6 +201,18 @@ public sealed class MirrorService : IDisposable
         return true;
     }
 
+    /// <summary>Raised when a region's lock/visibility/glow changed so open cards can refresh (also fired for edits made from a mirror's context menu).</summary>
+    public event Action<Guid>? RegionEdited;
+
+    /// <summary>Raised when a mirror's context menu asks for deletion; the owner runs the same delete + Undo flow as the card.</summary>
+    public event Action<Guid>? DeleteRequested;
+
+    /// <summary>Deletes through <see cref="DeleteRequested"/> so the undo snackbar is offered; removes outright if nobody listens.</summary>
+    public void RequestDelete(Guid id)
+    {
+        if (DeleteRequested is { } handler) handler(id); else Remove(id);
+    }
+
     public void Rename(Guid id, string name)
     {
         if (Find(id) is not { } r) return;
@@ -213,6 +225,7 @@ public sealed class MirrorService : IDisposable
         if (Find(id) is not { } r) return;
         r.IsVisible = v;
         if (_windows.TryGetValue(id, out var w)) Refresh(w);
+        RegionEdited?.Invoke(id);
         _onChanged();
     }
 
@@ -221,6 +234,17 @@ public sealed class MirrorService : IDisposable
         if (Find(id) is not { } r) return;
         r.IsLocked = v;
         if (_windows.TryGetValue(id, out var w)) w.ApplyLocked();
+        RegionEdited?.Invoke(id);
+        _onChanged();
+    }
+
+    /// <summary>Stores the glow border settings (repaired) and redraws the mirror.</summary>
+    public void SetGlow(Guid id, GlowSettings glow)
+    {
+        if (Find(id) is not { } r) return;
+        r.Glow = GlowStyle.Sanitize(glow);
+        if (_windows.TryGetValue(id, out var w)) w.ApplyGlow();
+        RegionEdited?.Invoke(id);
         _onChanged();
     }
 

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 
@@ -13,9 +13,16 @@ public sealed partial class MirrorsViewModel : ObservableObject
 
     public void Attach(MirrorService service)
     {
-        if (_service is not null) _service.LockedAll -= OnLockedAll;
+        if (_service is not null)
+        {
+            _service.LockedAll -= OnLockedAll;
+            _service.RegionEdited -= OnRegionEdited;
+            _service.DeleteRequested -= OnDeleteRequested;
+        }
         _service = service;
         _service.LockedAll += OnLockedAll;
+        _service.RegionEdited += OnRegionEdited;
+        _service.DeleteRequested += OnDeleteRequested;
         Rebuild();
         OnTibiaStateChanged();
     }
@@ -77,6 +84,15 @@ public sealed partial class MirrorsViewModel : ObservableObject
     public bool IsEmpty => Cards.Count == 0;
 
     void OnLockedAll() { foreach (var c in Cards) c.RefreshLocked(); }
+
+    /// <summary>A mirror's context menu changed lock/visibility/glow: bring its card up to date.</summary>
+    void OnRegionEdited(Guid id) => Cards.FirstOrDefault(c => c.Id == id)?.Refresh();
+
+    /// <summary>A mirror's context menu asked to delete: same flow (and Undo snackbar) as the card's Delete button.</summary>
+    void OnDeleteRequested(Guid id)
+    {
+        if (Cards.FirstOrDefault(c => c.Id == id) is { } card) OnCardDeleted(card); else _service?.Remove(id);
+    }
 
     [RelayCommand(CanExecute = nameof(CanAddRegion))]
     async Task AddRegion()

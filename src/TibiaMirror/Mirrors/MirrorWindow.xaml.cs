@@ -14,12 +14,10 @@ namespace TibiaMirror.Mirrors;
 
 public partial class MirrorWindow : Window
 {
-    const int Inset = 2;
-    static readonly Brush Accent = Freeze(new SolidColorBrush(Color.FromRgb(0xFF, 0x7F, 0x00)));
-    static readonly Brush NoBrush = Brushes.Transparent;
-
     readonly RegionModel _region;
     readonly Action _onUserEdit;
+    readonly MirrorService _service;
+    Color? _flashColor;
     nint _hwnd;
     DwmThumbnail? _thumb;
     nint _thumbSource;
@@ -29,10 +27,11 @@ public partial class MirrorWindow : Window
     DispatcherTimer? _flashTimer;
     TibiaState _state = new(null, false);
 
-    public MirrorWindow(RegionModel region, Action onUserEdit)
+    public MirrorWindow(RegionModel region, Action onUserEdit, MirrorService service)
     {
         _region = region;
         _onUserEdit = onUserEdit;
+        _service = service;
         InitializeComponent();
         _hwnd = new WindowInteropHelper(this).EnsureHandle();
         WindowStyles.MakeToolWindow(_hwnd);
@@ -40,6 +39,7 @@ public partial class MirrorWindow : Window
         ApplyLocked();
         MouseLeftButtonDown += OnBodyMouseDown;
         MouseWheel += OnWheelZoom;
+        MouseRightButtonUp += OnContextMenuRequested;
         foreach (var h in new[] { HandleTL, HandleTR, HandleBL, HandleBR }) WireHandle(h);
         SizeChanged += (_, _) => { if (IsVisible) { UpdateThumbnail(); } };
         // lets dependents (countdown bar) follow while dragging/resizing
@@ -52,8 +52,6 @@ public partial class MirrorWindow : Window
     public PixelRect Bounds => WindowStyles.GetBoundsPhysical(_hwnd);
     /// <summary>Raised on move/resize/show/hide.</summary>
     public event Action? LayoutChanged;
-
-    static Brush Freeze(SolidColorBrush b) { b.Freeze(); return b; }
 
     void ApplyBounds() { if (!_region.Mirror.IsEmpty) WindowStyles.SetBoundsPhysical(_hwnd, _region.Mirror); }
 
@@ -68,8 +66,39 @@ public partial class MirrorWindow : Window
     public void ApplyLocked()
     {
         WindowStyles.SetClickThrough(_hwnd, _region.IsLocked);
-        Frame.BorderBrush = _region.IsLocked ? NoBrush : Accent;
         Handles.Visibility = _region.IsLocked ? Visibility.Collapsed : Visibility.Visible;
+        RenderGlow();   // hidden while locked (seamless overlay), shown again on unlock
+    }
+
+    /// <summary>Redraws the glow border and re-fits the thumbnail after the glow settings changed.</summary>
+    public void ApplyGlow()
+    {
+        RenderGlow();
+        UpdateThumbnail();
+    }
+
+    /// <summary>Draws the glow as 1px border layers fading towards the thumbnail. A true outer glow is impossible: the DWM thumbnail paints over
+    /// the window interior and nothing renders outside the window, so the glow lives in the edge the thumbnail is inset by.</summary>
+    void RenderGlow()
+    {
+        GlowLayers.Children.Clear();
+        var g = _region.Glow;
+        if (_flashColor is not null && !g.Enabled) g = g with { Enabled = true, Intensity = GlowIntensity.Low };   // a flash shows even when the glow is off
+        if (!g.Enabled || (_region.IsLocked && _flashColor is null)) return;   // locked mirrors stay borderless, as before; only a flash shows
+        var color = _flashColor ?? ParseColor(g.Color);
+        var opacities = GlowStyle.LayerOpacities(g.Intensity);
+        for (var i = 0; i < opacities.Length; i++)
+        {
+            var brush = new SolidColorBrush(color) { Opacity = opacities[i] };
+            brush.Freeze();
+            GlowLayers.Children.Add(new System.Windows.Controls.Border { Margin = new Thickness(i), BorderThickness = new Thickness(1), BorderBrush = brush });
+        }
+    }
+
+    static Color ParseColor(string hex)
+    {
+        GlowStyle.TryParse(GlowStyle.Normalize(hex), out var r, out var g, out var b);
+        return Color.FromRgb(r, g, b);
     }
 
     /// <summary>Re-evaluates visibility and the thumbnail for the given Tibia state.</summary>
@@ -110,7 +139,8 @@ public partial class MirrorWindow : Window
             }
             var src = CropMath.ToThumbnailSource(_region.Crop, w.WindowBounds, w.ClientBounds);
             var b = Bounds;
-            var interior = new PixelRect(Inset, Inset, Math.Max(1, b.Width - 2 * Inset), Math.Max(1, b.Height - 2 * Inset));
+            var inset = GlowStyle.Inset(_region.Glow);
+            var interior = new PixelRect(inset, inset, Math.Max(1, b.Width - 2 * inset), Math.Max(1, b.Height - 2 * inset));
             var dest = MirrorLayout.DestinationFor(_region.Crop, new PixelRect(0, 0, w.ClientBounds.Width, w.ClientBounds.Height), interior);
             if (src.IsEmpty || dest.IsEmpty)
             {
@@ -143,6 +173,17 @@ public partial class MirrorWindow : Window
         if (_region.IsLocked || e.ChangedButton != MouseButton.Left) return;
         try { DragMove(); } catch (InvalidOperationException) { return; }
         Persist();
+    }
+
+    /// <summary>Right-click on an unlocked mirror opens its context menu (locked mirrors are click-through and never get here).</summary>
+    void OnContextMenuRequested(object sender, MouseButtonEventArgs e)
+    {
+        if (_region.IsLocked) return;
+        var menu = MirrorContextMenu.Build(_region, _service);
+        menu.PlacementTarget = this;
+        menu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+        menu.IsOpen = true;
+        e.Handled = true;
     }
 
     /// <summary>Wheel zoom on an unlocked mirror: 0.5x-4x of the crop's native size, 0.1 per notch, anchored under the cursor.</summary>
@@ -216,24 +257,24 @@ public partial class MirrorWindow : Window
 
     public void Flash(int pulses, string colorHex)
     {
-        Brush color;
-        try { color = (Brush)new BrushConverter().ConvertFromString(colorHex)!; }
-        catch { color = Accent; }
+        Color color;
+        try { color = (Color)ColorConverter.ConvertFromString(colorHex); }
+        catch { color = ParseColor(_region.Glow.Color); }
         _flashTimer?.Stop();
         int ticks = pulses * 2, n = 0;
         _flashTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
-        Frame.BorderBrush = color;
+        SetFlash(color);
         _flashTimer.Tick += (_, _) =>
         {
             n++;
             if (n >= ticks) { _flashTimer!.Stop(); RestoreBorder(); return; }
-            Frame.BorderBrush = n % 2 == 0 ? color : RestingBrush();
+            SetFlash(n % 2 == 0 ? color : null);
         };
         _flashTimer.Start();
     }
 
-    Brush RestingBrush() => _region.IsLocked ? NoBrush : Accent;
-    void RestoreBorder() => Frame.BorderBrush = RestingBrush();
+    void SetFlash(Color? color) { _flashColor = color; RenderGlow(); }
+    void RestoreBorder() => SetFlash(null);
 
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {

@@ -1,4 +1,5 @@
 using TibiaMirror.Audio;
+using TibiaMirror.Mirrors;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Profiles;
@@ -16,6 +17,7 @@ public static class ProfileNormalizer
         {
             r.Name ??= "Region";
             r.Countdown ??= new();
+            r.Glow = GlowStyle.Sanitize(r.Glow);
         }
         foreach (var t in p.Timers)
         {

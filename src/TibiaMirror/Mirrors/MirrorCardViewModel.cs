@@ -1,6 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
+using System.Windows.Media;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Mirrors;
@@ -48,6 +49,26 @@ public sealed partial class MirrorCardViewModel : ObservableObject
     public string OpacityText => $"{Math.Round(_region.Opacity * 100)}%";
 
     public void RefreshLocked() => OnPropertyChanged(nameof(IsLocked));
+
+    /// <summary>Re-reads everything a mirror's context menu can change.</summary>
+    public void Refresh()
+    {
+        OnPropertyChanged(nameof(IsLocked));
+        OnPropertyChanged(nameof(IsVisible));
+        OnPropertyChanged(nameof(Glow));
+        OnPropertyChanged(nameof(GlowBrush));
+        OnPropertyChanged(nameof(GlowChipOpacity));
+    }
+
+    public GlowSettings Glow => _region.Glow;
+
+    /// <summary>Colour chip showing the current glow colour (dimmed while the glow is off).</summary>
+    public Brush GlowBrush => GlowMenu.BrushFor(_region.Glow.Color);
+
+    public double GlowChipOpacity => _region.Glow.Enabled ? 1.0 : 0.35;
+
+    /// <summary>Applies new glow settings through the service (the same call the mirror's context menu uses).</summary>
+    public void SetGlow(GlowSettings glow) { _service.SetGlow(Id, glow); Refresh(); }
 
     [RelayCommand]
     void Rename()

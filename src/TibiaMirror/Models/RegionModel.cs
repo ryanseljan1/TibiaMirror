@@ -10,4 +10,5 @@ public sealed class RegionModel
     public bool IsVisible { get; set; } = true;
     public bool IsLocked { get; set; }
     public CountdownSettings Countdown { get; set; } = new();
+    public GlowSettings Glow { get; set; } = new();
 }
