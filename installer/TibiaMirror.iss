@@ -36,5 +36,7 @@ Type: files; Name: "{autostartup}\TibiaMirror.lnk"
 [Registry]
 ; Same value the in-app "Start with Windows" toggle writes, so both stay in sync
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "TibiaMirror"; ValueData: """{app}\TibiaMirror.exe"" --startup"; Flags: uninsdeletevalue; Tasks: startup
+; Also removed on uninstall when enabled from the app Settings instead of the installer task
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "TibiaMirror"; Flags: uninsdeletevalue
 [Run]
 Filename: "{app}\TibiaMirror.exe"; Description: "Launch TibiaMirror"; Flags: nowait postinstall skipifsilent

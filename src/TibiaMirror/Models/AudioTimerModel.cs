@@ -6,6 +6,9 @@ public enum RepressBehavior { Restart, IgnoreWhileRunning }
 
 public sealed class AudioTimerModel
 {
+    /// <summary>Shortest duration/interval (the edit dialog's minimum); also keeps interval maths away from zero.</summary>
+    public const double MinSeconds = 0.1;
+
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = "Timer";
     public Hotkey? Hotkey { get; set; }
@@ -26,5 +29,5 @@ public sealed class AudioTimerModel
     /// </summary>
     public DateTime? ResumeAtUtc { get; set; }
 
-    [JsonIgnore] public double EffectiveIntervalSeconds => IntervalSeconds is > 0 ? IntervalSeconds.Value : DurationSeconds;
+    [JsonIgnore] public double EffectiveIntervalSeconds => Math.Max(MinSeconds, IntervalSeconds is > 0 ? IntervalSeconds.Value : DurationSeconds);
 }

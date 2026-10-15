@@ -25,6 +25,7 @@ public partial class MirrorWindow : Window
     bool _closingForReal, _closed;
     bool _wantShown;
     DispatcherTimer? _flashTimer;
+    readonly WheelAccumulator _wheel = new();
     TibiaState _state = new(null, false);
 
     public MirrorWindow(RegionModel region, Action onUserEdit, MirrorService service)
@@ -68,6 +69,7 @@ public partial class MirrorWindow : Window
         WindowStyles.SetClickThrough(_hwnd, _region.IsLocked);
         Handles.Visibility = _region.IsLocked ? Visibility.Collapsed : Visibility.Visible;
         RenderGlow();   // hidden while locked (seamless overlay), shown again on unlock
+        UpdateThumbnail();   // the inset follows the glow
     }
 
     /// <summary>Redraws the glow border and re-fits the thumbnail after the glow settings changed.</summary>
@@ -139,7 +141,7 @@ public partial class MirrorWindow : Window
             }
             var src = CropMath.ToThumbnailSource(_region.Crop, w.WindowBounds, w.ClientBounds);
             var b = Bounds;
-            var inset = GlowStyle.Inset(_region.Glow);
+            var inset = GlowStyle.Inset(_region.Glow, _region.IsLocked);
             var interior = new PixelRect(inset, inset, Math.Max(1, b.Width - 2 * inset), Math.Max(1, b.Height - 2 * inset));
             var dest = MirrorLayout.DestinationFor(_region.Crop, new PixelRect(0, 0, w.ClientBounds.Width, w.ClientBounds.Height), interior);
             if (src.IsEmpty || dest.IsEmpty)
@@ -190,11 +192,12 @@ public partial class MirrorWindow : Window
     void OnWheelZoom(object sender, MouseWheelEventArgs e)
     {
         if (_region.IsLocked || _region.Crop.IsEmpty || ActualWidth <= 0 || ActualHeight <= 0) return;
-        var notches = ZoomMath.NotchesFromDelta(e.Delta);
-        if (notches == 0) return;
+        var notches = _wheel.Add(e.Delta);
+        if (notches == 0) { e.Handled = true; return; }
         var p = e.GetPosition(this);
         var before = Bounds;
-        var after = ZoomMath.Zoom(before, _region.Crop, notches, p.X / ActualWidth, p.Y / ActualHeight);
+        var after = MonitorClamp.Clamp(ZoomMath.Zoom(before, _region.Crop, notches, p.X / ActualWidth, p.Y / ActualHeight),
+            Monitors.WorkAreas(), Monitors.PrimaryWorkArea());
         e.Handled = true;
         if (after == before) return;
         WindowStyles.SetBoundsPhysical(_hwnd, after);

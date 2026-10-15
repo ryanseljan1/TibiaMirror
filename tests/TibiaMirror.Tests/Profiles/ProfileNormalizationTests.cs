@@ -29,6 +29,13 @@ public class ProfileNormalizationTests : IDisposable
         ProfileNormalizer.Normalize(q); AssertClean(q);
     }
 
+    [Fact] public void Normalize_clamps_timer_duration_to_minimum()
+    {
+        var p = new Profile { Timers = { new AudioTimerModel { DurationSeconds = 0 }, new AudioTimerModel { DurationSeconds = double.NaN } } };
+        ProfileNormalizer.Normalize(p);
+        Assert.All(p.Timers, t => Assert.Equal(AudioTimerModel.MinSeconds, t.DurationSeconds));
+    }
+
     [Fact] public void LoadProfile_normalizes_malformed_file()
     {
         var paths = new AppPaths(_root); var s = new ProfileService(paths); s.LoadInitial(); s.Create("Bad");

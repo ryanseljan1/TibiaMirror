@@ -175,6 +175,9 @@ public sealed class MirrorService : IDisposable
         _onChanged();
     }
 
+    /// <summary>Raised after a removed region was put back (id), so dependents can re-register its hotkeys.</summary>
+    public event Action<Guid>? RegionRestored;
+
     /// <summary>Raised after a region was removed (id).</summary>
     public event Action<Guid>? RegionRemoved;
 
@@ -197,6 +200,7 @@ public sealed class MirrorService : IDisposable
         if (!ReferenceEquals(removed.Profile, _profile) || Find(removed.Region.Id) is not null) return false;
         _profile.Regions.Insert(Math.Min(removed.Index, _profile.Regions.Count), removed.Region);
         Open(removed.Region);
+        RegionRestored?.Invoke(removed.Region.Id);
         _onChanged();
         return true;
     }

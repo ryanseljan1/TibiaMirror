@@ -12,6 +12,37 @@ public class TimerLoopAndResumeTests
     }
     AudioTimerService Reload(Profile p) { var s = new AudioTimerService(_clock, _snd); s.Load(p); return s; }
 
+    [Fact] public void Profile_switch_does_not_resume_timers_but_restart_does()
+    {
+        _t.Repeat = true;
+        var a = new Profile { IsListening = true }; a.Timers.Add(_t);
+        var s = Reload(a); s.Trigger(_t.Id);
+        s.Load(new Profile { IsListening = true });
+        var json = System.Text.Json.JsonSerializer.Serialize(a);   // saved by SaveCurrent before the switch
+        var back = System.Text.Json.JsonSerializer.Deserialize<Profile>(json)!;
+        s.Load(back);
+        Assert.False(s.IsRunning(_t.Id)); Assert.All(back.Timers, x => Assert.Null(x.ResumeAtUtc));
+
+        var future = new AudioTimerModel { DurationSeconds = 10, ResumeAtUtc = _clock.UtcNow.AddSeconds(30) };
+        var p = new Profile { IsListening = true }; p.Timers.Add(future);
+        Assert.True(Reload(p).IsRunning(future.Id));   // fresh service = app startup
+    }
+
+    [Fact] public void Reloading_the_same_profile_keeps_running_timers()
+    {
+        var p = new Profile { IsListening = true }; p.Timers.Add(_t);
+        var s = Reload(p); s.Trigger(_t.Id); s.Load(p);
+        Assert.True(s.IsRunning(_t.Id));
+    }
+
+    [Fact] public void Zero_duration_loop_does_not_divide_by_zero()
+    {
+        _t.DurationSeconds = 0; _t.Repeat = true;
+        Assert.True(_t.EffectiveIntervalSeconds >= 0.1);
+        var s = Make(); s.Trigger(_t.Id); _clock.Advance(5); s.Tick();
+        Assert.True(s.IsRunning(_t.Id));
+    }
+
     [Fact] public void Loop_fires_every_interval_until_cancelled()
     {
         _t.Repeat = true; _t.IntervalSeconds = 5;

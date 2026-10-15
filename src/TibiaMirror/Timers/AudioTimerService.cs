@@ -7,6 +7,7 @@ public sealed class AudioTimerService(IClock clock, ISoundPlayer sounds)
 {
     readonly Dictionary<Guid, DateTime> _endsAt = new();
     Profile _profile = new();
+    bool _loaded;   // false until the first Load: only app startup resumes persisted timers
 
     public event Action<Guid>? Completed;
 
@@ -14,18 +15,22 @@ public sealed class AudioTimerService(IClock clock, ISoundPlayer sounds)
     public event Action? StateChanged;
 
     /// <summary>
-    /// Switches profile. Timers of the new profile whose persisted end is still in the future resume; one-shot timers
-    /// that ended while the app was closed are dropped silently, and loops resume at the next interval boundary.
+    /// Loads a profile. At app startup (the first Load) timers whose persisted end is still in the future resume; one-shot
+    /// timers that ended while the app was closed are dropped silently, and loops resume at the next interval boundary.
+    /// Switching to a different profile later never resumes anything (the old profile was saved with its run state set).
     /// </summary>
     public void Load(Profile profile)
     {
         // a reload of the same profile keeps its running timers (they are rebuilt from ResumeAtUtc below)
-        if (!ReferenceEquals(_profile, profile)) foreach (var old in _profile.Timers) old.ResumeAtUtc = null;
+        var same = ReferenceEquals(_profile, profile);
+        if (!same) foreach (var old in _profile.Timers) old.ResumeAtUtc = null;
+        var resume = same || !_loaded;
+        _loaded = true;
         _profile = profile; _endsAt.Clear();
         var now = clock.UtcNow;
         foreach (var t in profile.Timers)
         {
-            if (t.ResumeAtUtc is not { } at || !profile.IsListening) { t.ResumeAtUtc = null; continue; }
+            if (!resume || t.ResumeAtUtc is not { } at || !profile.IsListening) { t.ResumeAtUtc = null; continue; }
             if (t.Repeat) _endsAt[t.Id] = NextBoundary(at, t.EffectiveIntervalSeconds, now);
             else if (at > now) _endsAt[t.Id] = at;
             else { t.ResumeAtUtc = null; continue; }

@@ -53,12 +53,13 @@ public partial class App : Application
         _tray.ToggleMirrorsRequested += _host.RequestToggleMirrors;
         _tray.ExitRequested += ExitApp;
         _single.ListenForShowRequests(() => Dispatcher.Invoke(ShowMain));
+        var startupFailed = false;
         try { _host.Start(); }
-        catch (Exception ex) { Log.Error("Startup failed", ex); }   // still show the window so the user is not left with a tray-only app
+        catch (Exception ex) { startupFailed = true; Log.Error("Startup failed", ex); }   // still show the window so the user is not left with a tray-only app
         finally
         {
             // Launched by the Windows Run key: stay in the tray; the tray icon or a second launch shows the window.
-            if (!Settings.StartupRegistration.IsStartupLaunch(e.Args)) ShowMain();
+            if (startupFailed || !Settings.StartupRegistration.IsStartupLaunch(e.Args)) ShowMain();
         }
     }
 

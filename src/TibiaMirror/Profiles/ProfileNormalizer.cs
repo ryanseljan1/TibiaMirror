@@ -23,6 +23,7 @@ public static class ProfileNormalizer
         {
             t.Name ??= "Timer";
             if (string.IsNullOrEmpty(t.Sound)) t.Sound = BuiltInSounds.DefaultId;
+            if (!(t.DurationSeconds >= AudioTimerModel.MinSeconds)) t.DurationSeconds = AudioTimerModel.MinSeconds;   // also catches NaN
             if (t.IntervalSeconds is { } iv && !(iv >= 0.1 && iv <= 3600)) t.IntervalSeconds = null;
             if (t.ResumeAtUtc is { Kind: DateTimeKind.Local } at) t.ResumeAtUtc = at.ToUniversalTime();
         }

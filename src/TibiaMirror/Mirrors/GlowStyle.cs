@@ -65,8 +65,8 @@ public static class GlowStyle
         return layers;
     }
 
-    /// <summary>Inset of the thumbnail inside the window: the glow edge when shown, otherwise the plain 2px frame.</summary>
-    public static int Inset(GlowSettings glow) => glow.Enabled ? Thickness(glow.Intensity) : 2;
+    /// <summary>Inset of the thumbnail inside the window: the glow edge when the glow is drawn (enabled and the mirror not locked), otherwise the plain 2px frame.</summary>
+    public static int Inset(GlowSettings glow, bool isLocked) => glow.Enabled && !isLocked ? Thickness(glow.Intensity) : 2;
 
     /// <summary>A copy with colour and intensity repaired.</summary>
     public static GlowSettings Sanitize(GlowSettings? g) =>

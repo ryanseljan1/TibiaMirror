@@ -17,9 +17,17 @@ public static class ZoomMath
     public static double NextScale(double scale, int notches) =>
         Math.Clamp(Math.Round(scale + notches * Step, 1, MidpointRounding.AwayFromZero), MinScale, MaxScale);
 
-    /// <summary>Whole notches for a wheel delta (120 per notch); partial notches from smooth wheels count as one step.</summary>
-    public static int NotchesFromDelta(int delta) =>
-        delta == 0 ? 0 : Math.Sign(delta) * Math.Max(1, Math.Abs(delta) / 120);
+    /// <summary>
+    /// Whole notches for a wheel delta (120 per notch) given the remainder carried over from earlier events. Smooth wheels
+    /// send fractions of a notch; they add up instead of each counting as a step. A carry of the opposite sign is discarded.
+    /// </summary>
+    public static (int Notches, int Carry) Accumulate(int carry, int delta)
+    {
+        if (delta == 0) return (0, carry);
+        if (carry != 0 && Math.Sign(carry) != Math.Sign(delta)) carry = 0;   // direction change
+        var total = carry + delta;
+        return (total / 120, total % 120);
+    }
 
     /// <summary>
     /// New window rectangle after zooming. Keeps the crop's aspect ratio; the point at fraction
@@ -35,5 +43,18 @@ public static class ZoomMath
         int x = window.X + (int)Math.Round(anchorX * (window.Width - w));
         int y = window.Y + (int)Math.Round(anchorY * (window.Height - h));
         return new PixelRect(x, y, w, h);
+    }
+}
+
+/// <summary>Per-window wheel state: turns raw wheel deltas into whole notches, keeping the remainder.</summary>
+public sealed class WheelAccumulator
+{
+    int _carry;
+
+    public int Add(int delta)
+    {
+        var (notches, carry) = ZoomMath.Accumulate(_carry, delta);
+        _carry = carry;
+        return notches;
     }
 }

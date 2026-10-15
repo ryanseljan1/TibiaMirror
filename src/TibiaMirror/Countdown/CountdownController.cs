@@ -27,6 +27,7 @@ public sealed class CountdownController : IDisposable
         _timer.Tick += (_, _) => OnTick();
         mirrors.MirrorLayoutChanged += OnLayout;
         mirrors.RegionRemoved += OnRegionRemoved;
+        mirrors.RegionRestored += OnRegionRestored;
         vm.CardCreated += OnCardCreated;
         host.HotkeysReady += OnHotkeysReady;
     }
@@ -44,6 +45,9 @@ public sealed class CountdownController : IDisposable
         DropBar(id);
         _layouts.Remove(id);
     }
+
+    /// <summary>An undone delete: the restored region countdown hotkey must work again right away.</summary>
+    void OnRegionRestored(Guid id) => _registrations.Reload(_host.CurrentProfile);
 
     void DropBar(Guid id)
     {
@@ -142,6 +146,7 @@ public sealed class CountdownController : IDisposable
         _registrations.Dispose();
         _mirrors.MirrorLayoutChanged -= OnLayout;
         _mirrors.RegionRemoved -= OnRegionRemoved;
+        _mirrors.RegionRestored -= OnRegionRestored;
         _vm.CardCreated -= OnCardCreated;
         _host.HotkeysReady -= OnHotkeysReady;
         _service.Completed -= OnCompleted;

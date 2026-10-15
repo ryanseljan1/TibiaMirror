@@ -68,11 +68,23 @@ public class ZoomMathTests
     }
 
     [Theory]
-    [InlineData(120, 1)]
-    [InlineData(-120, -1)]
-    [InlineData(240, 2)]
-    [InlineData(30, 1)]     // high-resolution wheels report fractions of a notch: still one step
-    [InlineData(-30, -1)]
-    [InlineData(0, 0)]
-    public void Notches_from_wheel_delta(int delta, int expected) => Assert.Equal(expected, ZoomMath.NotchesFromDelta(delta));
+    [InlineData(0, 120, 1, 0)]
+    [InlineData(0, -120, -1, 0)]
+    [InlineData(0, 240, 2, 0)]
+    [InlineData(0, 30, 0, 30)]      // high-resolution wheels report fractions of a notch: they accumulate
+    [InlineData(90, 30, 1, 0)]
+    [InlineData(90, 60, 1, 30)]
+    [InlineData(-90, -60, -1, -30)]
+    [InlineData(90, -30, 0, -30)]   // direction change discards the opposite carry
+    [InlineData(0, 0, 0, 0)]
+    public void Accumulate_emits_whole_notches_and_keeps_remainder(int carry, int delta, int notches, int rest) =>
+        Assert.Equal((notches, rest), ZoomMath.Accumulate(carry, delta));
+
+    [Fact] public void WheelAccumulator_needs_four_quarter_notches_for_one_step()
+    {
+        var w = new WheelAccumulator();
+        Assert.Equal(0, w.Add(30)); Assert.Equal(0, w.Add(30)); Assert.Equal(0, w.Add(30));
+        Assert.Equal(1, w.Add(30));
+        Assert.Equal(0, w.Add(30));
+    }
 }

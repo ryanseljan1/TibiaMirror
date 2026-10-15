@@ -54,10 +54,11 @@ public class GlowStyleTests
         Assert.True(GlowStyle.PeakOpacity(GlowIntensity.Low) <= GlowStyle.PeakOpacity(GlowIntensity.Medium)
                     && GlowStyle.PeakOpacity(GlowIntensity.Medium) <= GlowStyle.PeakOpacity(GlowIntensity.High));
 
-    [Fact] public void Inset_is_glow_edge_when_enabled_else_plain_frame()
+    [Fact] public void Inset_is_glow_edge_only_when_drawn_else_plain_frame()
     {
-        Assert.Equal(5, GlowStyle.Inset(new GlowSettings { Intensity = GlowIntensity.High }));
-        Assert.Equal(2, GlowStyle.Inset(new GlowSettings { Enabled = false, Intensity = GlowIntensity.High }));
+        Assert.Equal(5, GlowStyle.Inset(new GlowSettings { Intensity = GlowIntensity.High }, false));
+        Assert.Equal(2, GlowStyle.Inset(new GlowSettings { Enabled = false, Intensity = GlowIntensity.High }, false));
+        Assert.Equal(2, GlowStyle.Inset(new GlowSettings { Intensity = GlowIntensity.High }, true));   // locked mirrors draw no glow
     }
 
     [Fact] public void Sanitize_repairs_colour_and_intensity_and_handles_null()

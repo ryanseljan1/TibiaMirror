@@ -68,7 +68,7 @@ public sealed partial class MirrorCardViewModel : ObservableObject
     public double GlowChipOpacity => _region.Glow.Enabled ? 1.0 : 0.35;
 
     /// <summary>Applies new glow settings through the service (the same call the mirror's context menu uses).</summary>
-    public void SetGlow(GlowSettings glow) { _service.SetGlow(Id, glow); Refresh(); }
+    public void SetGlow(GlowSettings glow) => _service.SetGlow(Id, glow);   // RegionEdited makes MirrorsViewModel refresh this card
 
     [RelayCommand]
     void Rename()
