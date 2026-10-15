@@ -80,3 +80,46 @@ Run this against real Tibia before each release. Tick every box. Items marked (k
 - [ ] Uninstall removes the app; `%APPDATA%\TibiaMirror` stays (delete it by hand to remove settings).
 - [ ] Portable zip: extract, run `TibiaMirror.exe`, everything above works.
 - [ ] The app and tray show the new icon.
+
+## QoL pack (0.1.0)
+
+### Delete and Undo
+- [ ] Delete a mirror: it disappears at once and "… deleted · Undo" shows for about 5 s. Undo brings it back in the same place in the list, with the same settings, and its window reappears if it was visible.
+- [ ] Delete a timer and a profile, then Undo each: they come back unchanged, and a deleted current profile becomes current again. The last profile still can't be deleted.
+- [ ] Let the snackbar time out: the deletion is final. Delete two things in a row: only the latest can be undone.
+- [ ] The snackbar is readable in dark and light mode.
+
+### Waiting for Tibia
+- [ ] With Tibia closed (or minimized), Add Region and Re-crop are disabled. Hovering shows "Open Tibia to start adding mirrors", and no message box appears.
+- [ ] With Tibia closed, the Mirrors page shows the hint about the Tibia process/title setting. It disappears when Tibia starts.
+
+### Focus debounce
+- [ ] "Only show mirrors while Tibia is focused" on: a quick alt-tab away and back (under ½ s) doesn't make the mirrors flicker. Staying away hides them after about 0.6 s.
+- [ ] Right after adding or re-cropping a region, the new mirror stays visible for about 2 s even though Tibia isn't focused.
+
+### Wheel zoom
+- [ ] Mouse wheel over an unlocked mirror scales it in 0.1 steps between 0.5× and 4× of the crop size, keeping the aspect ratio and the point under the cursor. The size is kept after restart.
+- [ ] Mouse wheel over a locked mirror does nothing to the mirror (it scrolls whatever is under it).
+
+### Lock-all hotkey
+- [ ] Settings: assign a Lock/Unlock-all hotkey (key). Pressing it locks all mirrors if any visible one is unlocked; pressing it again unlocks all. Mirror cards update.
+- [ ] Assigning a key already used by Show/Hide all, Next profile, a timer or a countdown shows the conflict prompt (key).
+
+### Start with Windows
+- [ ] Settings: tick "Start with Windows" and Save. `HKCU\Software\Microsoft\Windows\CurrentVersion\Run\TibiaMirror` is `"<exe path>" --startup`. Untick and Save: the value is removed.
+- [ ] Sign out and in (or reboot): TibiaMirror starts in the tray with no window shown. The tray icon opens the window.
+- [ ] Installer with "Start when Windows starts" ticked: the Settings checkbox shows ticked, and no Startup-folder shortcut is created.
+
+### Timers: loops, resume, formats, presets
+- [ ] A timer with "Repeat every N s" plays after its duration and then every N s, and the card shows it is looping. The Stop button ends it.
+- [ ] Re-press on a loop: "Restart" restarts it; "Ignore while running" stops it.
+- [ ] Start a 2-minute timer and a loop, close the app, reopen within the time: both continue with the right remaining time. Close it past the end of a one-shot timer: it doesn't play late.
+- [ ] Custom sounds in m4a, aac and flac play. A file that fails to play falls back to the Chime without a crash.
+- [ ] "From preset" next to Add timer: each preset opens the edit dialog prefilled with name, duration and sound, and no hotkey.
+
+### Mirror context menu and glow
+- [ ] Right-click an unlocked mirror: the menu shows Re-crop, Glow, Lock, Hide and Delete, in the app's theme. Each does the same as the card's button, and Delete offers Undo. Re-crop is disabled while Tibia is missing.
+- [ ] Right-click a locked mirror: no menu (the click goes to whatever is under it).
+- [ ] Glow on/off, each colour preset and Low/Medium/High change the unlocked mirror's border. The colour chip on the card matches. The picture is never covered by the border.
+- [ ] A locked mirror shows no border. A countdown end still flashes its border.
+- [ ] Mirrors from an older settings file load with the default orange glow.

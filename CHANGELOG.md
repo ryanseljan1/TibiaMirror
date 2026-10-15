@@ -16,3 +16,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Automatic saving, restore of window positions on start, and multi-monitor and mixed-DPI handling.
 - System tray icon, single instance, and application icon.
 - Installer (Inno Setup) and portable zip, built by a GitHub release workflow.
+- Deleting a mirror, timer or profile happens at once with an Undo button for 5 seconds, instead of a confirmation box.
+- Add Region and Re-crop are disabled while Tibia is missing, with a hint instead of a message box.
+- Mirrors no longer flicker when you alt-tab quickly: they hide only after Tibia has been unfocused for about 0.6 s, and new mirrors stay visible for 2 s.
+- Mouse wheel over an unlocked mirror zooms it from 0.5x to 4x.
+- Right-click menu on unlocked mirrors (Re-crop, Glow, Lock, Hide, Delete).
+- Glow border per mirror: on/off, 7 colours and 3 intensities.
+- Hotkey to lock or unlock all mirrors.
+- "Start with Windows" option in Settings; at sign-in the app starts in the tray.
+- Audio timers: repeat a sound every N seconds until stopped, running timers continue after a restart, m4a/aac/flac sounds, and "From preset" timers.
