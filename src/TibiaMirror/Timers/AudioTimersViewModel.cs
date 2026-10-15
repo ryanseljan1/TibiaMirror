@@ -93,11 +93,21 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
         Rebuild();
     }
 
+    /// <summary>Deletes at once and offers Undo, which puts the timer back at the same position with the same settings.</summary>
     public void DeleteTimer(AudioTimerModel model)
     {
+        var profile = _host.CurrentProfile;
+        var index = profile.Timers.IndexOf(model);
+        if (index < 0) return;
         _service.Cancel(model.Id);
-        _host.CurrentProfile.Timers.Remove(model);
+        profile.Timers.RemoveAt(index);
         Rebuild();
+        _host.Snackbar.Show($"Timer '{model.Name}' deleted", () =>
+        {
+            if (!ReferenceEquals(profile, _host.CurrentProfile) || profile.Timers.Contains(model)) return;
+            profile.Timers.Insert(Math.Min(index, profile.Timers.Count), model);
+            Rebuild();
+        });
     }
 
     public void Test(AudioTimerModel model) => _service.TestSound(model.Id);

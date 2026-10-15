@@ -39,6 +39,7 @@ public partial class MirrorWindow : Window
         ApplyBounds();
         ApplyLocked();
         MouseLeftButtonDown += OnBodyMouseDown;
+        MouseWheel += OnWheelZoom;
         foreach (var h in new[] { HandleTL, HandleTR, HandleBL, HandleBR }) WireHandle(h);
         SizeChanged += (_, _) => { if (IsVisible) { UpdateThumbnail(); } };
         // lets dependents (countdown bar) follow while dragging/resizing
@@ -142,6 +143,21 @@ public partial class MirrorWindow : Window
         if (_region.IsLocked || e.ChangedButton != MouseButton.Left) return;
         try { DragMove(); } catch (InvalidOperationException) { return; }
         Persist();
+    }
+
+    /// <summary>Wheel zoom on an unlocked mirror: 0.5x-4x of the crop's native size, 0.1 per notch, anchored under the cursor.</summary>
+    void OnWheelZoom(object sender, MouseWheelEventArgs e)
+    {
+        if (_region.IsLocked || _region.Crop.IsEmpty || ActualWidth <= 0 || ActualHeight <= 0) return;
+        var notches = ZoomMath.NotchesFromDelta(e.Delta);
+        if (notches == 0) return;
+        var p = e.GetPosition(this);
+        var before = Bounds;
+        var after = ZoomMath.Zoom(before, _region.Crop, notches, p.X / ActualWidth, p.Y / ActualHeight);
+        e.Handled = true;
+        if (after == before) return;
+        WindowStyles.SetBoundsPhysical(_hwnd, after);
+        Persist();   // same path as corner-drag resizing: stores the bounds, updates the thumbnail, autosaves
     }
 
     void Persist()

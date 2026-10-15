@@ -5,12 +5,14 @@ using TibiaMirror.Models;
 namespace TibiaMirror;
 public sealed class AppHost : IDisposable
 {
-    public AppHost(AppPaths paths) { Paths = paths; _autosave = new TibiaMirror.Persistence.Debouncer(TimeSpan.FromSeconds(1), SaveAll); }
+    public AppHost(AppPaths paths) { Paths = paths; MirrorsVm = new TibiaMirror.Mirrors.MirrorsViewModel(Snackbar);_autosave = new TibiaMirror.Persistence.Debouncer(TimeSpan.FromSeconds(1), SaveAll); }
     public AppPaths Paths { get; }
     readonly AppSettings _defaultSettings = new();   // used until SettingsService.Load() has run
     public AppSettings Settings => SettingsService?.Current ?? _defaultSettings;
     public Profile CurrentProfile { get; set; } = new();
     public TibiaMirror.Abstractions.ISoundPlayer Sounds { get; } = new TibiaMirror.Audio.SoundPlayer();
+    /// <summary>Hosts the "deleted - Undo" snackbar shown at the bottom of the main window.</summary>
+    public TibiaMirror.Controls.SnackbarService Snackbar { get; } = new(new TibiaMirror.Abstractions.SystemClock());
     public event Action? ToggleMirrorsRequested;   // raised by tray; MirrorService subscribes (Task 7)
     public void RequestToggleMirrors() => ToggleMirrorsRequested?.Invoke();
     public event Action<Profile>? ProfileChanged;
@@ -115,7 +117,7 @@ public sealed class AppHost : IDisposable
 
     // --- Task 7: mirrors ---
     public TibiaMirror.Mirrors.MirrorService? Mirrors { get; private set; }
-    public TibiaMirror.Mirrors.MirrorsViewModel MirrorsVm { get; } = new();
+    public TibiaMirror.Mirrors.MirrorsViewModel MirrorsVm { get; }
     IDisposable? _mirrorHotkey;
     public void ApplyMirrorHotkey()
     {
@@ -173,13 +175,15 @@ public sealed class AppHost : IDisposable
         Timers = new TibiaMirror.Timers.AudioTimerService(new TibiaMirror.Abstractions.SystemClock(), Sounds);
         TimersVm = new TibiaMirror.Timers.AudioTimersViewModel(this, Timers);
         _timersTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
-        _timersTimer.Tick += (_, _) => { Timers.Tick(); TimersVm.Refresh(); };
+        _timersTimer.Tick += (_, _) => { Timers.Tick(); TimersVm.Refresh(); Snackbar.Tick(); };
         _timersTimer.Start();
 
         Mirrors = new TibiaMirror.Mirrors.MirrorService(locator, () => Settings, ProfileEdited);
         Countdowns = new TibiaMirror.Countdown.CountdownController(this, Mirrors, MirrorsVm);   // Task 11: before Load/Attach so it sees layouts and cards
         Mirrors.Load(CurrentProfile);
         MirrorsVm.Attach(Mirrors);
+        TibiaStateChanged += _ => MirrorsVm.OnTibiaStateChanged();   // enables/disables Add Region and Re-crop
+        ProfileChanged += _ => Snackbar.Dismiss();                   // an Undo for another profile's item no longer applies
         ToggleMirrorsRequested += () => Mirrors.AllHidden = !Mirrors.AllHidden;
         ProfileChanged += p => { Mirrors.Load(p); MirrorsVm.Rebuild(); };
         ProfileChanged += Countdowns.OnProfileChanged;

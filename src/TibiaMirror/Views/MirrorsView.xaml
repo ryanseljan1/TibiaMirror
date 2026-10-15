@@ -6,7 +6,14 @@
     </UserControl.Resources>
     <DockPanel Margin="8">
         <Button DockPanel.Dock="Top" Content="&#xFF0B; Add Region" Command="{Binding AddRegionCommand}"
+                ToolTip="{Binding AddRegionTip}" ToolTipService.ShowOnDisabled="True"
                 HorizontalAlignment="Left" Padding="12,4" Margin="0,0,0,8"/>
+        <Border DockPanel.Dock="Top" Margin="0,0,0,8" Padding="8,6" CornerRadius="3" BorderThickness="1"
+                Background="{DynamicResource ThemeBannerBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}"
+                Visibility="{Binding ShowTibiaHint, Converter={StaticResource BoolToVis}}">
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource ThemeBannerTextBrush}"
+                       Text="Waiting for Tibia. TibiaMirror looks for the Tibia client window; start Tibia and it will be detected automatically. If it never is, you can change the process name and window title it looks for in Settings (the gear button)."/>
+        </Border>
         <Grid>
             <TextBlock Text="No mirrors yet. Start Tibia and click Add Region." HorizontalAlignment="Center"
                        VerticalAlignment="Top" Margin="0,24,0,0" Foreground="{DynamicResource ThemeMutedBrush}"
@@ -33,7 +40,8 @@
                                         <Slider Minimum="0.1" Maximum="1" Value="{Binding Opacity, Mode=TwoWay}"/>
                                     </DockPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                                        <Button Content="Re-crop" Padding="10,2" Command="{Binding RecropCommand}"/>
+                                        <Button Content="Re-crop" Padding="10,2" Command="{Binding RecropCommand}"
+                                                ToolTip="{Binding RecropTip}" ToolTipService.ShowOnDisabled="True"/>
                                         <Button Content="Delete" Padding="10,2" Margin="6,0,0,0" Command="{Binding DeleteCommand}"/>
                                     </StackPanel>
                                     <Expander Header="Countdown" Margin="0,6,0,0">

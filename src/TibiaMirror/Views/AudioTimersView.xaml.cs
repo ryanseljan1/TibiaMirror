@@ -42,9 +42,7 @@ public partial class AudioTimersView : UserControl
     void Delete_Click(object sender, RoutedEventArgs e)
     {
         if (Vm is not { } vm || Card(sender) is not { } card) return;
-        if (MessageBox.Show(Window.GetWindow(this), $"Delete timer \"{card.Name}\"?", "Delete timer",
-                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-            vm.DeleteTimer(card.Model);
+        vm.DeleteTimer(card.Model);
     }
 
     void Test_Click(object sender, RoutedEventArgs e)

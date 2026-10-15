@@ -18,6 +18,7 @@ public partial class MainWindow : Window
         host.ProfileChanged += p => Dispatcher.Invoke(() => ProfileText.Text = "Profile: " + p.Name);
         TimersView.Attach(host);
         MirrorsPage.DataContext = host.MirrorsVm;
+        SnackbarHost.DataContext = host.Snackbar;
         ShowHideAllButton.Click += (_, _) => host.RequestToggleMirrors();
         LockAllButton.Click += (_, _) => host.Mirrors?.LockAll();
         SettingsButton.Click += (_, _) => new TibiaMirror.Settings.SettingsWindow(host) { Owner = this }.ShowDialog();

@@ -56,14 +56,22 @@ public sealed partial class MirrorCardViewModel : ObservableObject
         if (dlg.ShowDialog() == true && dlg.Result is { } n) Name = n;
     }
 
-    [RelayCommand]
+    bool CanRecrop => _service.CanCapture;
+
+    /// <summary>Tooltip shown on the disabled Re-crop button (null while enabled, so no tooltip appears).</summary>
+    public string? RecropTip => CanRecrop ? null : MirrorsViewModel.OpenTibiaTip;
+
+    [RelayCommand(CanExecute = nameof(CanRecrop))]
     Task Recrop() => _service.RecropAsync(Id);
 
-    [RelayCommand]
-    void Delete()
+    /// <summary>Called by the view model when Tibia appears or disappears.</summary>
+    public void RefreshCaptureAvailability()
     {
-        if (MessageBox.Show($"Delete '{Name}'?", "Delete mirror", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
-        _service.Remove(Id);
-        _deleted(this);
+        RecropCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(RecropTip));
     }
+
+    /// <summary>Deletion takes effect at once; the owner removes the card and offers Undo.</summary>
+    [RelayCommand]
+    void Delete() => _deleted(this);
 }

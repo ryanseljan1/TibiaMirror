@@ -108,4 +108,37 @@ public class ProfileServiceTests : IDisposable
         Assert.Equal("default", s.Current.Name);
         Assert.Single(Directory.GetFiles(Path.Combine(_root, "profiles"), "*.json"));
     }
+
+    [Fact] public void Delete_then_restore_brings_back_identical_file()
+    {
+        var s = Make(); s.Create("Knight"); s.Current.Regions.Add(new RegionModel { Name = "HP" }); s.SaveCurrent(); s.Switch("Default");
+        var file = Path.Combine(_root, "profiles", "Knight.json"); var before = File.ReadAllBytes(file);
+        var d = s.Delete("Knight");
+        Assert.DoesNotContain("Knight", s.List());
+        s.Restore(d);
+        Assert.Contains("Knight", s.List()); Assert.Equal(before, File.ReadAllBytes(file));
+        Assert.Equal("Default", s.Current.Name);   // wasn't current, stays on Default
+    }
+
+    [Fact] public void Restore_of_deleted_current_profile_makes_it_current_again_with_latest_edits()
+    {
+        var s = Make(); s.Create("Knight"); s.Current.Regions.Add(new RegionModel { Name = "Unsaved" });
+        var d = s.Delete("Knight");   // edits made since the last autosave must survive the round trip
+        Assert.Equal("Default", s.Current.Name);
+        s.Restore(d);
+        Assert.Equal("Knight", s.Current.Name); Assert.Equal("Unsaved", s.Current.Regions[0].Name);
+    }
+
+    [Fact] public void Restore_fails_when_name_was_reused()
+    {
+        var s = Make(); s.Create("Knight"); s.Switch("Default");
+        var d = s.Delete("Knight"); s.Create("Knight");
+        Assert.Throws<InvalidOperationException>(() => s.Restore(d));
+    }
+
+    [Fact] public void Delete_of_last_profile_still_refused_and_returns_nothing_to_undo()
+    {
+        var s = Make(); Assert.Throws<InvalidOperationException>(() => s.Delete("Default"));
+        Assert.Equal(new[] { "Default" }, s.List());
+    }
 }

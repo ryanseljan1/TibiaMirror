@@ -1,10 +1,14 @@
-using System.Windows;
+using System.Windows.Threading;
+using TibiaMirror.Abstractions;
 using TibiaMirror.Detection;
 using TibiaMirror.Geometry;
 using TibiaMirror.Interop;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Mirrors;
+
+/// <summary>What <see cref="MirrorService.Remove"/> took out, for undo.</summary>
+public sealed record RemovedRegion(Profile Profile, RegionModel Region, int Index);
 
 public sealed class MirrorService : IDisposable
 {
@@ -14,16 +18,27 @@ public sealed class MirrorService : IDisposable
     readonly Dictionary<Guid, MirrorWindow> _windows = new();
     readonly HashSet<nint> _handles = new();
     readonly object _handlesGate = new();
+    readonly FocusDebounce _focus;
+    readonly DispatcherTimer _recheck = new();   // re-evaluates visibility when a debounced hide comes due
     Profile _profile = new();
     bool _allHidden;
 
-    public MirrorService(TibiaLocator locator, Func<AppSettings> settings, Action onChanged)
+    public MirrorService(TibiaLocator locator, Func<AppSettings> settings, Action onChanged, IClock? clock = null)
     {
         _locator = locator;
         _settings = settings;
         _onChanged = onChanged;
+        _focus = new FocusDebounce(clock ?? new SystemClock());
+        _focus.Reset(_locator.State.IsFocused);
+        _recheck.Tick += (_, _) => { _recheck.Stop(); RefreshAll(); };
         _locator.StateChanged += OnTibiaState;
     }
+
+    /// <summary>True when Tibia is running and not minimized, i.e. a region can be selected.</summary>
+    public bool CanCapture => _locator.State is { IsFound: true, IsMinimized: false };
+
+    /// <summary>True when the Tibia client window was found at all.</summary>
+    public bool TibiaFound => _locator.State.IsFound;
 
     public IReadOnlyList<RegionModel> Regions => _profile.Regions;
 
@@ -59,7 +74,28 @@ public sealed class MirrorService : IDisposable
         foreach (var w in _windows.Values.ToList()) Refresh(w);
     }
 
-    void Refresh(MirrorWindow w) => w.Apply(_locator.State, _allHidden, _settings().OnlyShowWhenTibiaFocused);
+    void Refresh(MirrorWindow w)
+    {
+        var onlyFocused = _settings().OnlyShowWhenTibiaFocused;
+        w.Apply(EffectiveState(onlyFocused), _allHidden, onlyFocused);
+        ScheduleRecheck();
+    }
+
+    /// <summary>The located state with focus passed through the hide debounce (a no-op when the setting is off).</summary>
+    TibiaState EffectiveState(bool onlyFocused)
+    {
+        var s = _locator.State;
+        if (!onlyFocused) { _focus.Reset(s.IsFocused); return s; }
+        return s with { IsFocused = _focus.Filter(s.IsFocused) };
+    }
+
+    void ScheduleRecheck()
+    {
+        _recheck.Stop();
+        if (_focus.NextCheck is not { } due) return;
+        _recheck.Interval = due + TimeSpan.FromMilliseconds(20);
+        _recheck.Start();
+    }
 
     void Open(RegionModel r)
     {
@@ -83,11 +119,7 @@ public sealed class MirrorService : IDisposable
     {
         if (_selecting) return null;
         var state = _locator.State;
-        if (!state.IsFound || state.IsMinimized)
-        {
-            MessageBox.Show("Start Tibia first, then click Add Region.");
-            return null;
-        }
+        if (!state.IsFound || state.IsMinimized) return null;   // the UI disables Add Region in this state
         _selecting = true;
         var startProfile = _profile;   // the profile can change (Next-profile hotkey) while the selector is open
         PixelRect? crop;
@@ -107,6 +139,7 @@ public sealed class MirrorService : IDisposable
             Mirror = PlaceMirror(c, client),
         };
         _profile.Regions.Add(region);
+        _focus.NotifyRegionChanged();   // selecting steals focus from Tibia: don't hide the new mirror straight away
         Open(region);
         _onChanged();
         return region;
@@ -122,11 +155,7 @@ public sealed class MirrorService : IDisposable
         var region = Find(id);
         var state = _locator.State;
         if (region is null) return;
-        if (!state.IsFound || state.IsMinimized)
-        {
-            MessageBox.Show("Start Tibia first, then click Re-crop.");
-            return;
-        }
+        if (!state.IsFound || state.IsMinimized) return;   // the UI disables Re-crop in this state
         _selecting = true;
         var startProfile = _profile;
         PixelRect? crop;
@@ -139,6 +168,7 @@ public sealed class MirrorService : IDisposable
         }
         if (crop is not { } c || !_windows.TryGetValue(id, out var w)) return;
         region.Crop = c;
+        _focus.NotifyRegionChanged();
         // keep the mirror's position, adopt the new crop's size at 1:1
         var m = region.Mirror;
         w.SetBounds(MonitorClamp.Clamp(new PixelRect(m.X, m.Y, c.Width, c.Height), Monitors.WorkAreas(), Monitors.PrimaryWorkArea()));
@@ -148,12 +178,27 @@ public sealed class MirrorService : IDisposable
     /// <summary>Raised after a region was removed (id).</summary>
     public event Action<Guid>? RegionRemoved;
 
-    public void Remove(Guid id)
+    /// <summary>Removes a region right away and returns a token for <see cref="Restore"/> (null if it did not exist).</summary>
+    public RemovedRegion? Remove(Guid id)
     {
+        var index = _profile.Regions.FindIndex(r => r.Id == id);
+        var region = index >= 0 ? _profile.Regions[index] : null;
         if (_windows.Remove(id, out var w)) { lock (_handlesGate) _handles.Remove(w.Handle); w.CloseForReal(); }
         _profile.Regions.RemoveAll(r => r.Id == id);
         RegionRemoved?.Invoke(id);
         _onChanged();
+        return region is null ? null : new RemovedRegion(_profile, region, index);
+    }
+
+    /// <summary>Puts a removed region back at its old position with its settings; its window is re-shown if it was visible.
+    /// Returns false if the profile changed in the meantime.</summary>
+    public bool Restore(RemovedRegion removed)
+    {
+        if (!ReferenceEquals(removed.Profile, _profile) || Find(removed.Region.Id) is not null) return false;
+        _profile.Regions.Insert(Math.Min(removed.Index, _profile.Regions.Count), removed.Region);
+        Open(removed.Region);
+        _onChanged();
+        return true;
     }
 
     public void Rename(Guid id, string name)
@@ -210,6 +255,7 @@ public sealed class MirrorService : IDisposable
 
     public void Dispose()
     {
+        _recheck.Stop();
         _locator.StateChanged -= OnTibiaState;
         CloseAll();
     }

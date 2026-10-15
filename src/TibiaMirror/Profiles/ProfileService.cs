@@ -4,6 +4,9 @@ using TibiaMirror.Persistence;
 
 namespace TibiaMirror.Profiles;
 
+/// <summary>Snapshot of a deleted profile file (and its backup) for undo.</summary>
+public sealed record DeletedProfile(string Name, byte[] Content, byte[]? Backup, bool WasCurrent);
+
 public sealed class ProfileService(AppPaths paths)
 {
     public Profile Current { get; private set; } = new();
@@ -90,18 +93,35 @@ public sealed class ProfileService(AppPaths paths)
         }
     }
 
-    public void Delete(string name)
+    /// <summary>Deletes a profile and returns what <see cref="Restore"/> needs to bring it back.</summary>
+    public DeletedProfile Delete(string name)
     {
         var n = Existing(name);
         var names = List();
         if (names.Count <= 1) throw new InvalidOperationException("You need at least one profile.");
         var isCurrent = string.Equals(n, Current.Name, StringComparison.OrdinalIgnoreCase);
-        File.Delete(paths.ProfileFile(n));
-        if (File.Exists(paths.ProfileFile(n) + ".bak")) File.Delete(paths.ProfileFile(n) + ".bak");
-        if (!isCurrent) return;
+        if (isCurrent) SaveCurrent();   // so the snapshot holds the latest in-memory edits
+        var file = paths.ProfileFile(n);
+        var bak = file + ".bak";
+        var deleted = new DeletedProfile(n, File.ReadAllBytes(file), File.Exists(bak) ? File.ReadAllBytes(bak) : null, isCurrent);
+        File.Delete(file);
+        if (File.Exists(bak)) File.Delete(bak);
+        if (!isCurrent) return deleted;
         var remaining = List();
         var next = remaining.FirstOrDefault(x => StringComparer.OrdinalIgnoreCase.Compare(x, n) > 0) ?? remaining[0];
         MakeCurrent(LoadProfile(next));
+        return deleted;
+    }
+
+    /// <summary>Undoes <see cref="Delete"/>: writes the files back byte for byte and, if it was the active profile, makes it active again.</summary>
+    public void Restore(DeletedProfile d)
+    {
+        if (List().Contains(d.Name, StringComparer.OrdinalIgnoreCase))
+            throw new InvalidOperationException($"A profile named '{d.Name}' already exists, so the deleted one can't be restored.");
+        var file = paths.ProfileFile(d.Name);
+        File.WriteAllBytes(file, d.Content);
+        if (d.Backup is { } b) File.WriteAllBytes(file + ".bak", b);
+        if (d.WasCurrent) Switch(d.Name);
     }
 
     public void Switch(string name)

@@ -65,9 +65,8 @@ public partial class ProfilesView : UserControl
     void Delete_Click(object s, RoutedEventArgs e) => Run(() =>
     {
         if (SelectedName is not { } n) return;
-        if (MessageBox.Show(Owner!, $"Delete profile '{n}'? This can't be undone.", AppInfo.Name,
-                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-            Service.Delete(n);
+        var deleted = Service.Delete(n);   // throws for the last profile; nothing is deleted then
+        _host?.Snackbar.Show($"Profile '{deleted.Name}' deleted", () => Run(() => Service.Restore(deleted)));
     });
 
     void Switch_Click(object s, RoutedEventArgs e) => Run(() => { if (SelectedName is { } n) Service.Switch(n); });
