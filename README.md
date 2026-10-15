@@ -7,8 +7,7 @@ Espelhe qualquer parte da tela do Tibia onde quiser — barras de vida, tempos d
 **Gratuito e de código aberto:** sem anúncios, sem chave de licença, sem conexões de rede e espelhos ilimitados — todos os recursos liberados. Não lê a memória do jogo nem envia teclas ou cliques.
 
 > [!TIP]
-> [![Nova versão: v0.1.0](https://img.shields.io/badge/nova%20vers%C3%A3o-v0.1.0-FF7F00?style=for-the-badge)](https://github.com/ryanseljan1/TibiaMirror/releases/tag/v0.1.0)
-> [![Baixar instalador (.exe)](https://img.shields.io/badge/baixar-instalador%20.exe-2EA043?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/ryanseljan1/TibiaMirror/releases/download/v0.1.0/TibiaMirror-Setup-0.1.0.exe)
+> [![Baixar v0.1.0](https://img.shields.io/badge/Baixar-v0.1.0-FF7F00?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/ryanseljan1/TibiaMirror/releases/download/v0.1.0/TibiaMirror-Setup-0.1.0.exe)
 >
 > **O TibiaMirror 0.1.0 chegou!** Desfazer exclusões, menu de clique direito nos espelhos, borda com brilho, zoom com a roda do mouse, temporizadores repetidos e mais. **[Ver as notas da versão →](https://github.com/ryanseljan1/TibiaMirror/releases/tag/v0.1.0)**
 
