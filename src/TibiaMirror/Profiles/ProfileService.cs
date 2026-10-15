@@ -69,7 +69,7 @@ public sealed class ProfileService(AppPaths paths)
         copy.Name = newName;
         copy.SchemaVersion = SchemaInfo.Current;   // the copy is a new file written by this version
         foreach (var r in copy.Regions) r.Id = Guid.NewGuid();
-        foreach (var t in copy.Timers) t.Id = Guid.NewGuid();
+        foreach (var t in copy.Timers) { t.Id = Guid.NewGuid(); t.ResumeAtUtc = null; }
         JsonStore.Save(paths.ProfileFile(newName), copy);
         return MakeCurrent(copy);
     }

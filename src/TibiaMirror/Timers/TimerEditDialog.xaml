@@ -11,6 +11,11 @@
         <controls:HotkeyBox x:Name="KeyBox" HorizontalAlignment="Left" Margin="0,2,0,8"/>
         <TextBlock Text="Duration (seconds)"/>
         <TextBox x:Name="DurationBox" Margin="0,2,0,8"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <CheckBox x:Name="RepeatCheck" Content="Repeat every" VerticalAlignment="Center"/>
+            <TextBox x:Name="IntervalBox" Width="70" Margin="6,0,6,0" IsEnabled="{Binding IsChecked, ElementName=RepeatCheck}"/>
+            <TextBlock Text="s" VerticalAlignment="Center"/>
+        </StackPanel>
         <TextBlock Text="Sound"/>
         <DockPanel Margin="0,2,0,8">
             <Button x:Name="TestButton" DockPanel.Dock="Right" Content="Test" Padding="10,2" Margin="6,0,0,0" Click="Test_Click"/>

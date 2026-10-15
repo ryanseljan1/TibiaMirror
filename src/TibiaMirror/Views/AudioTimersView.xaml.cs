@@ -24,6 +24,31 @@ public partial class AudioTimersView : UserControl
         if (dlg.ShowDialog() == true && dlg.Result is { } m && SameProfile(profile, vm)) vm.AddTimer(m);
     }
 
+    void Preset_Click(object sender, RoutedEventArgs e)
+    {
+        var menu = new ContextMenu { PlacementTarget = PresetButton, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
+        foreach (var preset in TimerPresets.All)
+        {
+            var item = new MenuItem { Header = preset.Label };
+            item.Click += (_, _) => AddFromPreset(preset);
+            menu.Items.Add(item);
+        }
+        menu.IsOpen = true;
+    }
+
+    void AddFromPreset(TimerPreset preset)
+    {
+        if (Vm is not { } vm) return;
+        var profile = vm.Host.CurrentProfile;
+        var dlg = new TimerEditDialog(null, vm.Host.Hotkeys, vm.Service, preset.ToModel()) { Owner = Window.GetWindow(this) };
+        if (dlg.ShowDialog() == true && dlg.Result is { } m && SameProfile(profile, vm)) vm.AddTimer(m);
+    }
+
+    void Stop_Click(object sender, RoutedEventArgs e)
+    {
+        if (Vm is { } vm && Card(sender) is { } card) vm.Stop(card.Model);
+    }
+
     void Edit_Click(object sender, RoutedEventArgs e)
     {
         if (Vm is not { } vm || Card(sender) is not { } card) return;

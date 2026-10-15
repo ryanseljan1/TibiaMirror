@@ -15,6 +15,7 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
     {
         _host = host; _service = service;
         _registrations = new TimerHotkeyRegistrations(host.Hotkeys, id => service.Trigger(id));
+        service.StateChanged += host.ProfileEdited;
         host.ProfileChanged += OnProfileChanged;
         host.HotkeysReady += OnHotkeysReady;
         // StartListeningOnOpen applies once, to the profile active at startup (it can also turn listening off).
@@ -89,6 +90,7 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
     {
         existing.Name = edited.Name; existing.Hotkey = edited.Hotkey; existing.DurationSeconds = edited.DurationSeconds;
         existing.Sound = edited.Sound; existing.Volume = edited.Volume; existing.OnRepress = edited.OnRepress;
+        existing.Repeat = edited.Repeat; existing.IntervalSeconds = edited.IntervalSeconds;
         _service.Cancel(existing.Id);
         Rebuild();
     }
@@ -110,6 +112,8 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
         });
     }
 
+    public void Stop(AudioTimerModel model) => _service.Cancel(model.Id);
+
     public void Test(AudioTimerModel model) => _service.TestSound(model.Id);
 
     /// <summary>Called every 100 ms by AppHost after AudioTimerService.Tick().</summary>
@@ -117,6 +121,7 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        _service.StateChanged -= _host.ProfileEdited;
         _host.ProfileChanged -= OnProfileChanged;
         _host.HotkeysReady -= OnHotkeysReady;
         _registrations.Dispose();

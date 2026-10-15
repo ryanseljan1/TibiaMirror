@@ -15,9 +15,7 @@ public sealed class SoundPlayer : ISoundPlayer, IDisposable
     {
         if (string.IsNullOrWhiteSpace(soundId)) return false;
         if (soundId.StartsWith("builtin:", StringComparison.Ordinal)) return BuiltInSounds.IsKnown(soundId);
-        var ext = Path.GetExtension(soundId);
-        return (ext.Equals(".mp3", StringComparison.OrdinalIgnoreCase) || ext.Equals(".wav", StringComparison.OrdinalIgnoreCase))
-               && File.Exists(soundId);
+        return SoundFormats.IsSupported(soundId) && File.Exists(soundId);
     }
 
     public void Play(string soundId, double volume)
@@ -38,7 +36,7 @@ public sealed class SoundPlayer : ISoundPlayer, IDisposable
         if (!CanPlay(soundId)) throw new ArgumentException("Sound not available");
         WaveStream reader = soundId.StartsWith("builtin:", StringComparison.Ordinal)
             ? new WaveFileReader(new MemoryStream(BuiltInSounds.RenderWav(soundId)))
-            : new AudioFileReader(soundId);
+            : SoundFormats.UsesMediaFoundation(soundId) ? new MediaFoundationReader(soundId) : new AudioFileReader(soundId);
         WaveOutEvent? output = null;
         try
         {

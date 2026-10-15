@@ -23,15 +23,18 @@ public partial class TimerEditDialog : Window
     /// <summary>The edited timer (a copy; keeps the existing Id when editing). Set when the user saved.</summary>
     public AudioTimerModel? Result { get; private set; }
 
-    public TimerEditDialog(AudioTimerModel? existing, HotkeyService? hotkeys, AudioTimerService service)
+    /// <param name="template">Prefill for a new timer (a preset); ignored when editing.</param>
+    public TimerEditDialog(AudioTimerModel? existing, HotkeyService? hotkeys, AudioTimerService service, AudioTimerModel? template = null)
     {
         InitializeComponent();
         _existing = existing; _hotkeys = hotkeys; _service = service;
         Title = existing is null ? "Add timer" : "Edit timer";
-        var m = existing ?? new AudioTimerModel { Name = "Timer" };
+        var m = existing ?? template ?? new AudioTimerModel { Name = "Timer" };
         NameBox.Text = m.Name;
         KeyBox.Hotkey = m.Hotkey;
         DurationBox.Text = m.DurationSeconds.ToString("0.##", CultureInfo.CurrentCulture);
+        RepeatCheck.IsChecked = m.Repeat;
+        IntervalBox.Text = m.EffectiveIntervalSeconds.ToString("0.##", CultureInfo.CurrentCulture);
         VolumeSlider.Value = m.Volume;
         (m.OnRepress == RepressBehavior.IgnoreWhileRunning ? IgnoreRadio : RestartRadio).IsChecked = true;
         foreach (var (id, name) in BuiltInSounds.All) SoundBox.Items.Add(new SoundChoice(id, name));
@@ -55,7 +58,7 @@ public partial class TimerEditDialog : Window
     {
         if (_revert || SoundBox.SelectedItem is not SoundChoice c) return;
         if (c != CustomChoice) { _lastChoice = c; return; }
-        var dlg = new OpenFileDialog { Filter = "Audio (*.mp3;*.wav)|*.mp3;*.wav" };
+        var dlg = new OpenFileDialog { Filter = SoundFormats.DialogFilter };
         if (dlg.ShowDialog(this) == true) SelectSound(dlg.FileName);
         else { _revert = true; SoundBox.SelectedItem = _lastChoice; _revert = false; }
     }
@@ -89,6 +92,9 @@ public partial class TimerEditDialog : Window
         var name = NameBox.Text.Trim();
         if (name.Length is < 1 or > 40) { ErrorText.Text = "Enter a name between 1 and 40 characters"; return; }
         if (!TryParseDuration(DurationBox.Text, out var secs)) { ErrorText.Text = "Enter a duration between 0.1 and 3600 seconds"; return; }
+        var repeat = RepeatCheck.IsChecked == true;
+        double interval = secs;
+        if (repeat && !TryParseDuration(IntervalBox.Text, out interval)) { ErrorText.Text = "Enter a repeat interval between 0.1 and 3600 seconds"; return; }
         if (SoundBox.SelectedItem is not SoundChoice sound || sound == CustomChoice) { ErrorText.Text = "Pick a sound"; return; }
         var hotkey = KeyBox.Hotkey;
         if (hotkey is not null && _hotkeys is not null)
@@ -106,6 +112,7 @@ public partial class TimerEditDialog : Window
             Id = _existing?.Id ?? Guid.NewGuid(),
             Name = name, Hotkey = hotkey, DurationSeconds = secs, Sound = sound.Id,
             Volume = (int)VolumeSlider.Value,
+            Repeat = repeat, IntervalSeconds = repeat ? interval : null,
             OnRepress = IgnoreRadio.IsChecked == true ? RepressBehavior.IgnoreWhileRunning : RepressBehavior.Restart,
         };
         DialogResult = true;

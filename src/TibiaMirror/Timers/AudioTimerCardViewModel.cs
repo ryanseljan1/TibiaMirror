@@ -22,6 +22,9 @@ public sealed class AudioTimerCardViewModel : ObservableObject
     public string Name => Model.Name;
     public string HotkeyText => Model.Hotkey?.ToString() ?? "No key";
     public string DurationText => $"{Model.DurationSeconds:0.##} s";
+    public bool IsRepeat => Model.Repeat;
+    public string LoopText => $"↻ every {Model.EffectiveIntervalSeconds:0.##} s";
+    public bool IsRunning => _service.IsRunning(Model.Id);
     public string RemainingText { get => _remainingText; private set => SetProperty(ref _remainingText, value); }
     public bool SoundMissing => _soundMissing;
     public string WarningText => _soundMissing
@@ -32,5 +35,6 @@ public sealed class AudioTimerCardViewModel : ObservableObject
     {
         var rem = _service.Remaining(Model.Id);
         RemainingText = rem is { } r ? $"{r.TotalSeconds:0.0} s" : "Ready";
+        OnPropertyChanged(nameof(IsRunning));
     }
 }

@@ -7,6 +7,7 @@
     <DockPanel Margin="8">
         <StackPanel DockPanel.Dock="Top">
             <DockPanel Margin="0,0,0,6">
+                <Button x:Name="PresetButton" DockPanel.Dock="Right" Content="From preset ▾" Padding="10,4" Margin="6,0,0,0" Click="Preset_Click"/>
                 <Button DockPanel.Dock="Right" Content="＋ Add Timer" Padding="10,4" Click="Add_Click"/>
                 <ToggleButton x:Name="ListenToggle" IsChecked="{Binding IsListening, Mode=TwoWay}" HorizontalAlignment="Left"
                               FontSize="16" FontWeight="Bold" Padding="16,6" MinWidth="130">
@@ -48,10 +49,14 @@
                                     <TextBlock>
                                         <Run Text="{Binding HotkeyText, Mode=OneWay}"/><Run Text="  |  "/><Run Text="{Binding DurationText, Mode=OneWay}"/><Run Text="  |  "/><Run Text="{Binding RemainingText, Mode=OneWay}" FontWeight="SemiBold"/>
                                     </TextBlock>
+                                    <TextBlock Text="{Binding LoopText}" Foreground="{DynamicResource ThemeMutedBrush}"
+                                               Visibility="{Binding IsRepeat, Converter={StaticResource B2V}}"/>
                                     <TextBlock Text="{Binding WarningText}" Foreground="DarkOrange"
                                                Visibility="{Binding SoundMissing, Converter={StaticResource B2V}}"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button Content="Stop" Padding="8,2" Margin="2" Click="Stop_Click"
+                                            Visibility="{Binding IsRunning, Converter={StaticResource B2V}}"/>
                                     <Button Content="Test" Padding="8,2" Margin="2" Click="Test_Click"/>
                                     <Button Content="Edit" Padding="8,2" Margin="2" Click="Edit_Click"/>
                                     <Button Content="Delete" Padding="8,2" Margin="2" Click="Delete_Click"/>
