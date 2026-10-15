@@ -3,25 +3,39 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.1.0] - unreleased
+## [0.1.0] - 2026-10-14
 
-### Added
-- Tibia detection with a status dot (waiting, found, minimized).
-- Mirrors: select any part of the Tibia window and show it live in its own window. Move, resize, lock (click-through), hide, rename, change opacity, re-crop and delete. Show/Hide all, with a hotkey.
-- Option to show mirrors only while Tibia is focused.
-- Audio timers: global hotkeys (active while Tibia is focused) start a timer and play a sound when it ends. Built-in sounds or your own audio files, per-timer and master volume, Listening on/off switch.
-- Countdown bar: a bar on one side of a mirror that shrinks over a set time, with color, thickness, full-edge or narrow-strip shape, optional border flash and end sound.
-- Profiles: create, rename, duplicate, delete, switch (UI or hotkey), export and import to share a setup.
-- Settings window with a data folder shortcut, Tibia process/title options, and an app-wide dark mode.
-- Automatic saving, restore of window positions on start, and multi-monitor and mixed-DPI handling.
-- System tray icon, single instance, and application icon.
-- Installer (Inno Setup) and portable zip, built by a GitHub release workflow.
-- Deleting a mirror, timer or profile happens at once with an Undo button for 5 seconds, instead of a confirmation box.
-- Add Region and Re-crop are disabled while Tibia is missing, with a hint instead of a message box.
-- Mirrors no longer flicker when you alt-tab quickly: they hide only after Tibia has been unfocused for about 0.6 s, and new mirrors stay visible for 2 s.
-- Mouse wheel over an unlocked mirror zooms it from 0.5x to 4x.
-- Right-click menu on unlocked mirrors (Re-crop, Glow, Lock, Hide, Delete).
-- Glow border per mirror: on/off, 7 colours and 3 intensities.
-- Hotkey to lock or unlock all mirrors.
-- "Start with Windows" option in Settings; at sign-in the app starts in the tray.
-- Audio timers: repeat a sound every N seconds until stopped, running timers continue after a restart, m4a/aac/flac sounds, and "From preset" timers.
+First public release. Compared with the release candidates (rc.1, rc.2), this version adds the "QoL pack" below.
+
+### New in this release
+- **Undo instead of "Are you sure?"**: deleting a mirror, timer or profile happens at once, with an Undo button for 5 seconds.
+- **Right-click menu on mirrors**: Re-crop, Glow, Lock, Hide and Delete right on an unlocked mirror.
+- **Glow border**: choose a border colour (7 presets) and intensity (Low, Medium, High) per mirror, or turn it off. A colour chip on the card shows it. Locked mirrors stay borderless.
+- **Mouse-wheel zoom**: scroll over an unlocked mirror to scale it from 0.5x to 4x. Smooth-scrolling touchpads are supported.
+- **Lock/Unlock all hotkey**: one key to make every mirror click-through, or movable again.
+- **Start with Windows** in Settings: TibiaMirror starts quietly in the tray when you sign in.
+- **Repeating timers**: "Repeat every N s" plays a sound on a loop until you stop it, which is handy for potion and food reminders.
+- **Timers survive a restart**: a running timer continues after you close and reopen the app. One that ended while the app was closed doesn't play late.
+- **Timer presets**: "From preset" creates common timers with name, duration and sound filled in.
+- **More sound formats**: custom sounds can be m4a, aac or flac, as well as mp3 and wav.
+
+### Improved
+- No more flicker when alt-tabbing with "Only show mirrors while Tibia is focused": mirrors hide only after Tibia has been unfocused for about 0.6 s, and a new mirror stays visible for 2 s.
+- While Tibia isn't running, Add Region and Re-crop are disabled with a hint, instead of showing a message box.
+- The status dot is a real coloured dot (grey, amber, green).
+- Dark mode: toggle buttons, dropdowns and the Listening label are readable.
+- A missing custom timer sound shows a warning on the timer and in its editor (it plays the Chime instead).
+
+### Fixed
+- The main window opens where you left it (its position was overwritten at start).
+- The installer's "Start when Windows starts" option and the in-app setting now use the same entry, so the app no longer starts twice. Uninstalling removes it.
+- Switching profiles no longer brings back timers that were running in the other profile.
+- A timer with a zero duration in an imported profile no longer crashes the app.
+
+### Included since the release candidates
+- Mirrors of any part of the Tibia window: move, resize, lock (click-through), hide, rename, opacity, re-crop. Show/Hide all, with a hotkey. Unlimited mirrors.
+- Audio timers with global hotkeys, built-in or custom sounds, and per-timer and master volume.
+- Countdown bars on mirrors, with colour, shape, border flash and end sound.
+- Profiles: create, rename, duplicate, delete, switch (UI or hotkey), export and import.
+- Settings with Tibia detection options and dark mode. Automatic saving, multi-monitor and mixed-DPI support, tray icon.
+- Installer and portable zip.

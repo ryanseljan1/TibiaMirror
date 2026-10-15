@@ -6,6 +6,11 @@ Mirror any part of your Tibia screen anywhere you want — health bars, cooldown
 
 **Free and open source:** no ads, no license key, no network calls, unlimited mirrors — every feature included. It never reads game memory or sends keys or clicks.
 
+> [!TIP]
+> [![New release: v0.1.0](https://img.shields.io/badge/new%20release-v0.1.0-FF7F00?style=for-the-badge)](https://github.com/ryanseljan1/TibiaMirror/releases/tag/v0.1.0)
+>
+> **TibiaMirror 0.1.0 is out!** Undo for deletes, a right-click menu on mirrors, glow borders, mouse-wheel zoom, repeating timers and more. **[Read the patch notes →](https://github.com/ryanseljan1/TibiaMirror/releases/tag/v0.1.0)**
+
 <!-- Screenshots are coming. Add docs/images/overview.png, then uncomment:
 ![TibiaMirror overview](docs/images/overview.png)
 -->
