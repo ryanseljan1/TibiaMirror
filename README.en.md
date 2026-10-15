@@ -4,6 +4,8 @@
 
 Mirror any part of your Tibia screen anywhere you want — health bars, cooldowns, the minimap — plus audio timers and countdown bars.
 
+**Free and open source:** no ads, no license key, no network calls, unlimited mirrors — every feature included. It never reads game memory or sends keys or clicks.
+
 <!-- Screenshots are coming. Add docs/images/overview.png, then uncomment:
 ![TibiaMirror overview](docs/images/overview.png)
 -->

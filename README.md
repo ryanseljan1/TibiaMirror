@@ -4,6 +4,8 @@
 
 Espelhe qualquer parte da tela do Tibia onde quiser — barras de vida, tempos de recarga, minimapa — e use temporizadores com som e barras de contagem regressiva.
 
+**Gratuito e de código aberto:** sem anúncios, sem chave de licença, sem conexões de rede e espelhos ilimitados — todos os recursos liberados. Não lê a memória do jogo nem envia teclas ou cliques.
+
 <!-- Capturas de tela em breve. Adicione docs/images/overview.png e descomente:
 ![Visão geral do TibiaMirror](docs/images/overview.png)
 -->

@@ -5,6 +5,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms> <!-- NotifyIcon for tray -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Dev builds and tests are framework-dependent; release.yml publishes self-contained (no .NET install needed by users). -->
     <SelfContained>false</SelfContained>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\Icons\app.ico</ApplicationIcon>
