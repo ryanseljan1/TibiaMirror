@@ -8,6 +8,7 @@ Mirror any part of your Tibia screen anywhere you want — health bars, cooldown
 
 > [!TIP]
 > [![New release: v0.1.0](https://img.shields.io/badge/new%20release-v0.1.0-FF7F00?style=for-the-badge)](https://github.com/ryanseljan1/TibiaMirror/releases/tag/v0.1.0)
+> [![Download installer (.exe)](https://img.shields.io/badge/download-installer%20.exe-2EA043?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/ryanseljan1/TibiaMirror/releases/download/v0.1.0/TibiaMirror-Setup-0.1.0.exe)
 >
 > **TibiaMirror 0.1.0 is out!** Undo for deletes, a right-click menu on mirrors, glow borders, mouse-wheel zoom, repeating timers and more. **[Read the patch notes →](https://github.com/ryanseljan1/TibiaMirror/releases/tag/v0.1.0)**
 
