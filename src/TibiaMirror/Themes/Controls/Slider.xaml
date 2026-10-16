@@ -27,7 +27,7 @@
     <Style TargetType="{x:Type Slider}">
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text}"/>
         <Setter Property="MinHeight" Value="24"/>
-        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource FocusVisual}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Slider}">

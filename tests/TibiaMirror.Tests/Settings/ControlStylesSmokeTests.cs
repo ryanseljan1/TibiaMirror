@@ -11,6 +11,30 @@ namespace TibiaMirror.Tests.Settings;
 [Collection(WpfCollection.Name)]
 public class ControlStylesSmokeTests
 {
+    /// <summary>
+    /// A StaticResource to a key in a sibling dictionary (e.g. FocusVisual in Chrome.xaml) resolves to UnsetValue and only
+    /// blows up when the property is used (FocusVisualStyle on the first Tab): no style setter may hold UnsetValue.
+    /// </summary>
+    [Fact]
+    public void No_style_setter_is_unresolved() => Sta.Run(() =>
+    {
+        var resources = new ResourceDictionary();
+        foreach (var name in new[] { "Tokens", "Light", "Icons", "Controls/Controls" })
+            resources.MergedDictionaries.Add(new ResourceDictionary
+                { Source = new Uri($"pack://application:,,,/TibiaMirror;component/Themes/{name}.xaml", UriKind.Absolute) });
+        var bad = new List<string>();
+        void Scan(ResourceDictionary d)
+        {
+            foreach (var key in d.Keys)
+                for (var style = d[key] as Style; style is not null; style = style.BasedOn)
+                    bad.AddRange(style.Setters.OfType<Setter>().Where(s => s.Value == DependencyProperty.UnsetValue)
+                        .Select(s => $"{key}: {s.Property.Name}"));
+            foreach (var m in d.MergedDictionaries) Scan(m);
+        }
+        Scan(resources);
+        Assert.True(bad.Count == 0, string.Join("\n", bad.Distinct()));
+    });
+
     /// <summary>StaticResource lookups inside templates only fail when the template is applied: instantiate every style.</summary>
     [Fact]
     public void Every_control_style_applies_in_every_theme() => Sta.Run(() =>
@@ -78,7 +102,8 @@ public class ControlStylesSmokeTests
     public void Every_dynamic_resource_under_Themes_is_defined()
     {
         var themes = Path.Combine(RepoPaths.Src, "TibiaMirror", "Themes");
-        string[] shared = [File.ReadAllText(Path.Combine(themes, "Tokens.xaml")), File.ReadAllText(Path.Combine(themes, "Icons.xaml"))];
+        string[] shared = [File.ReadAllText(Path.Combine(themes, "Tokens.xaml")), File.ReadAllText(Path.Combine(themes, "Icons.xaml")),
+            .. Directory.EnumerateFiles(Path.Combine(themes, "Controls"), "*.xaml").Select(File.ReadAllText)];
         var used = Directory.EnumerateFiles(themes, "*.xaml", SearchOption.AllDirectories)
             .SelectMany(f => Regex.Matches(File.ReadAllText(f), @"\{DynamicResource ([\w.]+)\}").Select(m => m.Groups[1].Value))
             .ToHashSet();

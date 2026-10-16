@@ -88,7 +88,7 @@ public sealed partial class MirrorsViewModel : ObservableObject
     void OnLockedAll() { foreach (var c in Cards) c.RefreshLocked(); RefreshLockAll(); }
 
     /// <summary>True when the Lock all button (and hotkey) would lock next; false when it would unlock.</summary>
-    public bool LockAllWillLock => _service is null || MirrorLockToggle.ShouldLock(_service.Regions);
+    public bool LockAllWillLock => _service is null || MirrorLockToggle.ShowsLock(_service.Regions.ToList());
 
     /// <summary>Raised when <see cref="LockAllWillLock"/> may have changed (lock/visibility edits, add, delete, rebuild).</summary>
     public event Action? LockAllStateChanged;
