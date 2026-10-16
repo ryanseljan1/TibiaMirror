@@ -1,4 +1,0 @@
-Rename
-Name must be 1-40 characters.
-OK
-Cancel

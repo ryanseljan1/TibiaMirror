@@ -1,3 +1,5 @@
+using TibiaMirror.Localization;
+
 namespace TibiaMirror.Mirrors;
 
 public static class RegionNaming
@@ -7,7 +9,7 @@ public static class RegionNaming
     {
         var used = new HashSet<string?>(existing, StringComparer.OrdinalIgnoreCase);
         var n = 1;
-        while (used.Contains("Region " + n)) n++;
-        return "Region " + n;
+        while (used.Contains(Loc.Format("Mirrors_RegionName", n))) n++;
+        return Loc.Format("Mirrors_RegionName", n);
     }
 }

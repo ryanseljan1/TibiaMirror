@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using TibiaMirror.Localization;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -112,7 +113,7 @@ public partial class RegionSelectorWindow : Window
 
     void FlashTooSmall()
     {
-        SizeLabel.Text = "Too small";
+        SizeLabel.Text = Loc.Get("Mirrors_TooSmall");
         SizeLabel.Visibility = Visibility.Visible;
         _tooSmallTimer?.Stop();
         _tooSmallTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };

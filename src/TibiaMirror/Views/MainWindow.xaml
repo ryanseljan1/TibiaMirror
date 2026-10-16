@@ -3,33 +3,42 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:TibiaMirror.Views"
         xmlns:controls="clr-namespace:TibiaMirror.Controls"
-        Title="TibiaMirror" Width="520" Height="640" MinWidth="420" Style="{StaticResource AppWindowStyle}">
+        xmlns:loc="clr-namespace:TibiaMirror.Localization"
+        Title="{loc:Loc Main_Title}" Width="520" Height="640" MinWidth="420" Style="{StaticResource AppWindowStyle}">
     <DockPanel>
-        <Border x:Name="HotkeyBanner" DockPanel.Dock="Top" Background="{DynamicResource ThemeBannerBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="0,0,0,1" Padding="8,4" Visibility="Collapsed">
+        <Border x:Name="HotkeyBanner" DockPanel.Dock="Top" Background="{DynamicResource Brush.WarningSubtle}" BorderBrush="{DynamicResource Brush.BorderSubtle}" BorderThickness="0,0,0,1" Padding="8,4" Visibility="Collapsed">
             <DockPanel>
-                <Button x:Name="RetryHotkeysButton" DockPanel.Dock="Right" Content="Retry" Padding="8,1"/>
-                <TextBlock Text="Hotkeys are unavailable." VerticalAlignment="Center" Foreground="{DynamicResource ThemeBannerTextBrush}"/>
+                <Button x:Name="RetryHotkeysButton" DockPanel.Dock="Right" Content="{loc:Loc Main_HotkeysRetry}" Padding="8,1"/>
+                <TextBlock Text="{loc:Loc Main_HotkeysUnavailable}" VerticalAlignment="Center" Foreground="{DynamicResource Brush.Text}"/>
             </DockPanel>
         </Border>
         <!-- InfoBarHost: contract for the updater UI (B4 sets Content from App.xaml.cs). Keep name + public modifier. -->
         <ContentControl x:Name="InfoBarHost" x:FieldModifier="public" DockPanel.Dock="Top"/>
         <DockPanel DockPanel.Dock="Top" Margin="8">
-            <Button x:Name="SettingsButton" DockPanel.Dock="Right" Content="⚙" Width="32" Margin="4,0,0,0"/>
-            <Button x:Name="LockAllButton" DockPanel.Dock="Right" Content="Lock all" Padding="8,2" Margin="4,0,0,0"/>
-            <Button x:Name="ShowHideAllButton" DockPanel.Dock="Right" Content="Show/Hide all" Padding="8,2" Margin="4,0,0,0"/>
+            <Button x:Name="SettingsButton" DockPanel.Dock="Right" Style="{StaticResource Button.Icon}" Margin="4,0,0,0"
+                    ToolTip="{loc:Loc Main_Settings}" AutomationProperties.Name="{loc:Loc Main_Settings}">
+                <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Settings}"/>
+            </Button>
+            <Button x:Name="LockAllButton" DockPanel.Dock="Right" Padding="8,2" Margin="4,0,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="LockAllGlyph" Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Lock}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="LockAllText" Text="{loc:Loc Main_LockAll}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button x:Name="ShowHideAllButton" DockPanel.Dock="Right" Content="{loc:Loc Main_ShowHideAll}" Padding="8,2" Margin="4,0,0,0"/>
             <StackPanel VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" x:Name="StatusPanel">
-                    <Ellipse x:Name="StatusDot" Width="10" Height="10" Margin="0,0,6,0" VerticalAlignment="Center" StrokeThickness="1" Stroke="{DynamicResource ThemeMutedBrush}" Fill="#FF9AA3AE"/>
-                    <TextBlock x:Name="StatusText" Text="Waiting for Tibia…" AutomationProperties.Name="Waiting for Tibia…"/>
+                    <Ellipse x:Name="StatusDot" Width="10" Height="10" Margin="0,0,6,0" VerticalAlignment="Center" StrokeThickness="1" Stroke="{DynamicResource Brush.TextSecondary}" Fill="{DynamicResource Brush.TextMuted}"/>
+                    <TextBlock x:Name="StatusText" Text="{loc:Loc Main_StatusWaiting}" AutomationProperties.Name="{loc:Loc Main_StatusWaiting}"/>
                 </StackPanel>
                 <TextBlock x:Name="ProfileText"/>
             </StackPanel>
         </DockPanel>
         <Grid>
             <TabControl>
-                <TabItem Header="Mirrors"><views:MirrorsView x:Name="MirrorsPage"/></TabItem>
-                <TabItem Header="Audio Timers"><views:AudioTimersView x:Name="TimersView"/></TabItem>
-                <TabItem Header="Profiles"><views:ProfilesView x:Name="ProfilesTab"/></TabItem>
+                <TabItem Header="{loc:Loc Main_TabMirrors}"><views:MirrorsView x:Name="MirrorsPage"/></TabItem>
+                <TabItem Header="{loc:Loc Main_TabAudioTimers}"><views:AudioTimersView x:Name="TimersView"/></TabItem>
+                <TabItem Header="{loc:Loc Main_TabProfiles}"><views:ProfilesView x:Name="ProfilesTab"/></TabItem>
             </TabControl>
             <controls:Snackbar x:Name="SnackbarHost" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="16,0,16,16"/>
         </Grid>
