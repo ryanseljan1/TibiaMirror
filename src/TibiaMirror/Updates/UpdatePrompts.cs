@@ -14,6 +14,7 @@ public sealed class UpdatePrompts
     readonly AppHost _host;
     readonly ContentControl _infoBarHost;
     readonly Dispatcher _ui = Application.Current.Dispatcher;
+    bool _installing;
 
     public UpdatePrompts(AppHost host, ContentControl infoBarHost)
     {
@@ -62,6 +63,7 @@ public sealed class UpdatePrompts
 
     void ShowAvailable(ReleaseInfo r)
     {
+        if (!UpdateDecisions.ShouldShowAvailable(_installing)) return;
         var p = UpdateDecisions.Available(_host.Updates.IsPortable);
         _host.Snackbar.Show(Loc.Format(p.MessageKey, r.Version), Build(p, r), null);
     }
@@ -85,7 +87,7 @@ public sealed class UpdatePrompts
                 break;
             case UpdateActionKind.UpdateNow:
             case UpdateActionKind.Retry:
-                _ = Install(r);
+                if (UpdateDecisions.CanStartInstall(_installing)) _ = Install(r);
                 break;
         }
     }
@@ -98,13 +100,28 @@ public sealed class UpdatePrompts
 
     async Task Install(ReleaseInfo r)
     {
+        _installing = true;
         var sb = _host.Snackbar;
-        sb.Show(Loc.Get("Updates_Downloading"), [], null);
+        var message = Loc.Get("Updates_Downloading");
+        double current = 0;
+        void ShowProgress()
+        {
+            sb.Show(message, [], null);
+            sb.IsBusy = true;
+            sb.Progress = current;
+        }
+        sb.Show(message, [], null);
         sb.IsBusy = true;
-        var progress = new Progress<double>(v => sb.Progress = v);   // captures the UI context
+        var progress = new Progress<double>(v =>   // captures the UI context
+        {
+            current = v;
+            if (UpdateDecisions.NeedsProgressReshow(sb.IsVisible, sb.IsBusy, sb.Message, message)) ShowProgress();
+            else sb.Progress = v;
+        });
         try { await _host.Updates.DownloadAndInstallAsync(r, progress); }
         catch (Exception e)
         {
+            _installing = false;
             Log.Error("Update download failed", e);
             var p = UpdateDecisions.Failure(e);
             sb.Show(Loc.Get(p.MessageKey), Build(p, r), null);

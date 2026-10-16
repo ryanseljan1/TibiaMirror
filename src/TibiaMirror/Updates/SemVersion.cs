@@ -55,8 +55,8 @@ public sealed class SemVersion : IComparable<SemVersion>, IEquatable<SemVersion>
         var y = b.Split('.');
         for (var i = 0; i < Math.Min(x.Length, y.Length); i++)
         {
-            var xn = int.TryParse(x[i], out var xi);
-            var yn = int.TryParse(y[i], out var yi);
+            var xn = int.TryParse(x[i], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var xi);
+            var yn = int.TryParse(y[i], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var yi);
             int c;
             if (xn && yn) c = xi.CompareTo(yi);
             else if (xn) c = -1;

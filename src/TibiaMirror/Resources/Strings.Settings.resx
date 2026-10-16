@@ -26,6 +26,7 @@
   <data name="Settings_CheckUpdates" xml:space="preserve"><value>Check for updates automatically</value></data>
   <data name="Settings_CheckNow" xml:space="preserve"><value>Check now</value></data>
   <data name="Settings_UpToDate" xml:space="preserve"><value>You're up to date.</value></data>
+  <data name="Settings_CheckFailed" xml:space="preserve"><value>Couldn't check for updates. Try again later.</value></data>
   <data name="Settings_UpdateAvailable" xml:space="preserve"><value>Update {0} available — see the main window.</value></data>
   <data name="Settings_ErrProcessEmpty" xml:space="preserve"><value>The Tibia process name can't be empty.</value></data>
   <data name="Settings_ErrTitleEmpty" xml:space="preserve"><value>The Tibia window title prefix can't be empty.</value></data>

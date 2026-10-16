@@ -17,11 +17,12 @@ public sealed class UpdateService
     readonly Action _requestShutdown;
     readonly Func<ProcessStartInfo, Process?> _startProcess;
     readonly string _workDir;
+    readonly int _pid;
 
     public event EventHandler<ReleaseInfo>? UpdateAvailable;
 
     public UpdateService(HttpClient http, Func<AppSettings> settings, string currentVersion, string? processPath,
-        Action requestShutdown, Func<ProcessStartInfo, Process?>? startProcess = null, string? workDir = null)
+        Action requestShutdown, Func<ProcessStartInfo, Process?>? startProcess = null, string? workDir = null, int? processId = null)
     {
         _http = http;
         _settings = settings;
@@ -29,10 +30,14 @@ public sealed class UpdateService
         _processPath = processPath;
         _requestShutdown = requestShutdown;
         _startProcess = startProcess ?? Process.Start;
+        _pid = processId ?? Environment.ProcessId;
         _workDir = workDir ?? Path.Combine(Path.GetTempPath(), "TibiaMirror-update");
         if (!_http.DefaultRequestHeaders.UserAgent.Any())
             _http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", $"TibiaMirror/{currentVersion}");
     }
+
+    /// <summary>True when the last check could not read or parse the feed.</summary>
+    public bool LastCheckFailed { get; private set; }
 
     public bool IsPortable => IsPortablePath(_processPath);
 
@@ -49,12 +54,13 @@ public sealed class UpdateService
 
     async Task<ReleaseInfo?> CheckCoreAsync(bool honourSkip, CancellationToken ct)
     {
+        LastCheckFailed = false;
         try
         {
             var feed = Environment.GetEnvironmentVariable(FeedEnvVar);
             var json = await ReadTextAsync(string.IsNullOrEmpty(feed) ? FeedUrl : feed, ct).ConfigureAwait(false);
             var release = ReleaseInfo.Parse(json);
-            if (release is null) { Log.Warn("Update feed returned no usable release."); return null; }
+            if (release is null) { Log.Warn("Update feed returned no usable release."); LastCheckFailed = true; return null; }
             var offer = honourSkip
                 ? UpdatePolicy.ShouldOffer(release.Version, _current, _settings().SkippedVersion)
                 : release.Version > _current;
@@ -66,6 +72,7 @@ public sealed class UpdateService
         catch (Exception e)
         {
             Log.Warn($"Update check failed: {e.Message}");
+            LastCheckFailed = true;
             return null;
         }
     }
@@ -88,13 +95,20 @@ public sealed class UpdateService
             throw new UpdateVerificationException($"Hash mismatch for {release.InstallerName}.");
         }
         var exe = _processPath ?? throw new InvalidOperationException("Unknown process path.");
-        _startProcess(new ProcessStartInfo("cmd.exe", BuildInstallCommandLine(path, exe))
+        _startProcess(new ProcessStartInfo("powershell.exe", BuildInstallCommandLine(path, exe, _pid))
         { CreateNoWindow = true, UseShellExecute = false, WindowStyle = ProcessWindowStyle.Hidden });
         _requestShutdown();
     }
 
-    public static string BuildInstallCommandLine(string installerPath, string appExePath) =>
-        $"/d /s /c \"start \"\" /wait \"{installerPath}\" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART & start \"\" \"{appExePath}\"\"";
+    /// <summary>Hidden PowerShell that waits for this process to exit (releasing the single-instance mutex), installs silently, then relaunches.</summary>
+    public static string BuildInstallCommandLine(string installerPath, string appExePath, int processId)
+    {
+        static string Q(string p) => "'" + p.Replace("'", "''") + "'";
+        var script = $"Wait-Process -Id {processId} -ErrorAction SilentlyContinue; " +
+            $"Start-Process -FilePath {Q(installerPath)} -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait; " +
+            $"Start-Process -FilePath {Q(appExePath)}";
+        return $"-NoProfile -NonInteractive -WindowStyle Hidden -Command \"{script}\"";
+    }
 
     async Task<string> ReadTextAsync(string location, CancellationToken ct)
     {

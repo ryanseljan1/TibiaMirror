@@ -22,21 +22,21 @@ public class SnackbarServiceTests
     [Fact] public void Undo_runs_action_once_and_hides()
     {
         var s = Make(); int n = 0; s.Show("x", () => n++);
-        s.Undo(); s.Undo();
+        s.RunAction(s.Actions.FirstOrDefault()); s.RunAction(s.Actions.FirstOrDefault());
         Assert.Equal(1, n); Assert.False(s.IsVisible);
     }
 
     [Fact] public void Undo_after_expiry_does_nothing()
     {
         var s = Make(); int n = 0; s.Show("x", () => n++);
-        _clock.Advance(6); s.Tick(); s.Undo();
+        _clock.Advance(6); s.Tick(); s.RunAction(s.Actions.FirstOrDefault());
         Assert.Equal(0, n);
     }
 
     [Fact] public void Undo_after_expiry_without_tick_does_nothing()
     {
         var s = Make(); int n = 0; s.Show("x", () => n++);
-        _clock.Advance(6); s.Undo();
+        _clock.Advance(6); s.RunAction(s.Actions.FirstOrDefault());
         Assert.Equal(0, n); Assert.False(s.IsVisible);
     }
 
@@ -47,21 +47,21 @@ public class SnackbarServiceTests
         s.Show("second", () => b++);
         Assert.Equal("second", s.Message);
         _clock.Advance(3); s.Tick(); Assert.True(s.IsVisible);   // timer restarted by the second one
-        s.Undo();
+        s.RunAction(s.Actions.FirstOrDefault());
         Assert.Equal(0, a); Assert.Equal(1, b);
     }
 
     [Fact] public void Dismiss_hides_without_undoing()
     {
         var s = Make(); int n = 0; s.Show("x", () => n++);
-        s.Dismiss(); s.Undo();
+        s.Dismiss(); s.RunAction(s.Actions.FirstOrDefault());
         Assert.False(s.IsVisible); Assert.Equal(0, n);
     }
 
     [Fact] public void Failing_undo_is_swallowed_and_hides()
     {
         var s = Make(); s.Show("x", () => throw new InvalidOperationException("boom"));
-        s.Undo();
+        s.RunAction(s.Actions.FirstOrDefault());
         Assert.False(s.IsVisible);
     }
 

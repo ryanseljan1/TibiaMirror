@@ -12,6 +12,7 @@ public partial class SettingsWindow : Window
     readonly AppHost _host;
     readonly StartupRegistration _startup = new(new RegistryRunKey(), Environment.ProcessPath ?? "");
     bool _startupWasEnabled;
+    bool _initialCheckUpdates;
 
     public SettingsWindow(AppHost host)
     {
@@ -28,6 +29,7 @@ public partial class SettingsWindow : Window
         ThemeDarkRadio.IsChecked = mode == ThemeMode.Dark;
         ThemeLightRadio.IsChecked = mode == ThemeMode.Light;
         CheckUpdatesCheck.IsChecked = s.CheckForUpdates == true;
+        _initialCheckUpdates = CheckUpdatesCheck.IsChecked == true;
         _startupWasEnabled = ReadStartupEnabled();
         StartWithWindowsCheck.IsChecked = _startupWasEnabled;
         ProcessBox.Text = s.TibiaProcessName;
@@ -68,7 +70,8 @@ public partial class SettingsWindow : Window
         try
         {
             var release = await _host.Updates.CheckNowAsync(CancellationToken.None);
-            UpdateStatusText.Text = release is null ? Loc.Get("Settings_UpToDate") : Loc.Format("Settings_UpdateAvailable", release.Version);
+            UpdateStatusText.Text = release is not null ? Loc.Format("Settings_UpdateAvailable", release.Version)
+                : _host.Updates.LastCheckFailed ? Loc.Get("Settings_CheckFailed") : Loc.Get("Settings_UpToDate");
         }
         catch (Exception e) { Log.Error("Update check from Settings failed", e); }
         finally { CheckNowButton.IsEnabled = true; }
@@ -122,6 +125,12 @@ public partial class SettingsWindow : Window
         }
     }
 
+    async Task CheckAfterOptInAsync()
+    {
+        try { await _host.Updates.CheckAsync(); }
+        catch (Exception e) { Log.Error("Update check after opt-in failed", e); }
+    }
+
     void Save()
     {
         if (ValidateDetection(ProcessBox.Text, TitleBox.Text) is not null) return;
@@ -133,7 +142,9 @@ public partial class SettingsWindow : Window
         s.OnlyShowWhenTibiaFocused = OnlyFocusedCheck.IsChecked == true;
         s.ClickThroughWhileTibiaFocused = ClickThroughCheck.IsChecked == true;
         s.ThemeMode = ThemeSystemRadio.IsChecked == true ? ThemeMode.System : ThemeLightRadio.IsChecked == true ? ThemeMode.Light : ThemeMode.Dark;
-        s.CheckForUpdates = CheckUpdatesCheck.IsChecked == true;
+        var checkUpdates = CheckUpdatesCheck.IsChecked == true;
+        var updatesToggled = checkUpdates != _initialCheckUpdates;   // untouched toggle leaves null / a concurrent info-bar answer alone
+        if (updatesToggled) s.CheckForUpdates = checkUpdates;
         s.TibiaProcessName = ProcessBox.Text.Trim();
         s.TibiaTitlePrefix = TitleBox.Text.Trim();
         try { _host.SettingsService?.Save(); }
@@ -144,6 +155,7 @@ public partial class SettingsWindow : Window
         }
         ApplyStartup();
         _host.ApplySettings();
+        if (updatesToggled && checkUpdates) _ = CheckAfterOptInAsync();
         DialogResult = true;
     }
 }

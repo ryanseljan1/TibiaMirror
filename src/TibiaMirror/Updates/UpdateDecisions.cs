@@ -11,6 +11,14 @@ public static class UpdateDecisions
         ? new("Updates_AvailablePortable", [UpdateActionKind.WhatsNew, UpdateActionKind.Download, UpdateActionKind.Later])
         : new("Updates_Available", [UpdateActionKind.WhatsNew, UpdateActionKind.UpdateNow, UpdateActionKind.Later, UpdateActionKind.Skip]);
 
+    /// <summary>While a download/install runs, new offers and Update now/Retry clicks are ignored.</summary>
+    public static bool CanStartInstall(bool installing) => !installing;
+    public static bool ShouldShowAvailable(bool installing) => !installing;
+
+    /// <summary>The progress snackbar must be shown again if it was replaced or dismissed meanwhile.</summary>
+    public static bool NeedsProgressReshow(bool visible, bool busy, string current, string expected) =>
+        !visible || !busy || current != expected;
+
     public static UpdatePrompt Failure(Exception ex) => new(
         ex is UpdateVerificationException ? "Updates_VerifyFailed" : "Updates_DownloadFailed",
         [UpdateActionKind.Retry, UpdateActionKind.Later]);

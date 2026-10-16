@@ -16,6 +16,21 @@ public class ThemeManagerTests
     }
 
     [Fact]
+    public void Applying_the_same_mode_twice_keeps_the_dictionary_instance()
+    {
+        Sta.Run(() =>
+        {
+            var resources = new ResourceDictionary();
+            ThemeManager.Apply(resources, ThemeMode.Dark, highContrast: false);
+            var first = resources.MergedDictionaries[0];
+            ThemeManager.Apply(resources, ThemeMode.Dark, highContrast: false);
+            Assert.Same(first, resources.MergedDictionaries[0]);
+            ThemeManager.Apply(resources, ThemeMode.Light, highContrast: false);
+            Assert.NotSame(first, resources.MergedDictionaries[0]);
+        });
+    }
+
+    [Fact]
     public void Applying_dark_then_light_swaps_the_theme_dictionary_in_place()
     {
         Sta.Run(() =>
