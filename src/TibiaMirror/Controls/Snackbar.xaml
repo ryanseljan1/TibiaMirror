@@ -11,22 +11,38 @@
             <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.35"/>
         </Border.Effect>
         <DockPanel>
-            <Button DockPanel.Dock="Right" Command="{Binding UndoCommand}" Content="Undo" Margin="16,0,0,0" Padding="4,0"
-                    Cursor="Hand" FontWeight="SemiBold" Foreground="{DynamicResource ThemeTextBrush}" Background="Transparent" BorderThickness="0">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <TextBlock x:Name="Label" Text="{TemplateBinding Content}" Padding="{TemplateBinding Padding}"
-                                   Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" TextDecorations="Underline"/>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Label" Property="Opacity" Value="0.75"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
-            <TextBlock Text="{Binding Message}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                       Foreground="{DynamicResource ThemeTextBrush}"/>
+            <Button DockPanel.Dock="Right" Command="{Binding DismissCommand}" Content="&#x2715;" Margin="12,0,0,0" Padding="4,0"
+                    Cursor="Hand" Foreground="{DynamicResource ThemeTextBrush}" Background="Transparent" BorderThickness="0"/>
+            <ItemsControl DockPanel.Dock="Right" ItemsSource="{Binding Actions}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Command="{Binding DataContext.RunActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                CommandParameter="{Binding}" Content="{Binding Label}" Margin="16,0,0,0" Padding="4,0"
+                                Cursor="Hand" FontWeight="SemiBold" Foreground="{DynamicResource ThemeTextBrush}" Background="Transparent" BorderThickness="0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <TextBlock x:Name="Label" Text="{TemplateBinding Content}" Padding="{TemplateBinding Padding}"
+                                               Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" TextDecorations="Underline"/>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Label" Property="Opacity" Value="0.75"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="{Binding Message}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource ThemeTextBrush}"/>
+                <ProgressBar Height="4" Margin="0,6,0,0" Minimum="0" Maximum="1" Value="{Binding Progress, Mode=OneWay, TargetNullValue=0}"
+                             IsIndeterminate="{Binding IsIndeterminate, Mode=OneWay}" Foreground="{DynamicResource ThemeTextBrush}" Background="{DynamicResource ThemeBorderBrush}"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
         </DockPanel>
     </Border>
 </UserControl>

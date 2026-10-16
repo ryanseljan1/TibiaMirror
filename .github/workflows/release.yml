@@ -49,6 +49,12 @@ jobs:
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\TibiaMirror.iss
           # Fixed-name copy so README's Download card can use releases/latest/download/TibiaMirror-Setup.exe
           Copy-Item "artifacts\TibiaMirror-Setup-$env:TM_VERSION.exe" "artifacts\TibiaMirror-Setup.exe"
+      - name: Checksums
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem artifacts -File | Where-Object Name -ne "SHA256SUMS.txt" | Sort-Object Name
+          $lines = foreach ($f in $files) { "{0}  {1}" -f (Get-FileHash $f.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $f.Name }
+          [System.IO.File]::WriteAllText("$PWD/artifacts/SHA256SUMS.txt", (($lines -join "`n") + "`n"), (New-Object System.Text.UTF8Encoding $false))
       - uses: softprops/action-gh-release@v2
         with:
           files: artifacts/*
