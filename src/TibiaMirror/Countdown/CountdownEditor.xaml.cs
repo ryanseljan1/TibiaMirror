@@ -5,6 +5,7 @@ using System.Windows.Media;
 using Microsoft.Win32;
 using TibiaMirror.Audio;
 using TibiaMirror.Hotkeys;
+using TibiaMirror.Localization;
 using TibiaMirror.Models;
 using TibiaMirror.Timers;
 
@@ -14,8 +15,8 @@ namespace TibiaMirror.Countdown;
 public partial class CountdownEditor : UserControl
 {
     sealed record SoundChoice(string? Id, string Name);
-    static readonly SoundChoice NoneChoice = new(null, "None");
-    static readonly SoundChoice CustomChoice = new("", "Custom file…");
+    static readonly SoundChoice NoneChoice = new(null, Loc.Get("Timers_SoundNone"));
+    static readonly SoundChoice CustomChoice = new("", Loc.Get("Timers_CustomFile"));
     static readonly string[] Swatches = { "#FFFF7F00", "#FFE53935", "#FF43A047", "#FF1E88E5", "#FFFFFFFF", "#FFFDD835" };
 
     readonly RegionModel _region;
@@ -55,6 +56,11 @@ public partial class CountdownEditor : UserControl
         FlashBox.IsChecked = _s.FlashOnDone;
         SelectSound(_s.Sound);
         _loading = false;
+        // The sound file may appear or vanish while the editor is open; re-check the warning every couple of seconds.
+        var recheck = new System.Windows.Threading.DispatcherTimer { Interval = SoundAvailabilityCache.Ttl };
+        recheck.Tick += (_, _) => UpdateSoundWarning();
+        Loaded += (_, _) => recheck.Start();
+        Unloaded += (_, _) => recheck.Stop();
     }
 
     void Notify() { if (!_loading) _changed(); }
@@ -78,7 +84,7 @@ public partial class CountdownEditor : UserControl
             if (others.Count > 0)
             {
                 var names = string.Join(", ", others.Select(o => o is AudioTimerModel t ? t.Name : o.ToString()));
-                if (MessageBox.Show(Window.GetWindow(this), $"This key is already used by: {names}. Use it anyway?", "Key already in use",
+                if (MessageBox.Show(Window.GetWindow(this), Loc.Format("Timers_KeyInUseBody", names), Loc.Get("Timers_KeyInUseTitle"),
                         MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 {
                     KeyBox.Hotkey = _s.Hotkey;
@@ -129,7 +135,7 @@ public partial class CountdownEditor : UserControl
     {
         var text = _canPlay is null ? "" : CountdownSoundWarning.For(_s.Sound, _canPlay);
         SoundWarning.Text = text;
-        SoundWarning.Visibility = text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        SoundWarningPanel.Visibility = text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     void SelectSound(string? id)
@@ -154,7 +160,7 @@ public partial class CountdownEditor : UserControl
         if (_revert || _loading || SoundBox.SelectedItem is not SoundChoice c) return;
         if (c == CustomChoice)
         {
-            var dlg = new OpenFileDialog { Filter = "Audio (*.mp3;*.wav)|*.mp3;*.wav" };
+            var dlg = new OpenFileDialog { Filter = Loc.Get("Timers_AudioFilter") };
             if (dlg.ShowDialog(Window.GetWindow(this)) == true) { SelectSound(dlg.FileName); c = (SoundChoice)SoundBox.SelectedItem; }
             else { _revert = true; SoundBox.SelectedItem = _lastChoice; _revert = false; return; }
         }

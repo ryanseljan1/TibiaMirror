@@ -1,44 +1,55 @@
 <UserControl x:Class="TibiaMirror.Views.AudioTimersView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:TibiaMirror.Localization">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="B2V"/>
     </UserControl.Resources>
     <DockPanel Margin="8">
         <StackPanel DockPanel.Dock="Top">
             <DockPanel Margin="0,0,0,6">
-                <Button x:Name="PresetButton" DockPanel.Dock="Right" Content="From preset ▾" Padding="10,4" Margin="6,0,0,0" Click="Preset_Click"/>
-                <Button DockPanel.Dock="Right" Content="＋ Add Timer" Padding="10,4" Click="Add_Click"/>
+                <Button x:Name="PresetButton" DockPanel.Dock="Right" Style="{StaticResource Button.Secondary}" Padding="10,4" Margin="6,0,0,0" Click="Preset_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{loc:Loc Timers_FromPreset}" VerticalAlignment="Center"/>
+                        <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.ChevronDown}" Margin="6,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button DockPanel.Dock="Right" Style="{StaticResource Button.Primary}" Padding="10,4" Click="Add_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Add}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{loc:Loc Timers_AddTimer}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
                 <ToggleButton x:Name="ListenToggle" IsChecked="{Binding IsListening, Mode=TwoWay}" HorizontalAlignment="Left"
                               FontSize="16" FontWeight="Bold" Padding="16,6" MinWidth="130">
                     <ToggleButton.Style>
                         <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
-                            <Setter Property="Content" Value="Listening: OFF"/>
+                            <Setter Property="Content" Value="{loc:Loc Timers_ListeningOff}"/>
                             <Style.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
-                                    <Setter Property="Content" Value="Listening: ON"/>
-                                    <Setter Property="Background" Value="{DynamicResource ThemeSuccessBrush}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource ThemeOnSuccessBrush}"/>
+                                    <Setter Property="Content" Value="{loc:Loc Timers_ListeningOn}"/>
+                                    <Setter Property="Background" Value="{DynamicResource Brush.Success}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource Brush.OnAccent}"/>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
                     </ToggleButton.Style>
                 </ToggleButton>
             </DockPanel>
-            <CheckBox Content="Start listening when the app opens" IsChecked="{Binding StartListeningOnOpen, Mode=TwoWay}" Margin="0,0,0,6"/>
+            <CheckBox Style="{StaticResource ToggleSwitch}" Content="{loc:Loc Timers_StartListeningOnOpen}" IsChecked="{Binding StartListeningOnOpen, Mode=TwoWay}" Margin="0,0,0,6"/>
             <DockPanel Margin="0,0,0,8">
-                <TextBlock DockPanel.Dock="Left" Text="Master volume" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBlock DockPanel.Dock="Left" Text="{loc:Loc Timers_MasterVolume}" VerticalAlignment="Center" Margin="0,0,8,0"/>
                 <TextBlock DockPanel.Dock="Right" Text="{Binding MasterVolume}" Width="30" TextAlignment="Right" VerticalAlignment="Center"/>
                 <Slider Minimum="0" Maximum="100" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding MasterVolume, Mode=TwoWay}"/>
             </DockPanel>
         </StackPanel>
-        <TextBlock DockPanel.Dock="Top" Text="No timers yet. Click Add Timer, pick a key and a duration."
-                   Visibility="{Binding IsEmpty, Converter={StaticResource B2V}}" Foreground="{DynamicResource ThemeMutedBrush}" Margin="0,16,0,0" TextWrapping="Wrap"/>
+        <TextBlock DockPanel.Dock="Top" Text="{loc:Loc Timers_EmptyHint}"
+                   Visibility="{Binding IsEmpty, Converter={StaticResource B2V}}" Foreground="{DynamicResource Brush.TextSecondary}" Margin="0,16,0,0" TextWrapping="Wrap"/>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Cards}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,6">
+                        <Border BorderBrush="{DynamicResource Brush.BorderSubtle}" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,6">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -47,19 +58,23 @@
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14"/>
                                     <TextBlock>
-                                        <Run Text="{Binding HotkeyText, Mode=OneWay}"/><Run Text="  |  "/><Run Text="{Binding DurationText, Mode=OneWay}"/><Run Text="  |  "/><Run Text="{Binding RemainingText, Mode=OneWay}" FontWeight="SemiBold"/>
+                                        <Run Text="{Binding HotkeyText, Mode=OneWay}"/><Run Text="{loc:Loc Timers_CardSeparator}"/><Run Text="{Binding DurationText, Mode=OneWay}"/><Run Text="{loc:Loc Timers_CardSeparator}"/><Run Text="{Binding RemainingText, Mode=OneWay}" FontWeight="SemiBold"/>
                                     </TextBlock>
-                                    <TextBlock Text="{Binding LoopText}" Foreground="{DynamicResource ThemeMutedBrush}"
-                                               Visibility="{Binding IsRepeat, Converter={StaticResource B2V}}"/>
-                                    <TextBlock Text="{Binding WarningText}" Foreground="DarkOrange"
-                                               Visibility="{Binding SoundMissing, Converter={StaticResource B2V}}"/>
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding IsRepeat, Converter={StaticResource B2V}}">
+                                        <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Retry}" Foreground="{DynamicResource Brush.TextSecondary}" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding LoopText}" Foreground="{DynamicResource Brush.TextSecondary}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding SoundMissing, Converter={StaticResource B2V}}">
+                                        <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Warning}" Foreground="{DynamicResource Brush.Warning}" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding WarningText}" Foreground="{DynamicResource Brush.Warning}"/>
+                                    </StackPanel>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button Content="Stop" Padding="8,2" Margin="2" Click="Stop_Click"
+                                    <Button Content="{loc:Loc Timers_Stop}" Padding="8,2" Margin="2" Click="Stop_Click"
                                             Visibility="{Binding IsRunning, Converter={StaticResource B2V}}"/>
-                                    <Button Content="Test" Padding="8,2" Margin="2" Click="Test_Click"/>
-                                    <Button Content="Edit" Padding="8,2" Margin="2" Click="Edit_Click"/>
-                                    <Button Content="Delete" Padding="8,2" Margin="2" Click="Delete_Click"/>
+                                    <Button Content="{loc:Loc Timers_Test}" Padding="8,2" Margin="2" Click="Test_Click"/>
+                                    <Button Content="{loc:Loc Timers_Edit}" Padding="8,2" Margin="2" Click="Edit_Click"/>
+                                    <Button Style="{StaticResource Button.Danger}" Content="{loc:Loc Timers_Delete}" Padding="8,2" Margin="2" Click="Delete_Click"/>
                                 </StackPanel>
                             </Grid>
                         </Border>

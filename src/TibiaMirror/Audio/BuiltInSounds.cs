@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using NAudio.Wave;
+using TibiaMirror.Localization;
 
 namespace TibiaMirror.Audio;
 
@@ -23,14 +24,14 @@ public static class BuiltInSounds
         ["builtin:rise"] = new[] { new Note(523.25, 0, 0.15), new Note(659.25, 0.15, 0.15), new Note(783.99, 0.3, 0.3) },
     };
 
-    public static IReadOnlyList<(string Id, string DisplayName)> All { get; } = new[]
+    public static IReadOnlyList<(string Id, string DisplayName)> All => new[]
     {
-        ("builtin:chime", "Chime"),
-        ("builtin:ding", "Ding"),
-        ("builtin:double-ding", "Double ding"),
-        ("builtin:alert", "Alert"),
-        ("builtin:low-beep", "Low beep"),
-        ("builtin:rise", "Rise"),
+        ("builtin:chime", Loc.Get("Timers_SoundChime")),
+        ("builtin:ding", Loc.Get("Timers_SoundDing")),
+        ("builtin:double-ding", Loc.Get("Timers_SoundDoubleDing")),
+        ("builtin:alert", Loc.Get("Timers_SoundAlert")),
+        ("builtin:low-beep", Loc.Get("Timers_SoundLowBeep")),
+        ("builtin:rise", Loc.Get("Timers_SoundRise")),
     };
 
     private static readonly ConcurrentDictionary<string, byte[]> Cache = new();

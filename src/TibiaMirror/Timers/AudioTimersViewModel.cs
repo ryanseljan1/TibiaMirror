@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using TibiaMirror.Hotkeys;
+using TibiaMirror.Localization;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Timers;
@@ -104,7 +105,7 @@ public sealed class AudioTimersViewModel : ObservableObject, IDisposable
         _service.Cancel(model.Id);
         profile.Timers.RemoveAt(index);
         Rebuild();
-        _host.Snackbar.Show($"Timer '{model.Name}' deleted", () =>
+        _host.Snackbar.Show(Loc.Format("Timers_Deleted", model.Name), () =>
         {
             if (!ReferenceEquals(profile, _host.CurrentProfile) || profile.Timers.Contains(model)) return;
             profile.Timers.Insert(Math.Min(index, profile.Timers.Count), model);

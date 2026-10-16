@@ -6,4 +6,74 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Timers_Title" xml:space="preserve"><value>Audio Timers</value></data>
   <data name="Timers_AddButton" xml:space="preserve"><value>Add</value></data>
+  <data name="Timers_ListeningOff" xml:space="preserve"><value>Listening: OFF</value></data>
+  <data name="Timers_ListeningOn" xml:space="preserve"><value>Listening: ON</value></data>
+  <data name="Timers_FromPreset" xml:space="preserve"><value>From preset</value></data>
+  <data name="Timers_AddTimer" xml:space="preserve"><value>Add Timer</value></data>
+  <data name="Timers_StartListeningOnOpen" xml:space="preserve"><value>Start listening when the app opens</value></data>
+  <data name="Timers_MasterVolume" xml:space="preserve"><value>Master volume</value></data>
+  <data name="Timers_EmptyHint" xml:space="preserve"><value>No timers yet. Click Add Timer, pick a key and a duration.</value></data>
+  <data name="Timers_Stop" xml:space="preserve"><value>Stop</value></data>
+  <data name="Timers_Test" xml:space="preserve"><value>Test</value></data>
+  <data name="Timers_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Timers_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Timers_CardSeparator" xml:space="preserve"><value>  |  </value></data>
+  <data name="Timers_Ready" xml:space="preserve"><value>Ready</value></data>
+  <data name="Timers_NoKey" xml:space="preserve"><value>No key</value></data>
+  <data name="Timers_Seconds" xml:space="preserve"><value>{0:0.##} s</value></data>
+  <data name="Timers_RemainingSeconds" xml:space="preserve"><value>{0:0.0} s</value></data>
+  <data name="Timers_LoopEvery" xml:space="preserve"><value>every {0:0.##} s</value></data>
+  <data name="Timers_SoundMissing" xml:space="preserve"><value>Sound file not found — using {0}</value></data>
+  <data name="Timers_Deleted" xml:space="preserve"><value>Timer '{0}' deleted</value></data>
+  <data name="Timers_DialogTitleAdd" xml:space="preserve"><value>Add timer</value></data>
+  <data name="Timers_DialogTitleEdit" xml:space="preserve"><value>Edit timer</value></data>
+  <data name="Timers_DefaultName" xml:space="preserve"><value>Timer</value></data>
+  <data name="Timers_DialogTitle" xml:space="preserve"><value>Audio timer</value></data>
+  <data name="Timers_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Timers_HotkeyLabel" xml:space="preserve"><value>Hotkey (pressed while Tibia is focused)</value></data>
+  <data name="Timers_DurationLabel" xml:space="preserve"><value>Duration (seconds)</value></data>
+  <data name="Timers_RepeatEvery" xml:space="preserve"><value>Repeat every</value></data>
+  <data name="Timers_SecondsUnit" xml:space="preserve"><value>s</value></data>
+  <data name="Timers_Sound" xml:space="preserve"><value>Sound</value></data>
+  <data name="Timers_Volume" xml:space="preserve"><value>Volume</value></data>
+  <data name="Timers_OnRepress" xml:space="preserve"><value>When the key is pressed again while running</value></data>
+  <data name="Timers_RestartTimer" xml:space="preserve"><value>Restart the timer</value></data>
+  <data name="Timers_IgnoreWhileRunning" xml:space="preserve"><value>Ignore while running</value></data>
+  <data name="Timers_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Timers_CustomFile" xml:space="preserve"><value>Custom file…</value></data>
+  <data name="Timers_SoundNone" xml:space="preserve"><value>None</value></data>
+  <data name="Timers_ErrName" xml:space="preserve"><value>Enter a name between 1 and 40 characters</value></data>
+  <data name="Timers_ErrDuration" xml:space="preserve"><value>Enter a duration between 0.1 and 3600 seconds</value></data>
+  <data name="Timers_ErrInterval" xml:space="preserve"><value>Enter a repeat interval between 0.1 and 3600 seconds</value></data>
+  <data name="Timers_ErrPickSound" xml:space="preserve"><value>Pick a sound</value></data>
+  <data name="Timers_KeyInUseBody" xml:space="preserve"><value>This key is already used by: {0}. Use it anyway?</value></data>
+  <data name="Timers_KeyInUseTitle" xml:space="preserve"><value>Key already in use</value></data>
+  <data name="Timers_AudioFilter" xml:space="preserve"><value>Audio (*.mp3;*.wav)|*.mp3;*.wav</value></data>
+  <data name="Timers_PresetShortBuff" xml:space="preserve"><value>Short buff (30 s)</value></data>
+  <data name="Timers_PresetShortBuffName" xml:space="preserve"><value>Short buff</value></data>
+  <data name="Timers_PresetLongBuff" xml:space="preserve"><value>Long buff (10 min)</value></data>
+  <data name="Timers_PresetLongBuffName" xml:space="preserve"><value>Long buff</value></data>
+  <data name="Timers_PresetFood" xml:space="preserve"><value>Food (5 min, repeat)</value></data>
+  <data name="Timers_PresetFoodName" xml:space="preserve"><value>Food</value></data>
+  <data name="Timers_PresetMana" xml:space="preserve"><value>Mana potion reminder (1 min, repeat)</value></data>
+  <data name="Timers_PresetManaName" xml:space="preserve"><value>Mana potion reminder</value></data>
+  <data name="Timers_PresetBoss" xml:space="preserve"><value>Boss respawn check (20 min)</value></data>
+  <data name="Timers_PresetBossName" xml:space="preserve"><value>Boss respawn check</value></data>
+  <data name="Timers_SoundChime" xml:space="preserve"><value>Chime</value></data>
+  <data name="Timers_SoundDing" xml:space="preserve"><value>Ding</value></data>
+  <data name="Timers_SoundDoubleDing" xml:space="preserve"><value>Double ding</value></data>
+  <data name="Timers_SoundAlert" xml:space="preserve"><value>Alert</value></data>
+  <data name="Timers_SoundLowBeep" xml:space="preserve"><value>Low beep</value></data>
+  <data name="Timers_SoundRise" xml:space="preserve"><value>Rise</value></data>
+  <data name="Timers_CountdownEnable" xml:space="preserve"><value>Enable countdown</value></data>
+  <data name="Timers_CountdownDuration" xml:space="preserve"><value>Duration (seconds, 0.5 to 3600)</value></data>
+  <data name="Timers_CountdownSide" xml:space="preserve"><value>Side</value></data>
+  <data name="Timers_CountdownShape" xml:space="preserve"><value>Shape</value></data>
+  <data name="Timers_CountdownFullEdge" xml:space="preserve"><value>Full edge</value></data>
+  <data name="Timers_CountdownNarrowStrip" xml:space="preserve"><value>Narrow strip</value></data>
+  <data name="Timers_CountdownColor" xml:space="preserve"><value>Color</value></data>
+  <data name="Timers_CountdownColorHint" xml:space="preserve"><value>#AARRGGBB or #RRGGBB</value></data>
+  <data name="Timers_CountdownThickness" xml:space="preserve"><value>Thickness</value></data>
+  <data name="Timers_CountdownFlash" xml:space="preserve"><value>Flash border when done</value></data>
+  <data name="Timers_CountdownSoundWhenDone" xml:space="preserve"><value>Sound when done</value></data>
 </root>
