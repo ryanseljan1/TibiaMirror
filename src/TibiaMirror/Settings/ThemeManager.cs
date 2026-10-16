@@ -1,30 +1,71 @@
 using System.Windows;
-using System.Windows.Media;
+using Microsoft.Win32;
+using TibiaMirror.Models;
 
 namespace TibiaMirror.Settings;
 
-/// <summary>Updates shared brushes so open WPF windows respond to a saved theme change.</summary>
+/// <summary>Swaps the merged theme dictionary so open WPF windows follow the saved theme.</summary>
 public static class ThemeManager
 {
     public const string WindowBrushKey = "ThemeWindowBrush";
     public const string TextBrushKey = "ThemeTextBrush";
 
-    public static void Apply(bool darkMode) => Apply(Application.Current.Resources, darkMode);
+    static ThemeMode _mode = ThemeMode.Dark;
+    static bool _subscribed;
 
-    public static void Apply(ResourceDictionary resources, bool darkMode)
+    public static event EventHandler? ThemeChanged;
+    public static bool IsDark { get; private set; } = true;
+
+    public static void Apply(ThemeMode mode)
     {
-        var colors = darkMode
-            ? new[] { "#FF181B20", "#FFF2F4F7", "#FF22262D", "#FF303640", "#FFB4BBC7", "#FF515B69", "#FFFF8A8A", "#FF394B63", "#FF303640", "#FF59451D", "#FFFFE1A3", "#FF2F5C9E", "#FFFFFFFF", "#FF1F6B2E", "#FFFFFFFF" }
-            : new[] { "#FFF7F8FA", "#FF1D2530", "#FFFFFFFF", "#FFF4F5F7", "#FF5D6672", "#FFACB4BE", "#FFB00020", "#FFDCEAFF", "#FFE8EBF0", "#FFFFF3CD", "#FF664D03", "#FFBFD8F7", "#FF1D2530", "#FF9BE39B", "#FF183018" };
-        string[] keys =
+        _mode = mode;
+        Subscribe();
+        Apply(Application.Current.Resources, mode);
+        ThemeChanged?.Invoke(null, EventArgs.Empty);
+    }
+
+    public static void Apply(ResourceDictionary resources, ThemeMode mode, bool? systemLight = null, bool? highContrast = null)
+    {
+        var name = (highContrast ?? SystemParameters.HighContrast) ? "HighContrast"
+            : mode == ThemeMode.Dark ? "Dark"
+            : mode == ThemeMode.Light ? "Light"
+            : (systemLight ?? SystemUsesLightTheme()) ? "Light" : "Dark";
+        var theme = new ResourceDictionary { Source = new Uri($"pack://application:,,,/TibiaMirror;component/Themes/{name}.xaml", UriKind.Absolute) };
+        var merged = resources.MergedDictionaries;
+        var index = -1;
+        for (var i = 0; i < merged.Count; i++)
+            if (merged[i].Contains("ThemeId")) { index = i; break; }
+        if (index >= 0) merged[index] = theme; else merged.Add(theme);
+        IsDark = name != "Light";
+    }
+
+    static bool SystemUsesLightTheme()
+    {
+        try
         {
-            WindowBrushKey, TextBrushKey,
-            "ThemeSurfaceBrush", "ThemeControlBrush", "ThemeMutedBrush", "ThemeBorderBrush",
-            "ThemeErrorBrush", "ThemeSelectionBrush", "ThemeTabBrush", "ThemeBannerBrush", "ThemeBannerTextBrush",
-            "ThemeCheckedBrush", "ThemeCheckedTextBrush", "ThemeSuccessBrush", "ThemeOnSuccessBrush"
+            using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+            return key?.GetValue("AppsUseLightTheme") is not int v || v != 0;
+        }
+        catch { return true; }
+    }
+
+    static void Subscribe()
+    {
+        if (_subscribed) return;
+        _subscribed = true;
+        SystemEvents.UserPreferenceChanged += (_, e) =>
+        {
+            if (_mode == ThemeMode.System && e.Category == UserPreferenceCategory.General) Reapply();
         };
-        // Keep every themed property bound through DynamicResource; replacing a brush updates open windows too.
-        for (var i = 0; i < keys.Length; i++)
-            resources[keys[i]] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colors[i])!);
+        SystemParameters.StaticPropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SystemParameters.HighContrast)) Reapply();
+        };
+    }
+
+    static void Reapply()
+    {
+        var app = Application.Current;
+        app?.Dispatcher.BeginInvoke(() => Apply(_mode));
     }
 }

@@ -18,7 +18,7 @@ public sealed class AppHost : IDisposable
     public event Action<Profile>? ProfileChanged;
     public void SetProfile(Profile p) { ClampToMonitors(p); CurrentProfile = p; ProfileChanged?.Invoke(p); }
     public void ProfileEdited() => _autosave.Trigger();
-    public void ApplySettings() { ApplyMirrorHotkey(); ApplyLockAllHotkey(); ApplyProfileHotkey(); Mirrors?.Refresh(); TibiaMirror.Settings.ThemeManager.Apply(Settings.DarkMode); }
+    public void ApplySettings() { ApplyMirrorHotkey(); ApplyLockAllHotkey(); ApplyProfileHotkey(); Mirrors?.Refresh(); TibiaMirror.Settings.ThemeManager.Apply(Settings.ThemeMode ?? TibiaMirror.Models.ThemeMode.Dark); }
 
     // --- Task 10: autosave, restore, hotkey retry ---
     public TibiaMirror.Settings.SettingsService? SettingsService { get; private set; }

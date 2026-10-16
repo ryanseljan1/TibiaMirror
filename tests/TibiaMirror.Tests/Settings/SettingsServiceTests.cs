@@ -27,7 +27,8 @@ public class SettingsServiceTests : IDisposable
         settings.Load();
         settings.Save();
         using var json = System.Text.Json.JsonDocument.Parse(File.ReadAllText(paths.SettingsFile));
-        Assert.True(json.RootElement.GetProperty("DarkMode").GetBoolean());
+        Assert.Equal("Dark", json.RootElement.GetProperty("ThemeMode").GetString());
+        Assert.False(json.RootElement.TryGetProperty("DarkMode", out var legacy) && legacy.ValueKind != System.Text.Json.JsonValueKind.Null);
     }
 }
 

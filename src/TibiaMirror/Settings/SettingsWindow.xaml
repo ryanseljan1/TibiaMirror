@@ -18,7 +18,12 @@
         <CheckBox x:Name="OnlyFocusedCheck" Content="Only show mirrors while Tibia is focused" Margin="0,4,0,12"/>
         <CheckBox x:Name="ClickThroughCheck" Content="Click through mirrors while Tibia is focused" Margin="0,0,0,12"
                   ToolTip="Clicks on a mirror go to Tibia. To move or resize an unlocked mirror, focus another window first."/>
-        <CheckBox x:Name="DarkModeCheck" Content="Dark mode" Margin="0,0,0,12"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+            <TextBlock Text="Theme" VerticalAlignment="Center" Margin="0,0,12,0"/>
+            <ComboBox x:Name="ThemeModeCombo" MinWidth="120">
+                <ComboBoxItem Content="System"/><ComboBoxItem Content="Dark"/><ComboBoxItem Content="Light"/>
+            </ComboBox>
+        </StackPanel>
         <CheckBox x:Name="StartWithWindowsCheck" Content="Start with Windows (in the tray)" Margin="0,0,0,12"/>
         <Expander Header="Advanced">
             <StackPanel Margin="0,8,0,0">
