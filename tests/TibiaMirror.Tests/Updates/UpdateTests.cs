@@ -25,6 +25,7 @@ public sealed class UpdateTests : IDisposable
     [InlineData("0.2.0-beta.1", "0.2.0", -1)]
     [InlineData("0.2.0-beta.2", "0.2.0-beta.10", -1)]
     [InlineData("v0.2.0", "0.2.0", 0)]
+    [InlineData("0.2.0-rc.-1", "0.2.0-rc.-2", -1)]
     public void Compare(string a, string b, int expected) =>
         Assert.Equal(expected, Math.Sign(SemVersion.Parse(a).CompareTo(SemVersion.Parse(b))));
 
@@ -175,11 +176,53 @@ public sealed class UpdateTests : IDisposable
     }
 
     [Fact]
-    public void CommandLineQuotesPaths()
+    public void InstallGuardIgnoresOffersAndRepeatsWhileInstalling()
     {
-        var c = UpdateService.BuildInstallCommandLine(@"C:\Temp dir\Setup.exe", @"C:\Program Files\TibiaMirror\TibiaMirror.exe");
-        Assert.Equal("/d /s /c \"start \"\" /wait \"C:\\Temp dir\\Setup.exe\" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART & start \"\" \"C:\\Program Files\\TibiaMirror\\TibiaMirror.exe\"\"", c);
+        Assert.False(UpdateDecisions.ShouldShowAvailable(true));
+        Assert.False(UpdateDecisions.CanStartInstall(true));
+        Assert.True(UpdateDecisions.ShouldShowAvailable(false));
+        Assert.True(UpdateDecisions.CanStartInstall(false));
     }
+
+    [Fact]
+    public void ProgressReshownWhenSnackbarReplacedOrDismissed()
+    {
+        Assert.False(UpdateDecisions.NeedsProgressReshow(true, true, "Downloading", "Downloading"));
+        Assert.True(UpdateDecisions.NeedsProgressReshow(false, true, "Downloading", "Downloading"));
+        Assert.True(UpdateDecisions.NeedsProgressReshow(true, false, "Other", "Downloading"));
+        Assert.True(UpdateDecisions.NeedsProgressReshow(true, true, "Other", "Downloading"));
+    }
+
+    [Fact]
+    public void CommandLineWaitsForPidAndQuotesPaths()
+    {
+        var c = UpdateService.BuildInstallCommandLine(@"C:\Temp dir\Setup.exe", @"C:\Program Files\TibiaMirror\TibiaMirror.exe", 1234);
+        Assert.Equal("-NoProfile -NonInteractive -WindowStyle Hidden -Command \"Wait-Process -Id 1234 -ErrorAction SilentlyContinue; Start-Process -FilePath 'C:\\Temp dir\\Setup.exe' -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait; Start-Process -FilePath 'C:\\Program Files\\TibiaMirror\\TibiaMirror.exe'\"", c);
+    }
+
+    [Fact]
+    public void CommandLineEscapesApostrophes()
+    {
+        var c = UpdateService.BuildInstallCommandLine(@"C:\O'Neil\Setup.exe", @"C:\O'Neil\App.exe", 1);
+        Assert.Contains("'C:\\O''Neil\\Setup.exe'", c);
+        Assert.Contains("'C:\\O''Neil\\App.exe'", c);
+    }
+
+    [Fact]
+    public async Task LastCheckFailedReflectsFeedReadability()
+    {
+        Environment.SetEnvironmentVariable(UpdateService.FeedEnvVar, null);
+        var bad = Make(new FakeHandler(_ => throw new InvalidOperationException("no network")), new AppSettings());
+        Assert.Null(await bad.CheckNowAsync());
+        Assert.True(bad.LastCheckFailed);
+        var feed = Path.Combine(_dir, "ok.json");
+        File.WriteAllText(feed, Json("v0.0.1"));
+        Environment.SetEnvironmentVariable(UpdateService.FeedEnvVar, feed);
+        var ok = Make(new FakeHandler(_ => throw new InvalidOperationException()), new AppSettings());
+        Assert.Null(await ok.CheckNowAsync());
+        Assert.False(ok.LastCheckFailed);
+    }
+
 
     [Fact]
     public async Task DownloadVerifiesAndInstalls()
@@ -192,7 +235,8 @@ public sealed class UpdateTests : IDisposable
         var down = false;
         await Make(h, new AppSettings(), () => down = true, p => { psi = p; return null; }, Installed()).DownloadAndInstallAsync(rel);
         Assert.True(down);
-        Assert.Equal("cmd.exe", psi!.FileName);
+        Assert.Equal("powershell.exe", psi!.FileName);
+        Assert.Contains("Wait-Process", psi.Arguments);
         Assert.Contains("/VERYSILENT", psi.Arguments);
         Assert.True(File.Exists(Path.Combine(_dir, "work", "TibiaMirror-Setup-0.2.0.exe")));
     }

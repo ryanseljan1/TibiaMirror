@@ -62,14 +62,6 @@ public sealed partial class SnackbarService(IClock clock) : ObservableObject
     bool IsExpired => _expiresAt is { } e && clock.UtcNow >= e;
 
     [RelayCommand]
-    public void Undo() => RunFirst();
-
-    void RunFirst()
-    {
-        if (Actions.Count > 0) RunAction(Actions[0]); else Dismiss();
-    }
-
-    [RelayCommand]
     public void RunAction(SnackbarAction? action)
     {
         var expired = IsExpired;

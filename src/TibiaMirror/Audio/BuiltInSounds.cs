@@ -24,16 +24,24 @@ public static class BuiltInSounds
         ["builtin:rise"] = new[] { new Note(523.25, 0, 0.15), new Note(659.25, 0.15, 0.15), new Note(783.99, 0.3, 0.3) },
     };
 
-    public static IReadOnlyList<(string Id, string DisplayName)> All => new[]
-    {
-        ("builtin:chime", Loc.Get("Timers_SoundChime")),
-        ("builtin:ding", Loc.Get("Timers_SoundDing")),
-        ("builtin:double-ding", Loc.Get("Timers_SoundDoubleDing")),
-        ("builtin:alert", Loc.Get("Timers_SoundAlert")),
-        ("builtin:low-beep", Loc.Get("Timers_SoundLowBeep")),
-        ("builtin:rise", Loc.Get("Timers_SoundRise")),
-    };
+    private static readonly string[] Ids = { "builtin:chime", "builtin:ding", "builtin:double-ding", "builtin:alert", "builtin:low-beep", "builtin:rise" };
+    private static readonly string[] NameKeys = { "Timers_SoundChime", "Timers_SoundDing", "Timers_SoundDoubleDing", "Timers_SoundAlert", "Timers_SoundLowBeep", "Timers_SoundRise" };
+    private static IReadOnlyList<(string Id, string DisplayName)>? _all;
+    private static System.Globalization.CultureInfo? _allCulture;
 
+    /// <summary>Built-in sounds with localized names; cached per UI culture.</summary>
+    public static IReadOnlyList<(string Id, string DisplayName)> All
+    {
+        get
+        {
+            var culture = LocalizationManager.Instance.Culture;
+            var cached = _all;
+            if (cached is not null && Equals(_allCulture, culture)) return cached;
+            var list = Ids.Select((id, i) => (id, Loc.Get(NameKeys[i]))).ToArray();
+            _all = list; _allCulture = culture;
+            return list;
+        }
+    }
     private static readonly ConcurrentDictionary<string, byte[]> Cache = new();
 
     public static bool IsKnown(string id) => id != null && Recipes.ContainsKey(id);
