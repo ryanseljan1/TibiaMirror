@@ -5,7 +5,16 @@ using TibiaMirror.Models;
 namespace TibiaMirror;
 public sealed class AppHost : IDisposable
 {
-    public AppHost(AppPaths paths) { Paths = paths; MirrorsVm = new TibiaMirror.Mirrors.MirrorsViewModel(Snackbar);_autosave = new TibiaMirror.Persistence.Debouncer(TimeSpan.FromSeconds(1), SaveAll); }
+    public AppHost(AppPaths paths)
+    {
+        Paths = paths; MirrorsVm = new TibiaMirror.Mirrors.MirrorsViewModel(Snackbar);_autosave = new TibiaMirror.Persistence.Debouncer(TimeSpan.FromSeconds(1), SaveAll);
+        Updates = new(new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(10) }, () => Settings, AppInfo.Version, Environment.ProcessPath,
+            () => System.Windows.Application.Current?.Dispatcher.BeginInvoke(() => ExitRequested?.Invoke()));
+    }
+    /// <summary>Update check/install (DIST-01). The UI lives in Updates/ and App.xaml.cs; Settings has "Check now".</summary>
+    public TibiaMirror.Updates.UpdateService Updates { get; }
+    /// <summary>Raised (on the UI thread) when the app must exit, e.g. to let the updater install.</summary>
+    public event Action? ExitRequested;
     public AppPaths Paths { get; }
     readonly AppSettings _defaultSettings = new();   // used until SettingsService.Load() has run
     public AppSettings Settings => SettingsService?.Current ?? _defaultSettings;

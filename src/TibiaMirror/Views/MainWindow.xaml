@@ -11,6 +11,8 @@
                 <TextBlock Text="Hotkeys are unavailable." VerticalAlignment="Center" Foreground="{DynamicResource ThemeBannerTextBrush}"/>
             </DockPanel>
         </Border>
+        <!-- InfoBarHost: contract for the updater UI (B4 sets Content from App.xaml.cs). Keep name + public modifier. -->
+        <ContentControl x:Name="InfoBarHost" x:FieldModifier="public" DockPanel.Dock="Top"/>
         <DockPanel DockPanel.Dock="Top" Margin="8">
             <Button x:Name="SettingsButton" DockPanel.Dock="Right" Content="⚙" Width="32" Margin="4,0,0,0"/>
             <Button x:Name="LockAllButton" DockPanel.Dock="Right" Content="Lock all" Padding="8,2" Margin="4,0,0,0"/>

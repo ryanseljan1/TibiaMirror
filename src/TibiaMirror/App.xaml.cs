@@ -59,6 +59,7 @@ public partial class App : Application
         _tray.ShowRequested += ShowMain;
         _tray.ToggleMirrorsRequested += _host.RequestToggleMirrors;
         _tray.ExitRequested += ExitApp;
+        _host.ExitRequested += ExitApp;
         _single.ListenForShowRequests(() => Dispatcher.Invoke(ShowMain));
         var startupFailed = false;
         try { _host.Start(); }
