@@ -7,8 +7,8 @@ namespace TibiaMirror.Settings;
 /// <summary>Swaps the merged theme dictionary so open WPF windows follow the saved theme.</summary>
 public static class ThemeManager
 {
-    public const string WindowBrushKey = "ThemeWindowBrush";
-    public const string TextBrushKey = "ThemeTextBrush";
+    public const string WindowBrushKey = "Brush.Window";
+    public const string TextBrushKey = "Brush.Text";
 
     static ThemeMode _mode = ThemeMode.Dark;
     static bool _subscribed;

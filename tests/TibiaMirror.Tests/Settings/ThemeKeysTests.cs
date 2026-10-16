@@ -5,9 +5,10 @@ using TibiaMirror.Settings;
 
 namespace TibiaMirror.Tests.Settings;
 
+[Collection(WpfCollection.Name)]
 public class ThemeKeysTests
 {
-    static readonly string[] NewKeys = { "ThemeCheckedBrush", "ThemeCheckedTextBrush", "ThemeSuccessBrush", "ThemeOnSuccessBrush" };
+    static readonly string[] NewKeys = { "Brush.Accent", "Brush.OnAccent", "Brush.Success", "Brush.OnSuccess", "Brush.Inset" };
 
     public static double Lum(Color c)
     {
@@ -34,9 +35,9 @@ public class ThemeKeysTests
             ThemeManager.Apply(r, mode, false, false);
             foreach (var k in NewKeys) Assert.IsType<SolidColorBrush>(r.MergedDictionaries[0][k]);
             Color C(string k) => ThemeManagerTests.Brush(r, k);
-            Assert.True(Contrast(C("ThemeCheckedBrush"), C("ThemeCheckedTextBrush")) >= 4.5);
-            Assert.True(Contrast(C("ThemeSuccessBrush"), C("ThemeOnSuccessBrush")) >= 4.5);
-            Assert.True(Contrast(C("ThemeCheckedBrush"), C("ThemeControlBrush")) >= 1.3);
+            Assert.True(Contrast(C("Brush.Accent"), C("Brush.OnAccent")) >= 4.5);
+            Assert.True(Contrast(C("Brush.Success"), C("Brush.OnSuccess")) >= 4.5);   // running-timer chip
+            Assert.True(Contrast(C("Brush.Accent"), C("Brush.Inset")) >= 1.3);
         });
     }
 

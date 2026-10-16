@@ -46,7 +46,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.BorderSubtle}"/>
     </Style>
     <Style TargetType="{x:Type TabItem}">
-        <Setter Property="Background" Value="{DynamicResource ThemeTabBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource Brush.Sidebar}"/>
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.BorderSubtle}"/>
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
@@ -64,8 +64,7 @@
                             <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource Brush.SurfaceRaised}"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <!-- TODO C1: Brush.Surface -->
-                            <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource ThemeSurfaceBrush}"/>
+                            <Setter TargetName="TabBorder" Property="Background" Value="{DynamicResource Brush.Surface}"/>
                             <Setter Property="Panel.ZIndex" Value="1"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">

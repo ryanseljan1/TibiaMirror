@@ -5,6 +5,7 @@ using TibiaMirror.Settings;
 
 namespace TibiaMirror.Tests.Settings;
 
+[Collection(WpfCollection.Name)]
 public class ThemeManagerTests
 {
     public static Color Brush(ResourceDictionary r, string key)
@@ -67,10 +68,18 @@ public class ThemeManagerTests
 
 static class Sta
 {
+    /// <summary>pack://application URIs only resolve after Application's static constructor ran (it registers the pack
+    /// web-request factory); without this, tests pass or fail depending on whether another test created an App first.</summary>
+    static void EnsurePackUris()
+    {
+        _ = System.IO.Packaging.PackUriHelper.UriSchemePack;
+        System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(System.Windows.Application).TypeHandle);
+    }
+
     public static void Run(Action action)
     {
         Exception? failure = null;
-        var thread = new Thread(() => { try { _ = System.IO.Packaging.PackUriHelper.UriSchemePack; action(); } catch (Exception ex) { failure = ex; } });
+        var thread = new Thread(() => { try { EnsurePackUris(); action(); } catch (Exception ex) { failure = ex; } });
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
         Assert.True(thread.Join(TimeSpan.FromSeconds(20)), "WPF test did not finish");

@@ -5,6 +5,7 @@ using TibiaMirror.Settings;
 
 namespace TibiaMirror.Tests.Settings;
 
+[Collection(WpfCollection.Name)]
 public class ThemeContrastTests
 {
     static Color Over(Color fg, Color bg)

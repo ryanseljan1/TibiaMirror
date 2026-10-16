@@ -14,7 +14,6 @@ static class RepoPaths
 
     public static string Src => Path.Combine(Root, "src");
     public static string ResourcesDir => Path.Combine(Root, "src", "TibiaMirror", "Resources");
-    public static string AllowlistDir => Path.Combine(Root, "tests", "TibiaMirror.Tests", "Localization", "HardcodedAllowlist");
 
     public static IEnumerable<string> XamlFiles() =>
         Directory.EnumerateFiles(Src, "*.xaml", SearchOption.AllDirectories)

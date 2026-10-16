@@ -1,3 +1,5 @@
+using TibiaMirror.Localization;
+
 namespace TibiaMirror.Audio;
 
 /// <summary>File types accepted for custom timer sounds. Ogg is left out: Media Foundation has no Vorbis decoder by default.</summary>
@@ -20,7 +22,7 @@ public static class SoundFormats
         get
         {
             var globs = string.Join(";", Extensions.Select(e => "*" + e));
-            return $"Audio ({string.Join(", ", Extensions.Select(e => "*" + e))})|{globs}";
+            return Loc.Format("Timers_AudioFilesFilter", string.Join(", ", Extensions.Select(e => "*" + e))) + "|" + globs;
         }
     }
 }

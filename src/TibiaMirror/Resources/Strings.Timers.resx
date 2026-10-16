@@ -76,4 +76,5 @@
   <data name="Timers_CountdownThickness" xml:space="preserve"><value>Thickness</value></data>
   <data name="Timers_CountdownFlash" xml:space="preserve"><value>Flash border when done</value></data>
   <data name="Timers_CountdownSoundWhenDone" xml:space="preserve"><value>Sound when done</value></data>
+  <data name="Timers_AudioFilesFilter" xml:space="preserve"><value>Audio ({0})</value></data>
 </root>
