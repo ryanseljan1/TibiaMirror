@@ -3,6 +3,24 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-10-15
+
+Updates in the app, a new look, and dark, light or system themes.
+
+### New
+- **Update check** (you choose on first start): TibiaMirror asks GitHub once at startup whether a newer version exists. If one does, a message offers What's new, Update now, Later or Skip this version. Update now downloads the installer, checks it against the release's SHA256 checksums, installs it silently and restarts the app; your settings and profiles stay. Settings has "Check for updates automatically" and a "Check now" button. The portable version only shows a download link. No other data is sent.
+- **Themes**: System, Dark or Light in Settings. System follows Windows' light/dark setting live, and Windows High Contrast is used automatically.
+- **New look**: new colours, buttons, switches, menus, tooltips and scrollbars, with a keyboard focus ring when you use Tab. Icons replace the old symbols.
+
+### Improved
+- The "Lock all" button now works like its hotkey: it locks all mirrors, or unlocks them when all are already locked, and its label says which.
+- A timer's "sound file not found" warning updates by itself when the file is removed or put back.
+- Every text in the app now comes from translation files, ready for the Portuguese version.
+
+### Changed
+- An existing dark/light choice carries over to the new theme setting.
+- The README no longer says "no network calls": the only connection is the optional update check to GitHub.
+
 ## [0.1.1] - 2026-10-15
 
 Hotfix: mirrors no longer swallow your clicks in Tibia.
