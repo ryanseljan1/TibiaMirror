@@ -1,0 +1,15 @@
+Settings
+Show/Hide all mirrors
+Next profile
+Lock/Unlock all mirrors
+Only show mirrors while Tibia is focused
+Click through mirrors while Tibia is focused
+Clicks on a mirror go to Tibia. To move or resize an unlocked mirror, focus another window first.
+Dark mode
+Start with Windows (in the tray)
+Advanced
+Tibia process name (without .exe)
+Tibia window title prefix
+Open data folder
+Save
+Cancel

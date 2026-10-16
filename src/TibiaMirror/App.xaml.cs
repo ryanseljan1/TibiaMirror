@@ -15,6 +15,13 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        if (e.Args.Contains("--glyph-test"))
+        {
+            var glyphs = new Diagnostics.GlyphTestWindow();
+            glyphs.Closed += (_, _) => Shutdown();
+            glyphs.Show();
+            return;
+        }
         _single = new SingleInstance();
         if (!_single.IsFirst)
         {

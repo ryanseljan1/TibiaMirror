@@ -1,0 +1,14 @@
+Audio timer
+Name
+Hotkey (pressed while Tibia is focused)
+Duration (seconds)
+Repeat every
+s
+Sound
+Test
+Volume
+When the key is pressed again while running
+Restart the timer
+Ignore while running
+Save
+Cancel

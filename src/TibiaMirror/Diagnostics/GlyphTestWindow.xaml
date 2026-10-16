@@ -1,0 +1,8 @@
+<Window x:Class="TibiaMirror.Diagnostics.GlyphTestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Glyph test" Width="420" Height="640">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ItemsControl x:Name="List" Margin="12"/>
+    </ScrollViewer>
+</Window>
