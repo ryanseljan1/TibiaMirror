@@ -22,7 +22,7 @@ public partial class SettingsWindow : Window
         LockAllBox.Hotkey = s.LockAllHotkey;
         OnlyFocusedCheck.IsChecked = s.OnlyShowWhenTibiaFocused;
         ClickThroughCheck.IsChecked = s.ClickThroughWhileTibiaFocused;
-        DarkModeCheck.IsChecked = s.DarkMode;
+        ThemeModeCombo.SelectedIndex = (int)(s.ThemeMode ?? ThemeMode.Dark);
         _startupWasEnabled = ReadStartupEnabled();
         StartWithWindowsCheck.IsChecked = _startupWasEnabled;
         ProcessBox.Text = s.TibiaProcessName;
@@ -113,7 +113,7 @@ public partial class SettingsWindow : Window
         s.LockAllHotkey = LockAllBox.Hotkey;
         s.OnlyShowWhenTibiaFocused = OnlyFocusedCheck.IsChecked == true;
         s.ClickThroughWhileTibiaFocused = ClickThroughCheck.IsChecked == true;
-        s.DarkMode = DarkModeCheck.IsChecked == true;
+        s.ThemeMode = (ThemeMode)Math.Max(0, ThemeModeCombo.SelectedIndex);
         s.TibiaProcessName = ProcessBox.Text.Trim();
         s.TibiaTitlePrefix = TitleBox.Text.Trim();
         try { _host.SettingsService?.Save(); }

@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using TibiaMirror.Models;
 using TibiaMirror.Settings;
 
 namespace TibiaMirror.Tests.Settings;
@@ -17,7 +18,7 @@ public class SelectedTabThemeTests
             {
                 var app = new App();
                 app.InitializeComponent();
-                ThemeManager.Apply(app.Resources, true);
+                ThemeManager.Apply(app.Resources, ThemeMode.Dark, false, false);
                 var tabs = new TabControl();
                 foreach (var name in new[] { "Mirrors", "Audio Timers", "Profiles" })
                     tabs.Items.Add(new TabItem { Header = name, Content = new TextBlock { Text = name } });
@@ -36,15 +37,19 @@ public class SelectedTabThemeTests
                         Assert.Contains(surface, colors);
                         Assert.DoesNotContain(colors, c => c.R > 240 && c.G > 240 && c.B > 240);
                     }
-                    ThemeManager.Apply(app.Resources, false);
+                    ThemeManager.Apply(app.Resources, ThemeMode.Light, true, false);
                     window.UpdateLayout();
                     var lightSurface = ((SolidColorBrush)app.Resources["ThemeSurfaceBrush"]).Color;
                     Assert.Contains(lightSurface, DescendantBorders((TabItem)tabs.SelectedItem)
                         .Select(b => b.Background).OfType<SolidColorBrush>().Select(b => b.Color));
-                    ThemeManager.Apply(app.Resources, true);
+                    ThemeManager.Apply(app.Resources, ThemeMode.Dark, false, false);
                     window.UpdateLayout();
                     Assert.Contains(surface, DescendantBorders((TabItem)tabs.SelectedItem)
                         .Select(b => b.Background).OfType<SolidColorBrush>().Select(b => b.Color));
+                ThemeManager.Apply(app.Resources, ThemeMode.Dark, false, true);
+                window.UpdateLayout();
+                Assert.Contains(((SolidColorBrush)app.Resources["ThemeSurfaceBrush"]).Color, DescendantBorders((TabItem)tabs.SelectedItem)
+                    .Select(b => b.Background).OfType<SolidColorBrush>().Select(b => b.Color));
                 }
                 finally { window.Close(); app.Shutdown(); }
             }
