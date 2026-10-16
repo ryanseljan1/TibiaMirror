@@ -2,45 +2,49 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:TibiaMirror.Controls"
-        Title="Settings" Width="440" SizeToContent="Height" ResizeMode="NoResize"
+        xmlns:loc="clr-namespace:TibiaMirror.Localization"
+        Title="{loc:Loc Settings_Title}" Width="440" SizeToContent="Height" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Style="{StaticResource AppWindowStyle}">
     <StackPanel Margin="16">
         <Grid>
             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="Show/Hide all mirrors" VerticalAlignment="Center" Margin="0,0,12,8"/>
+            <TextBlock Grid.Row="0" Text="{loc:Loc Settings_ShowHideAll}" VerticalAlignment="Center" Margin="0,0,12,8"/>
             <controls:HotkeyBox Grid.Row="0" Grid.Column="1" x:Name="ShowHideBox" HorizontalAlignment="Left" Margin="0,0,0,8"/>
-            <TextBlock Grid.Row="1" Text="Next profile" VerticalAlignment="Center" Margin="0,0,12,8"/>
+            <TextBlock Grid.Row="1" Text="{loc:Loc Settings_NextProfile}" VerticalAlignment="Center" Margin="0,0,12,8"/>
             <controls:HotkeyBox Grid.Row="1" Grid.Column="1" x:Name="NextProfileBox" HorizontalAlignment="Left" Margin="0,0,0,8"/>
-            <TextBlock Grid.Row="2" Text="Lock/Unlock all mirrors" VerticalAlignment="Center" Margin="0,0,12,8"/>
+            <TextBlock Grid.Row="2" Text="{loc:Loc Settings_LockAll}" VerticalAlignment="Center" Margin="0,0,12,8"/>
             <controls:HotkeyBox Grid.Row="2" Grid.Column="1" x:Name="LockAllBox" HorizontalAlignment="Left" Margin="0,0,0,8"/>
         </Grid>
-        <CheckBox x:Name="OnlyFocusedCheck" Content="Only show mirrors while Tibia is focused" Margin="0,4,0,12"/>
-        <CheckBox x:Name="ClickThroughCheck" Content="Click through mirrors while Tibia is focused" Margin="0,0,0,12"
-                  ToolTip="Clicks on a mirror go to Tibia. To move or resize an unlocked mirror, focus another window first."/>
+        <CheckBox x:Name="OnlyFocusedCheck" Style="{StaticResource ToggleSwitch}" Content="{loc:Loc Settings_OnlyFocused}" Margin="0,4,0,12"/>
+        <CheckBox x:Name="ClickThroughCheck" Style="{StaticResource ToggleSwitch}" Content="{loc:Loc Settings_ClickThrough}" Margin="0,0,0,12"
+                  ToolTip="{loc:Loc Settings_ClickThroughTip}"/>
         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-            <TextBlock Text="Theme" VerticalAlignment="Center" Margin="0,0,12,0"/>
-            <ComboBox x:Name="ThemeModeCombo" MinWidth="120">
-                <ComboBoxItem Content="System"/><ComboBoxItem Content="Dark"/><ComboBoxItem Content="Light"/>
-            </ComboBox>
+            <TextBlock Text="{loc:Loc Settings_Theme}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+<StackPanel Orientation="Horizontal">                <RadioButton x:Name="ThemeSystemRadio" GroupName="ThemeMode" Style="{StaticResource Segmented}" Content="{loc:Loc Settings_ThemeSystem}"/>                <RadioButton x:Name="ThemeDarkRadio" GroupName="ThemeMode" Style="{StaticResource Segmented}" Content="{loc:Loc Settings_ThemeDark}"/>                <RadioButton x:Name="ThemeLightRadio" GroupName="ThemeMode" Style="{StaticResource Segmented}" Content="{loc:Loc Settings_ThemeLight}"/>            </StackPanel>
         </StackPanel>
-        <CheckBox x:Name="StartWithWindowsCheck" Content="Start with Windows (in the tray)" Margin="0,0,0,12"/>
-        <Expander Header="Advanced">
+        <CheckBox x:Name="StartWithWindowsCheck" Style="{StaticResource ToggleSwitch}" Content="{loc:Loc Settings_StartWithWindows}" Margin="0,0,0,12"/>
+        <CheckBox x:Name="CheckUpdatesCheck" Style="{StaticResource ToggleSwitch}" Content="{loc:Loc Settings_CheckUpdates}" Margin="0,0,0,12"/>
+        <Expander Header="{loc:Loc Settings_Advanced}">
             <StackPanel Margin="0,8,0,0">
-                <TextBlock Text="Tibia process name (without .exe)"/>
+                <TextBlock Text="{loc:Loc Settings_ProcessName}"/>
                 <TextBox x:Name="ProcessBox" Margin="0,2,0,8"/>
-                <TextBlock Text="Tibia window title prefix"/>
+                <TextBlock Text="{loc:Loc Settings_TitlePrefix}"/>
                 <TextBox x:Name="TitleBox" Margin="0,2,0,8"/>
-                <Button x:Name="OpenFolderButton" Content="Open data folder" HorizontalAlignment="Left" Padding="8,2"/>
+                <Button x:Name="OpenFolderButton" Content="{loc:Loc Settings_OpenDataFolder}" HorizontalAlignment="Left"/>
             </StackPanel>
         </Expander>
-        <TextBlock x:Name="ErrorText" Foreground="{DynamicResource ThemeErrorBrush}" Margin="0,8,0,0" TextWrapping="Wrap" Visibility="Collapsed"/>
+        <TextBlock x:Name="ErrorText" Foreground="{DynamicResource Brush.Danger}" Margin="0,8,0,0" TextWrapping="Wrap" Visibility="Collapsed"/>
         <DockPanel Margin="0,16,0,0">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                <Button x:Name="SaveButton" Content="Save" IsDefault="True" Width="72" Margin="0,0,8,0"/>
-                <Button Content="Cancel" IsCancel="True" Width="72"/>
+                <Button x:Name="SaveButton" Style="{StaticResource Button.Primary}" Content="{loc:Loc Settings_Save}" IsDefault="True" Width="72" Margin="0,0,8,0"/>
+                <Button Content="{loc:Loc Common_Cancel}" IsCancel="True" Width="72"/>
             </StackPanel>
-            <TextBlock x:Name="VersionText" VerticalAlignment="Center" Foreground="{DynamicResource ThemeMutedBrush}"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock x:Name="VersionText" VerticalAlignment="Center" Foreground="{DynamicResource Brush.TextSecondary}"/>
+                <Button x:Name="CheckNowButton" Style="{StaticResource Button.Ghost}" Content="{loc:Loc Settings_CheckNow}" Margin="8,0,0,0"/>
+                <TextBlock x:Name="UpdateStatusText" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{DynamicResource Brush.TextSecondary}"/>
+            </StackPanel>
         </DockPanel>
     </StackPanel>
 </Window>

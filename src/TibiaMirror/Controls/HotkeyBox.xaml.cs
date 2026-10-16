@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using TibiaMirror.Abstractions;
 using TibiaMirror.Hotkeys;
+using TibiaMirror.Localization;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Controls;
@@ -35,13 +36,13 @@ public partial class HotkeyBox : UserControl
         UpdateText();
     }
 
-    void UpdateText() => Btn.Content = _recording ? "Press a key…" : Hotkey?.ToString() ?? "None";
+    void UpdateText() => Btn.Content = _recording ? Loc.Get("Settings_HotkeyPrompt") : Hotkey?.ToString() ?? Loc.Get("Settings_HotkeyNone");
 
     void Btn_Click(object sender, RoutedEventArgs e)
     {
         if (_recording) return;
         var service = Service; var source = Source;
-        if (service is null || source is null) { Btn.Content = "Hotkeys unavailable"; return; }
+        if (service is null || source is null) { Btn.Content = Loc.Get("Settings_HotkeyUnavailable"); return; }
         _recording = true;
         service.IsSuspended = true;
         _recordingSource = source;
