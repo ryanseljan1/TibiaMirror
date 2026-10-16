@@ -123,3 +123,8 @@ Run this against real Tibia before each release. Tick every box. Items marked (k
 - [ ] Glow on/off, each colour preset and Low/Medium/High change the unlocked mirror's border. The colour chip on the card matches. The picture is never covered by the border.
 - [ ] A locked mirror shows no border. A countdown end still flashes its border.
 - [ ] Mirrors from an older settings file load with the default orange glow.
+
+### Click-through (0.1.1)
+- [ ] With Tibia focused, clicks and right-clicks over a locked mirror act in Tibia, and the mirror still shows the game picture.
+- [ ] "Click through mirrors while Tibia is focused" on (default): with Tibia focused, clicks over an unlocked mirror act in Tibia. Focus TibiaMirror and the same mirror can be dragged, resized, wheel-zoomed and right-clicked.
+- [ ] Setting off: unlocked mirrors catch clicks again even while Tibia is focused; locked mirrors stay click-through.

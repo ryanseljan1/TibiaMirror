@@ -3,7 +3,9 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.1.1] - 2026-10-15
+
+Hotfix: mirrors no longer swallow your clicks in Tibia.
 
 ### Fixed
 - **Clicks go through mirrors again**: locked mirrors are click-through as intended, so clicks and right-clicks over a mirror reach Tibia. Before, some of your actions in the game were lost.
