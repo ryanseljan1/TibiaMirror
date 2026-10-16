@@ -41,12 +41,12 @@
                                 <ColumnDefinition Width="*" MinWidth="70"/>
                                 <ColumnDefinition Width="18"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="Check" Text="&#x2713;" Visibility="Collapsed" HorizontalAlignment="Center"
+                            <TextBlock x:Name="Check" Text="{DynamicResource Glyph.Check}" FontFamily="{StaticResource Font.Icon}" FontSize="12" Visibility="Collapsed" HorizontalAlignment="Center"
                                        Foreground="{TemplateBinding Foreground}"/>
                             <ContentPresenter Grid.Column="1" ContentSource="Icon" Margin="0,0,6,0" VerticalAlignment="Center"/>
                             <ContentPresenter Grid.Column="2" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"
                                               TextElement.Foreground="{TemplateBinding Foreground}"/>
-                            <TextBlock x:Name="Arrow" Grid.Column="3" Text="&#x25B8;" Visibility="Collapsed" HorizontalAlignment="Center"
+                            <TextBlock x:Name="Arrow" Grid.Column="3" Text="{DynamicResource Glyph.ChevronRight}" FontFamily="{StaticResource Font.Icon}" FontSize="10" Visibility="Collapsed" HorizontalAlignment="Center"
                                        Foreground="{TemplateBinding Foreground}"/>
                             <Popup x:Name="PART_Popup" Placement="Right" IsOpen="{TemplateBinding IsSubmenuOpen}"
                                    AllowsTransparency="True" Focusable="False" HorizontalOffset="-2">

@@ -17,7 +17,7 @@
                     <Grid x:Name="Root" Background="Transparent" SnapsToDevicePixels="True">
                         <Ellipse x:Name="Ring" Stroke="Transparent" StrokeThickness="2"/>
                         <Ellipse Margin="4" Fill="{TemplateBinding Background}" Stroke="{DynamicResource Brush.BorderControl}" StrokeThickness="1"/>
-                        <TextBlock x:Name="Check" Text="&#xE73E;" FontFamily="{StaticResource Font.Icon}" FontSize="12" Visibility="Collapsed"
+                        <TextBlock x:Name="Check" Text="{DynamicResource Glyph.Check}" FontFamily="{StaticResource Font.Icon}" FontSize="12" Visibility="Collapsed"
                                    HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{TemplateBinding Foreground}"/>
                     </Grid>
                     <ControlTemplate.Triggers>

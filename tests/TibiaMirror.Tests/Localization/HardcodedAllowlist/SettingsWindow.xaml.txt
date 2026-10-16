@@ -13,3 +13,7 @@ Tibia window title prefix
 Open data folder
 Save
 Cancel
+Theme
+System
+Dark
+Light
