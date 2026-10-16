@@ -94,7 +94,14 @@ static class Sta
     public static void Run(Action action)
     {
         Exception? failure = null;
-        var thread = new Thread(() => { try { EnsurePackUris(); action(); } catch (Exception ex) { failure = ex; } });
+        // InvokeShutdown unhooks the thread's window subclasses; without it the test host can crash at exit when a
+        // message reaches a window whose thread is gone (HwndSubclass.SubclassWndProc → FailFast on CI).
+        var thread = new Thread(() =>
+        {
+            try { EnsurePackUris(); action(); }
+            catch (Exception ex) { failure = ex; }
+            finally { System.Windows.Threading.Dispatcher.CurrentDispatcher.InvokeShutdown(); }
+        });
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
         Assert.True(thread.Join(TimeSpan.FromSeconds(20)), "WPF test did not finish");

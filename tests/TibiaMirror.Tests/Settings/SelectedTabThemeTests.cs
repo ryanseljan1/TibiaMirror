@@ -55,6 +55,7 @@ public class SelectedTabThemeTests
                 finally { window.Close(); app.Shutdown(); }
             }
             catch (Exception ex) { failure = ex; }
+            finally { System.Windows.Threading.Dispatcher.CurrentDispatcher.InvokeShutdown(); }   // see Sta.Run
         });
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
