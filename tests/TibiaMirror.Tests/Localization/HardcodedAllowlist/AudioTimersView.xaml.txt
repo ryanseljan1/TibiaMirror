@@ -1,0 +1,9 @@
+From preset ▾
+＋ Add Timer
+Start listening when the app opens
+Master volume
+No timers yet. Click Add Timer, pick a key and a duration.
+Stop
+Test
+Edit
+Delete

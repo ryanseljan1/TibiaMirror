@@ -1,0 +1,12 @@
+Enable countdown
+Hotkey (pressed while Tibia is focused)
+Duration (seconds, 0.5 to 3600)
+Side
+Shape
+Full edge
+Narrow strip
+Color
+#AARRGGBB or #RRGGBB
+Thickness
+Flash border when done
+Sound when done
