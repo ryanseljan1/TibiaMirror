@@ -6,4 +6,18 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Updates_Title" xml:space="preserve"><value>Updates</value></data>
   <data name="Updates_CheckNow" xml:space="preserve"><value>Check now</value></data>
+  <data name="Updates_OptInPrompt" xml:space="preserve"><value>Check for TibiaMirror updates on GitHub at startup? No other data is sent.</value></data>
+  <data name="Updates_TurnOn" xml:space="preserve"><value>Turn on</value></data>
+  <data name="Updates_NotNow" xml:space="preserve"><value>Not now</value></data>
+  <data name="Updates_Available" xml:space="preserve"><value>TibiaMirror {0} is available.</value></data>
+  <data name="Updates_AvailablePortable" xml:space="preserve"><value>TibiaMirror {0} is available (portable build).</value></data>
+  <data name="Updates_WhatsNew" xml:space="preserve"><value>What's new</value></data>
+  <data name="Updates_UpdateNow" xml:space="preserve"><value>Update now</value></data>
+  <data name="Updates_Download" xml:space="preserve"><value>Download</value></data>
+  <data name="Updates_Later" xml:space="preserve"><value>Later</value></data>
+  <data name="Updates_SkipVersion" xml:space="preserve"><value>Skip this version</value></data>
+  <data name="Updates_Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="Updates_Downloading" xml:space="preserve"><value>Downloading update…</value></data>
+  <data name="Updates_VerifyFailed" xml:space="preserve"><value>The download failed verification and was deleted.</value></data>
+  <data name="Updates_DownloadFailed" xml:space="preserve"><value>Couldn't download the update.</value></data>
 </root>

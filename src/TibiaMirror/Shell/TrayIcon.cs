@@ -12,9 +12,9 @@ public sealed class TrayIcon : IDisposable
     public TrayIcon()
     {
         _menu = new WinForms.ContextMenuStrip();
-        _menu.Items.Add("Show", null, (_, _) => ShowRequested?.Invoke());
-        _menu.Items.Add("Show/Hide mirrors", null, (_, _) => ToggleMirrorsRequested?.Invoke());
-        _menu.Items.Add("Exit", null, (_, _) => ExitRequested?.Invoke());
+        _menu.Items.Add(Localization.Loc.Get("Common_Tray_Show"), null, (_, _) => ShowRequested?.Invoke());
+        _menu.Items.Add(Localization.Loc.Get("Common_Tray_ToggleMirrors"), null, (_, _) => ToggleMirrorsRequested?.Invoke());
+        _menu.Items.Add(Localization.Loc.Get("Common_Tray_Exit"), null, (_, _) => ExitRequested?.Invoke());
         _icon = new WinForms.NotifyIcon
         {
             Icon = LoadAppIcon(),

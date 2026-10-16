@@ -6,4 +6,18 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Common_Ok" xml:space="preserve"><value>OK</value></data>
   <data name="Common_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Common_Undo" xml:space="preserve"><value>Undo</value></data>
+  <data name="Common_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Common_Tray_Show" xml:space="preserve"><value>Show</value></data>
+  <data name="Common_Tray_ToggleMirrors" xml:space="preserve"><value>Show/Hide mirrors</value></data>
+  <data name="Common_Tray_Exit" xml:space="preserve"><value>Exit</value></data>
+  <data name="Common_Hotkey_ShowHide" xml:space="preserve"><value>Show/Hide all mirrors</value></data>
+  <data name="Common_Hotkey_NextProfile" xml:space="preserve"><value>Next profile</value></data>
+  <data name="Common_Hotkey_LockAll" xml:space="preserve"><value>Lock/Unlock all mirrors</value></data>
+  <data name="Common_CrashMessage" xml:space="preserve"><value>Something went wrong. Details were saved to the log folder:
+{0}</value></data>
+  <data name="Common_ProfileToast" xml:space="preserve"><value>Profile: {0}</value></data>
+  <data name="Common_SettingsRestored" xml:space="preserve"><value>Your settings file was damaged, so the last backup was restored.</value></data>
+  <data name="Common_SettingsCorrupt" xml:space="preserve"><value>Your settings file was damaged and could not be restored, so default settings are in use. The damaged file was kept as: {0}</value></data>
+  <data name="Common_ProfilesError" xml:space="preserve"><value>Could not read or write your profiles: {0}</value></data>
 </root>
