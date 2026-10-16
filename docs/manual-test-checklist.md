@@ -128,3 +128,39 @@ Run this against real Tibia before each release. Tick every box. Items marked (k
 - [ ] With Tibia focused, clicks and right-clicks over a locked mirror act in Tibia, and the mirror still shows the game picture.
 - [ ] "Click through mirrors while Tibia is focused" on (default): with Tibia focused, clicks over an unlocked mirror act in Tibia. Focus TibiaMirror and the same mirror can be dragged, resized, wheel-zoomed and right-clicked.
 - [ ] Setting off: unlocked mirrors catch clicks again even while Tibia is focused; locked mirrors stay click-through.
+
+## Updater + foundation (0.2.0)
+
+### Themes
+- [ ] Settings > Theme (System / Dark / Light): changing it applies instantly to every open window, no restart.
+- [ ] System follows a live Windows light/dark switch (Settings > Personalization > Colors) while the app is open.
+- [ ] Windows High Contrast on: the app uses the high-contrast colours. Off: it returns to the normal theme.
+- [ ] In Dark, Light and High Contrast every screen is readable: main tabs, Settings, dialogs, mirror context menu, tooltips and the snackbar.
+- [ ] Overlays (mirrors, countdown bar, region selector, toast) look the same in every theme.
+- [ ] Upgrade from a 0.1.x settings file: the old dark/light choice is kept.
+
+### Icons
+- [ ] All icons render (no boxes or missing glyphs) on Windows 10 and Windows 11.
+- [ ] `TibiaMirror.exe --glyph-test` lists every glyph.
+
+### Controls
+- [ ] The keyboard focus ring shows only when navigating with Tab, not after a mouse click.
+- [ ] Toggles, the segmented control, sliders and combo boxes are usable by keyboard (key).
+- [ ] The "Lock all" button label follows the hotkey: Lock all and Unlock all swap as mirrors are locked or unlocked (key).
+- [ ] A timer whose sound file is missing shows the missing-sound warning. Remove the file: it appears live. Restore it: it disappears live.
+
+### Updater
+Setup: build a fake feed, a `releases/latest`-style JSON with `file:///` asset URLs, a real installer and `SHA256SUMS.txt`. Launch with env `TM_UPDATE_FEED=<path to the JSON>`.
+- [ ] First run with automatic checks unset: an opt-in bar asks "Check for TibiaMirror updates on GitHub at startup? No other data is sent." with Turn on / Not now. The choice persists and the bar is not shown again.
+- [ ] Startup check with a newer version in the feed: the snackbar shows "TibiaMirror {version} is available." with What's new, Update now, Later and Skip this version.
+- [ ] Skip this version: on the next start that version is not offered, but Settings > Check now still finds it.
+- [ ] Later: the snackbar closes and nothing is skipped. The next start offers it again.
+- [ ] Update now: "Downloading update…" with progress, then a silent install. The app restarts on the new version and settings and profiles are kept.
+- [ ] Tampered installer (hash not matching `SHA256SUMS.txt`): "The download failed verification and was deleted.", the downloaded file is deleted, nothing is installed, and Retry / Later are offered.
+- [ ] Portable build (run from the unzipped folder): "TibiaMirror {version} is available (portable build)." with What's new, Download, Later. No install happens.
+- [ ] Offline (feed unreachable): no error is shown and startup is not delayed.
+- [ ] "Check for updates automatically" off: no request is made at startup (no feed access).
+- [ ] Settings > Check now with nothing newer: "You're up to date." With a newer version: "Update {version} available — see the main window."
+
+### Release pipeline
+- [ ] The GitHub release has `SHA256SUMS.txt`. `Get-FileHash -Algorithm SHA256` of the downloaded installer and zip matches the listed hashes.
