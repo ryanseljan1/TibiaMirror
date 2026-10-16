@@ -6,6 +6,7 @@ using TibiaMirror.Settings;
 
 namespace TibiaMirror.Tests.Settings;
 
+[Collection(WpfCollection.Name)]
 public class SelectedTabThemeTests
 {
     [Fact]
@@ -26,7 +27,7 @@ public class SelectedTabThemeTests
                 try
                 {
                     window.Show();
-                    var surface = ((SolidColorBrush)app.Resources["ThemeSurfaceBrush"]).Color;
+                    var surface = ((SolidColorBrush)app.Resources["Brush.Surface"]).Color;
                     for (var i = 0; i < tabs.Items.Count; i++)
                     {
                         tabs.SelectedIndex = i;
@@ -39,7 +40,7 @@ public class SelectedTabThemeTests
                     }
                     ThemeManager.Apply(app.Resources, ThemeMode.Light, true, false);
                     window.UpdateLayout();
-                    var lightSurface = ((SolidColorBrush)app.Resources["ThemeSurfaceBrush"]).Color;
+                    var lightSurface = ((SolidColorBrush)app.Resources["Brush.Surface"]).Color;
                     Assert.Contains(lightSurface, DescendantBorders((TabItem)tabs.SelectedItem)
                         .Select(b => b.Background).OfType<SolidColorBrush>().Select(b => b.Color));
                     ThemeManager.Apply(app.Resources, ThemeMode.Dark, false, false);
@@ -48,7 +49,7 @@ public class SelectedTabThemeTests
                         .Select(b => b.Background).OfType<SolidColorBrush>().Select(b => b.Color));
                 ThemeManager.Apply(app.Resources, ThemeMode.Dark, false, true);
                 window.UpdateLayout();
-                Assert.Contains(((SolidColorBrush)app.Resources["ThemeSurfaceBrush"]).Color, DescendantBorders((TabItem)tabs.SelectedItem)
+                Assert.Contains(((SolidColorBrush)app.Resources["Brush.Surface"]).Color, DescendantBorders((TabItem)tabs.SelectedItem)
                     .Select(b => b.Background).OfType<SolidColorBrush>().Select(b => b.Color));
                 }
                 finally { window.Close(); app.Shutdown(); }

@@ -8,6 +8,7 @@ using TibiaMirror.Tests.Localization;
 
 namespace TibiaMirror.Tests.Settings;
 
+[Collection(WpfCollection.Name)]
 public class ControlStylesSmokeTests
 {
     /// <summary>StaticResource lookups inside templates only fail when the template is applied: instantiate every style.</summary>

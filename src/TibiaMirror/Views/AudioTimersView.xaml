@@ -29,7 +29,7 @@
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter Property="Content" Value="{loc:Loc Timers_ListeningOn}"/>
                                     <Setter Property="Background" Value="{DynamicResource Brush.Success}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource Brush.OnAccent}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource Brush.OnSuccess}"/>
                                 </Trigger>
                             </Style.Triggers>
                         </Style>

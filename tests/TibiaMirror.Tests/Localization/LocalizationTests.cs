@@ -67,22 +67,41 @@ public class LocalizationTests
     }
 
     [Fact]
-    public void No_unlisted_hardcoded_literals_in_xaml()
+    public void No_hardcoded_literals_in_xaml()
     {
         var rx = new Regex(@"\b(Content|Text|Header|Title|ToolTip|AutomationProperties\.Name)=""([^""]*)""");
         var failures = new List<string>();
         foreach (var f in RepoPaths.XamlFiles())
         {
             if (f.Contains($"{Path.DirectorySeparatorChar}Diagnostics{Path.DirectorySeparatorChar}")) continue;
-            var allow = Path.Combine(RepoPaths.AllowlistDir, Path.GetFileName(f) + ".txt");
-            var allowed = File.Exists(allow) ? File.ReadAllLines(allow).ToHashSet() : new HashSet<string>();
             foreach (Match m in rx.Matches(File.ReadAllText(f)))
             {
                 var v = m.Groups[2].Value;
                 if (v.Length == 0 || v.StartsWith("{") || !v.Any(char.IsLetter)) continue;
-                if (!allowed.Contains(v)) failures.Add($"{Path.GetFileName(f)}: {m.Groups[1].Value}=\"{v}\"");
+                failures.Add($"{Path.GetFileName(f)}: {m.Groups[1].Value}=\"{v}\"");
             }
         }
+        Assert.True(failures.Count == 0, string.Join("\n", failures));
+    }
+
+    [Fact]
+    public void No_emoji_or_symbol_characters_outside_icons()
+    {
+        var sep = Path.DirectorySeparatorChar;
+        var failures = new List<string>();
+        var files = Directory.EnumerateFiles(RepoPaths.Src, "*.*", SearchOption.AllDirectories)
+            .Where(f => f.EndsWith(".xaml") || f.EndsWith(".cs"))
+            .Where(f => !f.Contains($"{sep}obj{sep}") && !f.Contains($"{sep}bin{sep}") && !f.Contains($"{sep}Diagnostics{sep}")
+                        && !f.EndsWith($"Themes{sep}Icons.xaml"));
+        foreach (var f in files)
+            foreach (var line in File.ReadLines(f).Select((t, i) => (t, i)))
+                for (var i = 0; i < line.t.Length; i++)
+                {
+                    var cp = char.ConvertToUtf32(line.t, i);
+                    if (char.IsHighSurrogate(line.t[i])) i++;
+                    if ((cp >= 0x2190 && cp <= 0x2BFF) || (cp >= 0x1F300 && cp <= 0x1FAFF))
+                        failures.Add($"{Path.GetFileName(f)}:{line.i + 1} U+{cp:X4}");
+                }
         Assert.True(failures.Count == 0, string.Join("\n", failures));
     }
 }
