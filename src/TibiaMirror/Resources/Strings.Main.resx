@@ -6,4 +6,19 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Main_Ready" xml:space="preserve"><value>Ready</value></data>
   <data name="Main_Title" xml:space="preserve"><value>TibiaMirror</value></data>
+  <data name="Main_HotkeysUnavailable" xml:space="preserve"><value>Hotkeys are unavailable.</value></data>
+  <data name="Main_HotkeysRetry" xml:space="preserve"><value>Retry</value></data>
+  <data name="Main_HotkeysStillUnavailable" xml:space="preserve"><value>Hotkeys are still unavailable. Details were saved to the log folder.</value></data>
+  <data name="Main_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Main_LockAll" xml:space="preserve"><value>Lock all</value></data>
+  <data name="Main_UnlockAll" xml:space="preserve"><value>Unlock all</value></data>
+  <data name="Main_ShowHideAll" xml:space="preserve"><value>Show/Hide all</value></data>
+  <data name="Main_StatusWaiting" xml:space="preserve"><value>Waiting for Tibia…</value></data>
+  <data name="Main_StatusMinimized" xml:space="preserve"><value>Tibia minimized</value></data>
+  <data name="Main_StatusDetected" xml:space="preserve"><value>Tibia detected</value></data>
+  <data name="Main_Profile" xml:space="preserve"><value>Profile: {0}</value></data>
+  <data name="Main_TabMirrors" xml:space="preserve"><value>Mirrors</value></data>
+  <data name="Main_TabAudioTimers" xml:space="preserve"><value>Audio Timers</value></data>
+  <data name="Main_TabProfiles" xml:space="preserve"><value>Profiles</value></data>
+  <data name="Main_TrayHint" xml:space="preserve"><value>Still running in the tray. Right-click the tray icon to exit.</value></data>
 </root>

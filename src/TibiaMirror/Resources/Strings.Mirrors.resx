@@ -6,4 +6,36 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Mirrors_Title" xml:space="preserve"><value>Mirrors</value></data>
   <data name="Mirrors_AddButton" xml:space="preserve"><value>Add</value></data>
+  <data name="Mirrors_AddRegion" xml:space="preserve"><value>Add region</value></data>
+  <data name="Mirrors_OpenTibiaTip" xml:space="preserve"><value>Open Tibia to start adding mirrors</value></data>
+  <data name="Mirrors_TibiaHint" xml:space="preserve"><value>Waiting for Tibia. TibiaMirror looks for the Tibia client window; start Tibia and it will be detected automatically. If it never is, you can change the process name and window title it looks for in Settings (the gear button).</value></data>
+  <data name="Mirrors_Empty" xml:space="preserve"><value>No mirrors yet. Start Tibia and click Add region.</value></data>
+  <data name="Mirrors_Lock" xml:space="preserve"><value>Lock</value></data>
+  <data name="Mirrors_Visible" xml:space="preserve"><value>Visible</value></data>
+  <data name="Mirrors_Hide" xml:space="preserve"><value>Hide</value></data>
+  <data name="Mirrors_Rename" xml:space="preserve"><value>Rename</value></data>
+  <data name="Mirrors_Opacity" xml:space="preserve"><value>Opacity</value></data>
+  <data name="Mirrors_Recrop" xml:space="preserve"><value>Re-crop</value></data>
+  <data name="Mirrors_Glow" xml:space="preserve"><value>Glow</value></data>
+  <data name="Mirrors_GlowTip" xml:space="preserve"><value>Glow border: on/off, colour, intensity</value></data>
+  <data name="Mirrors_GlowOn" xml:space="preserve"><value>Glow on</value></data>
+  <data name="Mirrors_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Mirrors_Countdown" xml:space="preserve"><value>Countdown</value></data>
+  <data name="Mirrors_Deleted" xml:space="preserve"><value>Mirror '{0}' deleted</value></data>
+  <data name="Mirrors_CantMirror" xml:space="preserve"><value>Can't mirror — is Tibia minimized?</value></data>
+  <data name="Mirrors_SelectHint" xml:space="preserve"><value>Drag to select a region. Esc or right-click to cancel.</value></data>
+  <data name="Mirrors_TooSmall" xml:space="preserve"><value>Too small</value></data>
+  <data name="Mirrors_RenameTitle" xml:space="preserve"><value>Rename</value></data>
+  <data name="Mirrors_NameError" xml:space="preserve"><value>Name must be 1-40 characters.</value></data>
+  <data name="Mirrors_RegionName" xml:space="preserve"><value>Region {0}</value></data>
+  <data name="Mirrors_GlowColor_Orange" xml:space="preserve"><value>Orange</value></data>
+  <data name="Mirrors_GlowColor_Red" xml:space="preserve"><value>Red</value></data>
+  <data name="Mirrors_GlowColor_Blue" xml:space="preserve"><value>Blue</value></data>
+  <data name="Mirrors_GlowColor_Green" xml:space="preserve"><value>Green</value></data>
+  <data name="Mirrors_GlowColor_Purple" xml:space="preserve"><value>Purple</value></data>
+  <data name="Mirrors_GlowColor_White" xml:space="preserve"><value>White</value></data>
+  <data name="Mirrors_GlowColor_Yellow" xml:space="preserve"><value>Yellow</value></data>
+  <data name="Mirrors_Intensity_Low" xml:space="preserve"><value>Low</value></data>
+  <data name="Mirrors_Intensity_Medium" xml:space="preserve"><value>Medium</value></data>
+  <data name="Mirrors_Intensity_High" xml:space="preserve"><value>High</value></data>
 </root>

@@ -1,57 +1,78 @@
 <UserControl x:Class="TibiaMirror.Views.MirrorsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:TibiaMirror.Localization">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
     <DockPanel Margin="8">
-        <Button DockPanel.Dock="Top" Content="&#xFF0B; Add Region" Command="{Binding AddRegionCommand}"
+        <Button DockPanel.Dock="Top" Style="{StaticResource Button.Primary}" Command="{Binding AddRegionCommand}"
                 ToolTip="{Binding AddRegionTip}" ToolTipService.ShowOnDisabled="True"
-                HorizontalAlignment="Left" Padding="12,4" Margin="0,0,0,8"/>
+                HorizontalAlignment="Left" Padding="12,4" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Add}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                <TextBlock Text="{loc:Loc Mirrors_AddRegion}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
         <Border DockPanel.Dock="Top" Margin="0,0,0,8" Padding="8,6" CornerRadius="3" BorderThickness="1"
-                Background="{DynamicResource ThemeBannerBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}"
+                Background="{DynamicResource Brush.WarningSubtle}" BorderBrush="{DynamicResource Brush.BorderSubtle}"
                 Visibility="{Binding ShowTibiaHint, Converter={StaticResource BoolToVis}}">
-            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource ThemeBannerTextBrush}"
-                       Text="Waiting for Tibia. TibiaMirror looks for the Tibia client window; start Tibia and it will be detected automatically. If it never is, you can change the process name and window title it looks for in Settings (the gear button)."/>
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Brush.Text}" Text="{loc:Loc Mirrors_TibiaHint}"/>
         </Border>
         <Grid>
-            <TextBlock Text="No mirrors yet. Start Tibia and click Add Region." HorizontalAlignment="Center"
-                       VerticalAlignment="Top" Margin="0,24,0,0" Foreground="{DynamicResource ThemeMutedBrush}"
+            <TextBlock Text="{loc:Loc Mirrors_Empty}" HorizontalAlignment="Center"
+                       VerticalAlignment="Top" Margin="0,24,0,0" Foreground="{DynamicResource Brush.TextSecondary}"
                        Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}"/>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Cards}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="{DynamicResource ThemeBorderBrush}" BorderThickness="1" CornerRadius="3" Padding="8" Margin="0,0,0,8">
+                            <Border BorderBrush="{DynamicResource Brush.BorderSubtle}" BorderThickness="1" CornerRadius="3" Padding="8" Margin="0,0,0,8">
                                 <StackPanel>
                                     <DockPanel>
-                                        <ToggleButton DockPanel.Dock="Right" Content="&#x1F512;" ToolTip="Lock" Width="30" Margin="4,0,0,0"
-                                                      IsChecked="{Binding IsLocked, Mode=TwoWay}"/>
-                                        <ToggleButton DockPanel.Dock="Right" Content="&#x1F441;" ToolTip="Visible" Width="30" Margin="4,0,0,0"
-                                                      IsChecked="{Binding IsVisible, Mode=TwoWay}"/>
-                                        <Button DockPanel.Dock="Right" Content="&#x270F;" ToolTip="Rename" Width="30" Margin="4,0,0,0"
-                                                Command="{Binding RenameCommand}"/>
+                                        <ToggleButton DockPanel.Dock="Right" ToolTip="{loc:Loc Mirrors_Lock}" AutomationProperties.Name="{loc:Loc Mirrors_Lock}"
+                                                      Width="30" Margin="4,0,0,0" IsChecked="{Binding IsLocked, Mode=TwoWay}">
+                                            <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Lock}"/>
+                                        </ToggleButton>
+                                        <ToggleButton DockPanel.Dock="Right" ToolTip="{loc:Loc Mirrors_Visible}" AutomationProperties.Name="{loc:Loc Mirrors_Visible}"
+                                                      Width="30" Margin="4,0,0,0" IsChecked="{Binding IsVisible, Mode=TwoWay}">
+                                            <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.View}"/>
+                                        </ToggleButton>
+                                        <Button DockPanel.Dock="Right" Style="{StaticResource Button.Icon}" ToolTip="{loc:Loc Mirrors_Rename}" AutomationProperties.Name="{loc:Loc Mirrors_Rename}"
+                                                Margin="4,0,0,0" Command="{Binding RenameCommand}">
+                                            <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Edit}"/>
+                                        </Button>
                                         <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center"
                                                    MouseLeftButtonDown="Name_MouseLeftButtonDown"/>
                                     </DockPanel>
                                     <DockPanel Margin="0,6,0,0">
                                         <TextBlock DockPanel.Dock="Right" Text="{Binding OpacityText}" Width="40" TextAlignment="Right" VerticalAlignment="Center"/>
-                                        <TextBlock DockPanel.Dock="Left" Text="Opacity" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock DockPanel.Dock="Left" Text="{loc:Loc Mirrors_Opacity}" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                         <Slider Minimum="0.1" Maximum="1" Value="{Binding Opacity, Mode=TwoWay}"/>
                                     </DockPanel>
                                     <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                                        <Button Content="Re-crop" Padding="10,2" Command="{Binding RecropCommand}"
-                                                ToolTip="{Binding RecropTip}" ToolTipService.ShowOnDisabled="True"/>
-                                        <Button Padding="10,2" Margin="6,0,0,0" Click="Glow_Click" ToolTip="Glow border: on/off, colour, intensity">
+                                        <Button Padding="10,2" Command="{Binding RecropCommand}"
+                                                ToolTip="{Binding RecropTip}" ToolTipService.ShowOnDisabled="True">
                                             <StackPanel Orientation="Horizontal">
-                                                <Border Width="12" Height="12" CornerRadius="2" Margin="0,0,6,0" VerticalAlignment="Center" BorderThickness="1"
-                                                        BorderBrush="{DynamicResource ThemeBorderBrush}" Background="{Binding GlowBrush}" Opacity="{Binding GlowChipOpacity}"/>
-                                                <TextBlock Text="Glow"/>
+                                                <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Crop}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{loc:Loc Mirrors_Recrop}" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
-                                        <Button Content="Delete" Padding="10,2" Margin="6,0,0,0" Command="{Binding DeleteCommand}"/>
+                                        <Button Padding="10,2" Margin="6,0,0,0" Click="Glow_Click" ToolTip="{loc:Loc Mirrors_GlowTip}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Border Width="12" Height="12" CornerRadius="2" Margin="0,0,6,0" VerticalAlignment="Center" BorderThickness="1"
+                                                        BorderBrush="{DynamicResource Brush.BorderControl}" Background="{Binding GlowBrush}" Opacity="{Binding GlowChipOpacity}"/>
+                                                <TextBlock Text="{loc:Loc Mirrors_Glow}"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Style="{StaticResource Button.Danger}" Padding="10,2" Margin="6,0,0,0" Command="{Binding DeleteCommand}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Delete}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{loc:Loc Mirrors_Delete}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
                                     </StackPanel>
-                                    <Expander Header="Countdown" Margin="0,6,0,0">
+                                    <Expander Header="{loc:Loc Mirrors_Countdown}" Margin="0,6,0,0">
                                         <ContentPresenter Content="{Binding CountdownEditor}"/>
                                     </Expander>
                                 </StackPanel>

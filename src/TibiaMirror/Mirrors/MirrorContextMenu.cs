@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using TibiaMirror.Localization;
 using TibiaMirror.Logging;
 using TibiaMirror.Models;
 
@@ -14,7 +15,7 @@ public static class MirrorContextMenu
         var id = region.Id;
         var menu = new ContextMenu();
 
-        var recrop = new MenuItem { Header = "Re-crop", IsEnabled = service.CanCapture };
+        var recrop = new MenuItem { Header = Loc.Get("Mirrors_Recrop"), IsEnabled = service.CanCapture };
         if (!service.CanCapture)
         {
             recrop.ToolTip = MirrorsViewModel.OpenTibiaTip;
@@ -27,20 +28,20 @@ public static class MirrorContextMenu
         };
         menu.Items.Add(recrop);
 
-        var glow = new MenuItem { Header = "Glow" };
+        var glow = new MenuItem { Header = Loc.Get("Mirrors_Glow") };
         foreach (var item in GlowMenu.Items(region.Glow, g => service.SetGlow(id, g))) glow.Items.Add(item);
         menu.Items.Add(glow);
 
         menu.Items.Add(new Separator());
-        var lockItem = new MenuItem { Header = "Lock" };
+        var lockItem = new MenuItem { Header = Loc.Get("Mirrors_Lock") };
         lockItem.Click += (_, _) => service.SetLocked(id, true);
         menu.Items.Add(lockItem);
-        var hide = new MenuItem { Header = "Hide" };
+        var hide = new MenuItem { Header = Loc.Get("Mirrors_Hide") };
         hide.Click += (_, _) => service.SetVisible(id, false);
         menu.Items.Add(hide);
 
         menu.Items.Add(new Separator());
-        var delete = new MenuItem { Header = "Delete" };
+        var delete = new MenuItem { Header = Loc.Get("Mirrors_Delete") };
         // deferred: deleting closes this very window, so let the menu finish closing first
         delete.Click += (_, _) => Application.Current.Dispatcher.BeginInvoke(() => service.RequestDelete(id));
         menu.Items.Add(delete);

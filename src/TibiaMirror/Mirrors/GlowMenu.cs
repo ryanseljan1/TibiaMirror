@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using TibiaMirror.Localization;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Mirrors;
@@ -23,7 +24,7 @@ public static class GlowMenu
         var colour = GlowStyle.Normalize(current.Color);
         yield return new MenuItem
         {
-            Header = "Glow on", IsCheckable = true, IsChecked = current.Enabled,
+            Header = Loc.Get("Mirrors_GlowOn"), IsCheckable = true, IsChecked = current.Enabled,
             Command = new Relay(() => apply(current with { Enabled = !current.Enabled })),
         };
         yield return new Separator();
@@ -31,7 +32,7 @@ public static class GlowMenu
         {
             yield return new MenuItem
             {
-                Header = p.Name, IsCheckable = true, IsChecked = p.Hex == colour,
+                Header = Loc.Get("Mirrors_GlowColor_" + p.Name), IsCheckable = true, IsChecked = p.Hex == colour,
                 Icon = new Rectangle { Width = 12, Height = 12, Fill = BrushFor(p.Hex), Stroke = Brushes.Gray, StrokeThickness = 1 },
                 Command = new Relay(() => apply(current with { Color = p.Hex })),
             };
@@ -41,7 +42,7 @@ public static class GlowMenu
         {
             yield return new MenuItem
             {
-                Header = i.ToString(), IsCheckable = true, IsChecked = i == GlowStyle.Normalize(current.Intensity),
+                Header = Loc.Get("Mirrors_Intensity_" + i), IsCheckable = true, IsChecked = i == GlowStyle.Normalize(current.Intensity),
                 Command = new Relay(() => apply(current with { Intensity = i })),
             };
         }

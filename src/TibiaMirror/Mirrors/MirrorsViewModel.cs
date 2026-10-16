@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using TibiaMirror.Localization;
 
 namespace TibiaMirror.Mirrors;
 
@@ -24,6 +25,7 @@ public sealed partial class MirrorsViewModel : ObservableObject
         _service.RegionEdited += OnRegionEdited;
         _service.DeleteRequested += OnDeleteRequested;
         Rebuild();
+        RefreshLockAll();
         OnTibiaStateChanged();
     }
 
@@ -54,13 +56,13 @@ public sealed partial class MirrorsViewModel : ObservableObject
         var removed = service.Remove(card.Id);
         Cards.Remove(card);
         if (removed is null) return;
-        _snackbar?.Show($"Mirror '{name}' deleted", () =>
+        _snackbar?.Show(Loc.Format("Mirrors_Deleted", name), () =>
         {
             if (service.Restore(removed)) AddCard(removed.Region, cardIndex);
         });
     }
 
-    public const string OpenTibiaTip = "Open Tibia to start adding mirrors";
+    public static string OpenTibiaTip => Loc.Get("Mirrors_OpenTibiaTip");
 
     /// <summary>Add Region needs a visible Tibia client to select from.</summary>
     public bool CanAddRegion => _service?.CanCapture == true;
@@ -83,10 +85,18 @@ public sealed partial class MirrorsViewModel : ObservableObject
 
     public bool IsEmpty => Cards.Count == 0;
 
-    void OnLockedAll() { foreach (var c in Cards) c.RefreshLocked(); }
+    void OnLockedAll() { foreach (var c in Cards) c.RefreshLocked(); RefreshLockAll(); }
+
+    /// <summary>True when the Lock all button (and hotkey) would lock next; false when it would unlock.</summary>
+    public bool LockAllWillLock => _service is null || MirrorLockToggle.ShouldLock(_service.Regions);
+
+    /// <summary>Raised when <see cref="LockAllWillLock"/> may have changed (lock/visibility edits, add, delete, rebuild).</summary>
+    public event Action? LockAllStateChanged;
+
+    void RefreshLockAll() { OnPropertyChanged(nameof(LockAllWillLock)); LockAllStateChanged?.Invoke(); }
 
     /// <summary>A mirror's context menu changed lock/visibility/glow: bring its card up to date.</summary>
-    void OnRegionEdited(Guid id) => Cards.FirstOrDefault(c => c.Id == id)?.Refresh();
+    void OnRegionEdited(Guid id) { Cards.FirstOrDefault(c => c.Id == id)?.Refresh(); RefreshLockAll(); }
 
     /// <summary>A mirror's context menu asked to delete: same flow (and Undo snackbar) as the card's Delete button.</summary>
     void OnDeleteRequested(Guid id)
@@ -107,7 +117,7 @@ public sealed partial class MirrorsViewModel : ObservableObject
     public MirrorsViewModel(TibiaMirror.Controls.SnackbarService? snackbar = null)
     {
         _snackbar = snackbar;
-        Cards.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsEmpty));
+        Cards.CollectionChanged += (_, _) => { OnPropertyChanged(nameof(IsEmpty)); RefreshLockAll(); };
     }
 }
 

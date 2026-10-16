@@ -1,1 +1,0 @@
-Drag to select a region. Esc or right-click to cancel.

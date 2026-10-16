@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
+using TibiaMirror.Localization;
+using TibiaMirror.Mirrors;
 using TibiaMirror.Shell;
 
 namespace TibiaMirror.Views;
@@ -15,16 +17,18 @@ public partial class MainWindow : Window
         _tray = tray;
         InitializeComponent();
         ProfilesTab.Init(host);
-        host.ProfileChanged += p => Dispatcher.Invoke(() => ProfileText.Text = "Profile: " + p.Name);
+        host.ProfileChanged += p => Dispatcher.Invoke(() => ProfileText.Text = Loc.Format("Main_Profile", p.Name));
         TimersView.Attach(host);
         MirrorsPage.DataContext = host.MirrorsVm;
         SnackbarHost.DataContext = host.Snackbar;
         ShowHideAllButton.Click += (_, _) => host.RequestToggleMirrors();
-        LockAllButton.Click += (_, _) => host.Mirrors?.LockAll();
+        LockAllButton.Click += (_, _) => host.Mirrors?.ToggleLockAll();   // same toggle as the hotkey
+        host.MirrorsVm.LockAllStateChanged += () => Dispatcher.Invoke(UpdateLockAll);
+        UpdateLockAll();
         SettingsButton.Click += (_, _) => new TibiaMirror.Settings.SettingsWindow(host) { Owner = this }.ShowDialog();
         RetryHotkeysButton.Click += (_, _) =>
         {
-            if (!host.RetryHotkeys()) MessageBox.Show(this, "Hotkeys are still unavailable. Details were saved to the log folder.", AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (!host.RetryHotkeys()) MessageBox.Show(this, Loc.Get("Main_HotkeysStillUnavailable"), AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
         };
         host.HotkeysUnavailableChanged += () => Dispatcher.Invoke(UpdateBanner);
         // WPF performs its own initial placement (default cascade position, DIP width/height) after SourceInitialized, and its
@@ -38,19 +42,20 @@ public partial class MainWindow : Window
         host.TibiaStateChanged += s => Dispatcher.Invoke(() => ShowTibiaState(s));
     }
 
-    static readonly System.Windows.Media.Brush WaitingDot = Frozen("#FF9AA3AE"), MinimizedDot = Frozen("#FFE0A100"), DetectedDot = Frozen("#FF2EAD4F");
-    static System.Windows.Media.Brush Frozen(string hex)
+    /// <summary>Re-reads the Lock all / Unlock all label from the mirrors' state (the click and the hotkey share ToggleLockAll).</summary>
+    void UpdateLockAll()
     {
-        var b = new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex)!);
-        b.Freeze();
-        return b;
+        var willLock = _host.MirrorsVm.LockAllWillLock;
+        LockAllText.Text = Loc.Get(MirrorLockToggle.LabelKey(willLock));
+        LockAllGlyph.Text = (string)FindResource(willLock ? "Glyph.Lock" : "Glyph.Unlock");
     }
+
 
     void ShowTibiaState(TibiaMirror.Detection.TibiaState s)
     {
-        var (text, dot) = !s.IsFound ? ("Waiting for Tibia…", WaitingDot) : s.IsMinimized ? ("Tibia minimized", MinimizedDot) : ("Tibia detected", DetectedDot);
+        var (text, dotKey) = !s.IsFound ? (Loc.Get("Main_StatusWaiting"), "Brush.TextMuted") : s.IsMinimized ? (Loc.Get("Main_StatusMinimized"), "Brush.Warning") : (Loc.Get("Main_StatusDetected"), "Brush.Success");
         StatusText.Text = text;
-        StatusDot.Fill = dot;
+        StatusDot.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, dotKey);
         System.Windows.Automation.AutomationProperties.SetName(StatusText, text);
     }
 
@@ -92,7 +97,7 @@ public partial class MainWindow : Window
         Hide();
         if (!_host.Settings.TrayHintShown)
         {
-            _tray.ShowBalloon(AppInfo.Name, "Still running in the tray. Right-click the tray icon to exit.");
+            _tray.ShowBalloon(AppInfo.Name, Loc.Get("Main_TrayHint"));
             _host.Settings.TrayHintShown = true;
             _host.ProfileEdited();
         }
