@@ -17,7 +17,9 @@ public partial class App : Application
         base.OnStartup(e);
         if (e.Args.Contains("--glyph-test"))
         {
-            new Diagnostics.GlyphTestWindow().Show();
+            var glyphs = new Diagnostics.GlyphTestWindow();
+            glyphs.Closed += (_, _) => Shutdown();
+            glyphs.Show();
             return;
         }
         _single = new SingleInstance();
