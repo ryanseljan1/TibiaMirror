@@ -17,4 +17,20 @@ public class MirrorVisibilityTests
         Assert.True(MirrorVisibility.ShouldShow(R, Found(focused: false), false, false));
         Assert.False(MirrorVisibility.ShouldShow(R, Found(focused: false), false, true));
     }
+
+    [Fact] public void Locked_mirror_is_always_click_through()
+    {
+        var locked = new RegionModel { IsLocked = true };
+        Assert.True(MirrorVisibility.IsClickThrough(locked, tibiaFocused: false, clickThroughWhenFocused: false));
+        Assert.True(MirrorVisibility.IsClickThrough(locked, tibiaFocused: true, clickThroughWhenFocused: true));
+    }
+
+    [Fact] public void Unlocked_mirror_is_click_through_only_while_tibia_is_focused_and_the_setting_is_on()
+    {
+        Assert.True(MirrorVisibility.IsClickThrough(R, tibiaFocused: true, clickThroughWhenFocused: true));
+        Assert.False(MirrorVisibility.IsClickThrough(R, tibiaFocused: false, clickThroughWhenFocused: true));
+        Assert.False(MirrorVisibility.IsClickThrough(R, tibiaFocused: true, clickThroughWhenFocused: false));
+    }
+
+    [Fact] public void Click_through_while_focused_is_on_by_default() => Assert.True(new AppSettings().ClickThroughWhileTibiaFocused);
 }

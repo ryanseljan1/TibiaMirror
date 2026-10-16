@@ -40,6 +40,12 @@ internal static class NativeMethods
     public const uint DWM_TNP_VISIBLE = 8;
     public const uint DWM_TNP_SOURCECLIENTAREAONLY = 0x10;
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct STYLESTRUCT { public uint styleOld, styleNew; }
+
+    public const int WM_STYLECHANGING = 0x007C;
+    public const uint LWA_ALPHA = 2;
+
     public const int GWL_EXSTYLE = -20;
     public const long WS_EX_TRANSPARENT = 0x20;
     public const long WS_EX_TOOLWINDOW = 0x80;
@@ -62,6 +68,7 @@ internal static class NativeMethods
     [DllImport("user32.dll")] public static extern nint GetForegroundWindow();
     [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")] public static extern nint GetWindowLongPtr(nint hwnd, int index);
     [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")] public static extern nint SetWindowLongPtr(nint hwnd, int index, nint value);
+    [DllImport("user32.dll")] public static extern bool SetLayeredWindowAttributes(nint hwnd, uint colorKey, byte alpha, uint flags);
     [DllImport("user32.dll")] public static extern bool SetWindowPos(nint hwnd, nint after, int x, int y, int cx, int cy, uint flags);
     [DllImport("user32.dll")] public static extern uint GetDpiForWindow(nint hwnd);
     [DllImport("user32.dll")] public static extern bool EnumDisplayMonitors(nint hdc, nint clip, MonitorEnumProc cb, nint data);

@@ -7,6 +7,7 @@ public sealed class AppSettings : TibiaMirror.Persistence.IVersioned
     public Hotkey? NextProfileHotkey { get; set; }
     public Hotkey? LockAllHotkey { get; set; }
     public bool OnlyShowWhenTibiaFocused { get; set; }
+    public bool ClickThroughWhileTibiaFocused { get; set; } = true;
     public bool DarkMode { get; set; }
     public string TibiaProcessName { get; set; } = "client";
     public string TibiaTitlePrefix { get; set; } = "Tibia";

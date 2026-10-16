@@ -3,6 +3,14 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Fixed
+- **Clicks go through mirrors again**: locked mirrors are click-through as intended, so clicks and right-clicks over a mirror reach Tibia. Before, some of your actions in the game were lost.
+
+### New
+- **Click through mirrors while Tibia is focused** (Settings, on by default): unlocked mirrors also let clicks through while you play. To move or resize one, focus another window first, for example TibiaMirror.
+
 ## [0.1.0] - 2026-10-14
 
 First public release. Compared with the release candidates (rc.1, rc.2), this version adds the "QoL pack" below.

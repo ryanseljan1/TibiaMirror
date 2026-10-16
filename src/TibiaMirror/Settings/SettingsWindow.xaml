@@ -16,6 +16,8 @@
             <controls:HotkeyBox Grid.Row="2" Grid.Column="1" x:Name="LockAllBox" HorizontalAlignment="Left" Margin="0,0,0,8"/>
         </Grid>
         <CheckBox x:Name="OnlyFocusedCheck" Content="Only show mirrors while Tibia is focused" Margin="0,4,0,12"/>
+        <CheckBox x:Name="ClickThroughCheck" Content="Click through mirrors while Tibia is focused" Margin="0,0,0,12"
+                  ToolTip="Clicks on a mirror go to Tibia. To move or resize an unlocked mirror, focus another window first."/>
         <CheckBox x:Name="DarkModeCheck" Content="Dark mode" Margin="0,0,0,12"/>
         <CheckBox x:Name="StartWithWindowsCheck" Content="Start with Windows (in the tray)" Margin="0,0,0,12"/>
         <Expander Header="Advanced">

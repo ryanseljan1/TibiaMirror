@@ -21,6 +21,7 @@ public partial class SettingsWindow : Window
         NextProfileBox.Hotkey = s.NextProfileHotkey;
         LockAllBox.Hotkey = s.LockAllHotkey;
         OnlyFocusedCheck.IsChecked = s.OnlyShowWhenTibiaFocused;
+        ClickThroughCheck.IsChecked = s.ClickThroughWhileTibiaFocused;
         DarkModeCheck.IsChecked = s.DarkMode;
         _startupWasEnabled = ReadStartupEnabled();
         StartWithWindowsCheck.IsChecked = _startupWasEnabled;
@@ -111,6 +112,7 @@ public partial class SettingsWindow : Window
         s.NextProfileHotkey = NextProfileBox.Hotkey;
         s.LockAllHotkey = LockAllBox.Hotkey;
         s.OnlyShowWhenTibiaFocused = OnlyFocusedCheck.IsChecked == true;
+        s.ClickThroughWhileTibiaFocused = ClickThroughCheck.IsChecked == true;
         s.DarkMode = DarkModeCheck.IsChecked == true;
         s.TibiaProcessName = ProcessBox.Text.Trim();
         s.TibiaTitlePrefix = TitleBox.Text.Trim();

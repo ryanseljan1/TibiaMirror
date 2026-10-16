@@ -27,6 +27,9 @@ public partial class MirrorWindow : Window
     DispatcherTimer? _flashTimer;
     readonly WheelAccumulator _wheel = new();
     TibiaState _state = new(null, false);
+    bool _clickThroughWhenFocused = true;
+    bool? _clickThrough;
+    readonly HwndSourceHook _keepLayered;
 
     public MirrorWindow(RegionModel region, Action onUserEdit, MirrorService service)
     {
@@ -36,6 +39,8 @@ public partial class MirrorWindow : Window
         InitializeComponent();
         _hwnd = new WindowInteropHelper(this).EnsureHandle();
         WindowStyles.MakeToolWindow(_hwnd);
+        _keepLayered = WindowStyles.KeepLayered(() => _clickThrough == true);
+        HwndSource.FromHwnd(_hwnd).AddHook(_keepLayered);
         ApplyBounds();
         ApplyLocked();
         MouseLeftButtonDown += OnBodyMouseDown;
@@ -64,9 +69,17 @@ public partial class MirrorWindow : Window
         LayoutChanged?.Invoke();
     }
 
+    void ApplyClickThrough()
+    {
+        var on = MirrorVisibility.IsClickThrough(_region, _state.IsFocused, _clickThroughWhenFocused);
+        if (on == _clickThrough) return;
+        _clickThrough = on;
+        WindowStyles.SetClickThroughOpaque(_hwnd, on);
+    }
+
     public void ApplyLocked()
     {
-        WindowStyles.SetClickThrough(_hwnd, _region.IsLocked);
+        ApplyClickThrough();
         Handles.Visibility = _region.IsLocked ? Visibility.Collapsed : Visibility.Visible;
         RenderGlow();   // hidden while locked (seamless overlay), shown again on unlock
         UpdateThumbnail();   // the inset follows the glow
@@ -104,11 +117,13 @@ public partial class MirrorWindow : Window
     }
 
     /// <summary>Re-evaluates visibility and the thumbnail for the given Tibia state.</summary>
-    public void Apply(TibiaState state, bool allHidden, bool onlyWhenFocused)
+    public void Apply(TibiaState state, bool allHidden, bool onlyWhenFocused, bool clickThroughWhenFocused)
     {
         _state = state;
+        _clickThroughWhenFocused = clickThroughWhenFocused;
         _wantShown = MirrorVisibility.ShouldShow(_region, state, allHidden, onlyWhenFocused);
         if (_closed) return;
+        ApplyClickThrough();
         if (_wantShown && !IsVisible)
         {
             Show();

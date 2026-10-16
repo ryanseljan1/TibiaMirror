@@ -76,8 +76,9 @@ public sealed class MirrorService : IDisposable
 
     void Refresh(MirrorWindow w)
     {
-        var onlyFocused = _settings().OnlyShowWhenTibiaFocused;
-        w.Apply(EffectiveState(onlyFocused), _allHidden, onlyFocused);
+        var settings = _settings();
+        var onlyFocused = settings.OnlyShowWhenTibiaFocused;
+        w.Apply(EffectiveState(onlyFocused), _allHidden, onlyFocused, settings.ClickThroughWhileTibiaFocused);
         ScheduleRecheck();
     }
 

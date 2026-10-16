@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Interop;
@@ -16,6 +18,25 @@ public static class WindowStyles
         var ex = NativeMethods.GetWindowLongPtr(hwnd, NativeMethods.GWL_EXSTYLE);
         NativeMethods.SetWindowLongPtr(hwnd, NativeMethods.GWL_EXSTYLE, (nint)ComputeExStyle(ex, enabled));
     }
+
+    /// <summary>Click-through for a window without AllowsTransparency. WPF strips WS_EX_LAYERED from those (on WM_STYLECHANGING) and
+    /// WS_EX_TRANSPARENT alone doesn't pass clicks through, so the window must have <see cref="KeepLayered"/> hooked first.</summary>
+    public static void SetClickThroughOpaque(nint hwnd, bool enabled)
+    {
+        SetClickThrough(hwnd, enabled);
+        if (enabled) NativeMethods.SetLayeredWindowAttributes(hwnd, 0, 255, NativeMethods.LWA_ALPHA);   // a layered window without attributes isn't drawn
+    }
+
+    /// <summary>Message hook that keeps WS_EX_LAYERED on the window while <paramref name="wanted"/> is true.</summary>
+    public static HwndSourceHook KeepLayered(Func<bool> wanted) => (nint hwnd, int msg, nint wParam, nint lParam, ref bool handled) =>
+    {
+        if (msg != NativeMethods.WM_STYLECHANGING || wParam != NativeMethods.GWL_EXSTYLE || !wanted()) return 0;
+        var s = Marshal.PtrToStructure<NativeMethods.STYLESTRUCT>(lParam);
+        s.styleNew |= (uint)NativeMethods.WS_EX_LAYERED;
+        Marshal.StructureToPtr(s, lParam, false);
+        handled = true;   // keeps WPF's own handler from stripping it again
+        return 0;
+    };
 
     /// <summary>Enable adds TRANSPARENT|LAYERED; disable clears only TRANSPARENT (WPF owns LAYERED).</summary>
     internal static long ComputeExStyle(long current, bool clickThrough) =>
