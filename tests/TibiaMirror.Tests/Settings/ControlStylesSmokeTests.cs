@@ -14,8 +14,11 @@ public class ControlStylesSmokeTests
     [Fact]
     public void Every_control_style_applies_in_every_theme() => Sta.Run(() =>
     {
-        var app = new App();
-        app.InitializeComponent();
+        // Not `new App()`: only one Application may exist per process and SelectedTabThemeTests owns it.
+        var app = new { Resources = new ResourceDictionary() };
+        foreach (var name in new[] { "Tokens", "Light", "Icons", "Controls/Controls" })
+            app.Resources.MergedDictionaries.Add(new ResourceDictionary
+                { Source = new Uri($"pack://application:,,,/TibiaMirror;component/Themes/{name}.xaml", UriKind.Absolute) });
         foreach (var hc in new[] { false, true })
         foreach (var mode in new[] { ThemeMode.Dark, ThemeMode.Light })
         {
@@ -45,13 +48,15 @@ public class ControlStylesSmokeTests
             menu.Items.Add(parent);
             menu.Items.Add(new Separator());
             panel.ContextMenu = menu;
+            menu.Resources = app.Resources;   // popups don't inherit window resources
             var tip = new ToolTip { Content = "tip" };
             var window = new Window
             {
                 Style = (Style)app.Resources["AppWindowStyle"],
                 Content = new ScrollViewer { Content = panel, Height = 200, VerticalScrollBarVisibility = ScrollBarVisibility.Visible },
-                Width = 400, Height = 300, ShowActivated = false
+                Width = 400, Height = 300, ShowActivated = false, Resources = app.Resources
             };
+            tip.Resources = app.Resources;
             try
             {
                 window.Show();
