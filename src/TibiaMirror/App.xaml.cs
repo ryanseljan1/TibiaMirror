@@ -11,6 +11,7 @@ public partial class App : Application
     AppHost? _host;
     TrayIcon? _tray;
     MainWindow? _main;
+    Updates.UpdatePrompts? _updatePrompts;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -66,13 +67,20 @@ public partial class App : Application
         catch (Exception ex) { startupFailed = true; Log.Error("Startup failed", ex); }   // still show the window so the user is not left with a tray-only app
         finally
         {
+            if (!startupFailed) StartUpdatePrompts();
             // Launched by the Windows Run key: stay in the tray; the tray icon or a second launch shows the window.
             if (startupFailed || !Settings.StartupRegistration.IsStartupLaunch(e.Args)) ShowMain();
         }
     }
 
+    void StartUpdatePrompts()
+    {
+        try { _updatePrompts = new Updates.UpdatePrompts(_host!, _main!.InfoBarHost); _updatePrompts.Start(); }
+        catch (Exception ex) { Log.Error("Update prompts failed", ex); }
+    }
+
     static void ShowCrashMessage(AppPaths paths) =>
-        MessageBox.Show("Something went wrong. Details were saved to the log folder:\n" + paths.LogsDir, AppInfo.Name);
+        MessageBox.Show(Localization.Loc.Format("Common_CrashMessage", paths.LogsDir), AppInfo.Name);
 
     void ShowMain()
     {

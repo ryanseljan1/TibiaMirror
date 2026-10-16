@@ -29,7 +29,7 @@ public sealed partial class SnackbarService(IClock clock) : ObservableObject
 
     /// <summary>Shows <paramref name="message"/> with an Undo button that runs <paramref name="undo"/>.</summary>
     public void Show(string message, Action undo) =>
-        Show(message, [new SnackbarAction("Undo", undo)], Duration);
+        Show(message, [new SnackbarAction(TibiaMirror.Localization.Loc.Get("Common_Undo"), undo)], Duration);
 
     /// <summary>Shows a message with any number of actions; <paramref name="duration"/> null = stays until dismissed.</summary>
     public void Show(string message, IReadOnlyList<SnackbarAction> actions, TimeSpan? duration)

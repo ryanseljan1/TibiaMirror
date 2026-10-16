@@ -86,9 +86,9 @@ public sealed class AppHost : IDisposable
     // --- Task 8: profiles ---
     public TibiaMirror.Profiles.ProfileService? Profiles { get; private set; }
     IDisposable? _profileHotkeyReg;
-    public TibiaMirror.Hotkeys.GlobalHotkeyOwner ShowHideOwner { get; } = new("Show/Hide all mirrors");
-    public TibiaMirror.Hotkeys.GlobalHotkeyOwner NextProfileOwner { get; } = new("Next profile");
-    public TibiaMirror.Hotkeys.GlobalHotkeyOwner LockAllOwner { get; } = new("Lock/Unlock all mirrors");
+    public TibiaMirror.Hotkeys.GlobalHotkeyOwner ShowHideOwner { get; } = new(TibiaMirror.Localization.Loc.Get("Common_Hotkey_ShowHide"));
+    public TibiaMirror.Hotkeys.GlobalHotkeyOwner NextProfileOwner { get; } = new(TibiaMirror.Localization.Loc.Get("Common_Hotkey_NextProfile"));
+    public TibiaMirror.Hotkeys.GlobalHotkeyOwner LockAllOwner { get; } = new(TibiaMirror.Localization.Loc.Get("Common_Hotkey_LockAll"));
     readonly List<string> _pendingNotices = new();
     bool _noticesReady;
 
@@ -121,7 +121,7 @@ public sealed class AppHost : IDisposable
 
     void ShowToast(string name) => System.Windows.Application.Current.Dispatcher.BeginInvoke(() =>
     {
-        try { TibiaMirror.Profiles.Toast.ShowToast("Profile: " + name); }
+        try { TibiaMirror.Profiles.Toast.ShowToast(TibiaMirror.Localization.Loc.Format("Common_ProfileToast", name)); }
         catch (Exception e) { TibiaMirror.Logging.Log.Error("Toast failed", e); }
     });
 
@@ -160,14 +160,14 @@ public sealed class AppHost : IDisposable
         SettingsService = new TibiaMirror.Settings.SettingsService(Paths);
         SettingsService.Load();
         if (SettingsService.LastLoadStatus == TibiaMirror.Persistence.LoadStatus.RestoredFromBackup)
-            QueueNotice("Your settings file was damaged, so the last backup was restored.");
+            QueueNotice(TibiaMirror.Localization.Loc.Get("Common_SettingsRestored"));
         else if (SettingsService.LastLoadStatus == TibiaMirror.Persistence.LoadStatus.Corrupt)
-            QueueNotice("Your settings file was damaged and could not be restored, so default settings are in use. The damaged file was kept as: " + SettingsService.CorruptPath);
+            QueueNotice(TibiaMirror.Localization.Loc.Format("Common_SettingsCorrupt", SettingsService.CorruptPath));
         Profiles = new TibiaMirror.Profiles.ProfileService(Paths);
         Profiles.Notice += QueueNotice;
         try { Profiles.LoadInitial(); }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
-        { TibiaMirror.Logging.Log.Error("Profile load failed", e); QueueNotice("Could not read or write your profiles: " + e.Message); }
+        { TibiaMirror.Logging.Log.Error("Profile load failed", e); QueueNotice(TibiaMirror.Localization.Loc.Format("Common_ProfilesError", e.Message)); }
         SetProfile(Profiles.Current);
         Profiles.CurrentChanged += p => { SetProfile(p); ShowToast(p.Name); };
         System.Windows.Application.Current.Dispatcher.BeginInvoke(FlushNotices, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
