@@ -1,0 +1,56 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+    <!-- Accent ramp -->
+    <Color x:Key="Accent.50">#FFF3E6</Color>  <Color x:Key="Accent.100">#FFE0BF</Color>
+    <Color x:Key="Accent.200">#FFC98F</Color> <Color x:Key="Accent.300">#FFAF5C</Color>
+    <Color x:Key="Accent.400">#FF9A2E</Color> <Color x:Key="Accent.500">#FF7F00</Color>
+    <Color x:Key="Accent.600">#E06F00</Color> <Color x:Key="Accent.700">#B85A00</Color>
+    <Color x:Key="Accent.800">#9A4D00</Color> <Color x:Key="Accent.900">#5C2D00</Color>
+
+    <!-- Spacing (4 px grid) -->
+    <sys:Double x:Key="Space.1">4</sys:Double>  <sys:Double x:Key="Space.2">8</sys:Double>
+    <sys:Double x:Key="Space.3">12</sys:Double> <sys:Double x:Key="Space.4">16</sys:Double>
+    <sys:Double x:Key="Space.6">24</sys:Double> <sys:Double x:Key="Space.8">32</sys:Double>
+    <Thickness x:Key="Pad.Card">16</Thickness>
+    <Thickness x:Key="Pad.Control">12,0</Thickness>
+
+    <!-- Radii -->
+    <CornerRadius x:Key="Radius.Sm">4</CornerRadius>  <CornerRadius x:Key="Radius.Md">8</CornerRadius>
+    <CornerRadius x:Key="Radius.Lg">12</CornerRadius> <CornerRadius x:Key="Radius.Xl">16</CornerRadius>
+    <CornerRadius x:Key="Radius.Pill">999</CornerRadius>
+
+    <!-- Sizes -->
+    <sys:Double x:Key="Size.Control">32</sys:Double>
+    <sys:Double x:Key="Size.TitleBar">44</sys:Double>
+    <sys:Double x:Key="Size.Sidebar">224</sys:Double>
+    <sys:Double x:Key="Size.SidebarCollapsed">56</sys:Double>
+    <sys:Double x:Key="Size.Drawer">380</sys:Double>
+
+    <!-- Typography -->
+    <FontFamily x:Key="Font.Ui">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.Display">Segoe UI Variable Display, Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.Icon">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+    <FontFamily x:Key="Font.Mono">Cascadia Mono, Consolas</FontFamily>
+    <sys:Double x:Key="Type.Caption">12</sys:Double>   <sys:Double x:Key="Type.BodySmall">13</sys:Double>
+    <sys:Double x:Key="Type.Body">14</sys:Double>      <sys:Double x:Key="Type.Subtitle">16</sys:Double>
+    <sys:Double x:Key="Type.Title">20</sys:Double>     <sys:Double x:Key="Type.Display">28</sys:Double>
+    <sys:Double x:Key="Icon.Md">16</sys:Double>        <sys:Double x:Key="Icon.Lg">20</sys:Double>
+    <sys:Double x:Key="Icon.Xl">32</sys:Double>
+
+    <!-- Opacity -->
+    <sys:Double x:Key="Opacity.Hover">0.08</sys:Double>
+    <sys:Double x:Key="Opacity.Pressed">0.12</sys:Double>
+    <sys:Double x:Key="Opacity.Disabled">0.38</sys:Double>
+
+    <!-- Motion. Duration values are overwritten with 0:0:0 by MotionManager when animations are off -->
+    <Duration x:Key="Motion.Fast">0:0:0.100</Duration>
+    <Duration x:Key="Motion.Base">0:0:0.180</Duration>
+    <Duration x:Key="Motion.Slow">0:0:0.260</Duration>
+    <Duration x:Key="Motion.Exit">0:0:0.160</Duration>
+    <CubicEase x:Key="Ease.Out" EasingMode="EaseOut"/>
+    <CubicEase x:Key="Ease.In" EasingMode="EaseIn"/>
+    <CubicEase x:Key="Ease.InOut" EasingMode="EaseInOut"/>
+
+
+</ResourceDictionary>

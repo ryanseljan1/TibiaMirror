@@ -1,0 +1,80 @@
+<!-- Legacy Theme*Brush aliases: removed in 0.2.0 wave 3 (C1) -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+    <sys:String x:Key="ThemeId">Dark</sys:String>
+
+    <Color x:Key="Color.Window">#12141A</Color>
+    <Color x:Key="Color.Sidebar">#0E1015</Color>
+    <Color x:Key="Color.Surface">#1A1D24</Color>
+    <Color x:Key="Color.SurfaceRaised">#222630</Color>
+    <Color x:Key="Color.Inset">#0E1015</Color>
+    <Color x:Key="Color.BorderSubtle">#2E333D</Color>
+    <Color x:Key="Color.BorderControl">#667085</Color>
+    <Color x:Key="Color.Text">#ECEEF3</Color>
+    <Color x:Key="Color.TextSecondary">#A8AFBD</Color>
+    <Color x:Key="Color.TextMuted">#8B93A3</Color>
+    <Color x:Key="Color.TextDisabled">#666E7E</Color>
+    <Color x:Key="Color.AccentText">#FFA033</Color>
+    <Color x:Key="Color.AccentSubtle">#24FF7F00</Color>
+    <Color x:Key="Color.Focus">#FFA033</Color>
+    <Color x:Key="Color.Success">#3DD68C</Color>
+    <Color x:Key="Color.Warning">#F5B73B</Color>
+    <Color x:Key="Color.Danger">#FF6B6B</Color>
+    <Color x:Key="Color.Info">#5CA8FF</Color>
+    <Color x:Key="Color.StateLayer">#FFFFFF</Color>
+    <Color x:Key="Color.Scrim">#99000000</Color>
+
+    <SolidColorBrush x:Key="Brush.Window"        Color="{StaticResource Color.Window}"/>
+    <SolidColorBrush x:Key="Brush.Sidebar"       Color="{StaticResource Color.Sidebar}"/>
+    <SolidColorBrush x:Key="Brush.Surface"       Color="{StaticResource Color.Surface}"/>
+    <SolidColorBrush x:Key="Brush.SurfaceRaised" Color="{StaticResource Color.SurfaceRaised}"/>
+    <SolidColorBrush x:Key="Brush.Inset"         Color="{StaticResource Color.Inset}"/>
+    <SolidColorBrush x:Key="Brush.BorderSubtle"  Color="{StaticResource Color.BorderSubtle}"/>
+    <SolidColorBrush x:Key="Brush.BorderControl" Color="{StaticResource Color.BorderControl}"/>
+    <SolidColorBrush x:Key="Brush.Text"          Color="{StaticResource Color.Text}"/>
+    <SolidColorBrush x:Key="Brush.TextSecondary" Color="{StaticResource Color.TextSecondary}"/>
+    <SolidColorBrush x:Key="Brush.TextMuted"     Color="{StaticResource Color.TextMuted}"/>
+    <SolidColorBrush x:Key="Brush.TextDisabled"  Color="{StaticResource Color.TextDisabled}"/>
+    <SolidColorBrush x:Key="Brush.Accent"        Color="#FF7F00"/>
+    <SolidColorBrush x:Key="Brush.AccentHover"   Color="#FF9A2E"/>
+    <SolidColorBrush x:Key="Brush.AccentPressed" Color="#E06F00"/>
+    <SolidColorBrush x:Key="Brush.OnAccent"      Color="#1A0F00"/>
+    <SolidColorBrush x:Key="Brush.AccentText"    Color="{StaticResource Color.AccentText}"/>
+    <SolidColorBrush x:Key="Brush.AccentSubtle"  Color="{StaticResource Color.AccentSubtle}"/>
+    <SolidColorBrush x:Key="Brush.Focus"         Color="{StaticResource Color.Focus}"/>
+    <SolidColorBrush x:Key="Brush.Success"       Color="{StaticResource Color.Success}"/>
+    <SolidColorBrush x:Key="Brush.Warning"       Color="{StaticResource Color.Warning}"/>
+    <SolidColorBrush x:Key="Brush.Danger"        Color="{StaticResource Color.Danger}"/>
+    <SolidColorBrush x:Key="Brush.OnDanger"      Color="#1A0505"/>
+    <SolidColorBrush x:Key="Brush.Info"          Color="{StaticResource Color.Info}"/>
+    <SolidColorBrush x:Key="Brush.StateLayer"    Color="{StaticResource Color.StateLayer}"/>
+    <SolidColorBrush x:Key="Brush.Scrim"         Color="{StaticResource Color.Scrim}"/>
+    <!-- Subtle semantic fills (16% dark / 12% light) -->
+    <SolidColorBrush x:Key="Brush.SuccessSubtle" Color="#293DD68C"/>
+    <SolidColorBrush x:Key="Brush.WarningSubtle" Color="#29F5B73B"/>
+    <SolidColorBrush x:Key="Brush.DangerSubtle"  Color="#29FF6B6B"/>
+    <SolidColorBrush x:Key="Brush.InfoSubtle"    Color="#295CA8FF"/>
+    <!-- Card sheen (reflection motif) -->
+    <LinearGradientBrush x:Key="Brush.CardSheen" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#0FFFFFFF" Offset="0"/><GradientStop Color="#00FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+    <DropShadowEffect x:Key="Elevation.2" BlurRadius="16" ShadowDepth="4" Direction="270" Opacity="0.35" Color="#000000"/>
+    <DropShadowEffect x:Key="Elevation.3" BlurRadius="32" ShadowDepth="8" Direction="270" Opacity="0.45" Color="#000000"/>
+    <!-- Legacy aliases -->
+    <SolidColorBrush x:Key="ThemeWindowBrush" Color="{StaticResource Color.Window}"/>
+    <SolidColorBrush x:Key="ThemeTextBrush" Color="{StaticResource Color.Text}"/>
+    <SolidColorBrush x:Key="ThemeSurfaceBrush" Color="{StaticResource Color.Surface}"/>
+    <SolidColorBrush x:Key="ThemeControlBrush" Color="{StaticResource Color.Inset}"/>
+    <SolidColorBrush x:Key="ThemeMutedBrush" Color="{StaticResource Color.TextSecondary}"/>
+    <SolidColorBrush x:Key="ThemeBorderBrush" Color="{StaticResource Color.BorderControl}"/>
+    <SolidColorBrush x:Key="ThemeErrorBrush" Color="{StaticResource Color.Danger}"/>
+    <SolidColorBrush x:Key="ThemeSelectionBrush" Color="{StaticResource Color.AccentSubtle}"/>
+    <SolidColorBrush x:Key="ThemeTabBrush" Color="{StaticResource Color.Sidebar}"/>
+    <SolidColorBrush x:Key="ThemeBannerBrush" Color="{StaticResource Color.Warning}"/>
+    <SolidColorBrush x:Key="ThemeBannerTextBrush" Color="{StaticResource Color.Window}"/>
+    <SolidColorBrush x:Key="ThemeCheckedBrush" Color="#FFFF7F00"/>
+    <SolidColorBrush x:Key="ThemeCheckedTextBrush" Color="#FF1A0F00"/>
+    <SolidColorBrush x:Key="ThemeSuccessBrush" Color="{StaticResource Color.Success}"/>
+    <SolidColorBrush x:Key="ThemeOnSuccessBrush" Color="{StaticResource Color.Window}"/>
+</ResourceDictionary>
