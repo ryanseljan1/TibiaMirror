@@ -72,3 +72,55 @@ public class SnackbarServiceTests
         Assert.Contains(nameof(SnackbarService.IsVisible), seen); Assert.Contains(nameof(SnackbarService.Message), seen);
     }
 }
+
+public class SnackbarServiceActionsTests
+{
+    readonly FakeClock _clock = new();
+    SnackbarService Make() => new(_clock);
+
+    [Fact] public void Holds_n_actions()
+    {
+        var s = Make();
+        s.Show("m", [new("A", () => { }), new("B", () => { }), new("C", () => { })], TimeSpan.FromSeconds(5));
+        Assert.Equal(["A", "B", "C"], s.Actions.Select(a => a.Label));
+    }
+
+    [Fact] public void Sticky_never_expires()
+    {
+        var s = Make(); s.Show("m", [], null);
+        _clock.Advance(3600); s.Tick();
+        Assert.True(s.IsVisible);
+    }
+
+    [Fact] public void Custom_duration_expires()
+    {
+        var s = Make(); s.Show("m", [], TimeSpan.FromSeconds(20));
+        _clock.Advance(19); s.Tick(); Assert.True(s.IsVisible);
+        _clock.Advance(2); s.Tick(); Assert.False(s.IsVisible);
+    }
+
+    [Fact] public void Action_runs_once_and_dismisses()
+    {
+        var s = Make(); int n = 0; var a = new SnackbarAction("Go", () => n++);
+        s.Show("m", [a], null);
+        s.RunAction(a); s.RunAction(a);
+        Assert.Equal(1, n); Assert.False(s.IsVisible); Assert.Empty(s.Actions);
+    }
+
+    [Fact] public void Failing_action_is_swallowed()
+    {
+        var s = Make(); var a = new SnackbarAction("Go", () => throw new InvalidOperationException());
+        s.Show("m", [a], null); s.RunAction(a);
+        Assert.False(s.IsVisible);
+    }
+
+    [Fact] public void Progress_and_busy_reset_on_show_and_dismiss()
+    {
+        var s = Make(); s.Show("m", [], null);
+        s.IsBusy = true; s.Progress = 0.4;
+        Assert.False(s.IsIndeterminate);
+        s.Show("n", [], null);
+        Assert.False(s.IsBusy); Assert.Null(s.Progress); Assert.True(s.IsIndeterminate);
+        s.Progress = 1; s.Dismiss(); Assert.Null(s.Progress);
+    }
+}

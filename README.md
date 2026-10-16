@@ -4,7 +4,7 @@
 
 Espelhe qualquer parte da tela do Tibia onde quiser — barras de vida, tempos de recarga, minimapa — e use temporizadores com som e barras de contagem regressiva.
 
-**Gratuito e de código aberto:** sem anúncios, sem chave de licença, sem conexões de rede e espelhos ilimitados — todos os recursos liberados. Não lê a memória do jogo nem envia teclas ou cliques.
+**Gratuito e de código aberto:** sem anúncios, sem chave de licença, só se conecta ao GitHub para verificar atualizações (opcional), sem telemetria, espelhos ilimitados — todos os recursos liberados. Não lê a memória do jogo nem envia teclas ou cliques.
 
 > [!TIP]
 > [![Baixar v0.1.1](https://img.shields.io/badge/Baixar-v0.1.1-FF7F00?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/ryanseljan1/TibiaMirror/releases/latest/download/TibiaMirror-Setup.exe)
