@@ -1,29 +1,33 @@
 <UserControl x:Class="TibiaMirror.Countdown.CountdownEditor"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:controls="clr-namespace:TibiaMirror.Controls">
+             xmlns:controls="clr-namespace:TibiaMirror.Controls"
+             xmlns:loc="clr-namespace:TibiaMirror.Localization">
     <StackPanel Margin="0,6,0,0">
-        <CheckBox x:Name="EnabledBox" Content="Enable countdown" Checked="Changed" Unchecked="Changed"/>
-        <TextBlock Text="Hotkey (pressed while Tibia is focused)" Margin="0,6,0,0"/>
+        <CheckBox x:Name="EnabledBox" Style="{StaticResource ToggleSwitch}" Content="{loc:Loc Timers_CountdownEnable}" Checked="Changed" Unchecked="Changed"/>
+        <TextBlock Text="{loc:Loc Timers_HotkeyLabel}" Margin="0,6,0,0"/>
         <controls:HotkeyBox x:Name="KeyBox" HorizontalAlignment="Left" Margin="0,2,0,0" HotkeyChanged="KeyBox_HotkeyChanged"/>
-        <TextBlock Text="Duration (seconds, 0.5 to 3600)" Margin="0,6,0,0"/>
+        <TextBlock Text="{loc:Loc Timers_CountdownDuration}" Margin="0,6,0,0"/>
         <TextBox x:Name="DurationBox" Margin="0,2,0,0" LostFocus="DurationBox_LostFocus"/>
-        <TextBlock Text="Side" Margin="0,6,0,0"/>
+        <TextBlock Text="{loc:Loc Timers_CountdownSide}" Margin="0,6,0,0"/>
         <ComboBox x:Name="SideBox" Margin="0,2,0,0" SelectionChanged="Changed"/>
-        <TextBlock Text="Shape" Margin="0,6,0,0"/>
+        <TextBlock Text="{loc:Loc Timers_CountdownShape}" Margin="0,6,0,0"/>
         <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-            <RadioButton x:Name="FullRadio" Content="Full edge" Margin="0,0,12,0" Checked="Changed"/>
-            <RadioButton x:Name="NarrowRadio" Content="Narrow strip" Checked="Changed"/>
+            <RadioButton x:Name="FullRadio" Content="{loc:Loc Timers_CountdownFullEdge}" Margin="0,0,12,0" Checked="Changed"/>
+            <RadioButton x:Name="NarrowRadio" Content="{loc:Loc Timers_CountdownNarrowStrip}" Checked="Changed"/>
         </StackPanel>
-        <TextBlock Text="Color" Margin="0,6,0,0"/>
+        <TextBlock Text="{loc:Loc Timers_CountdownColor}" Margin="0,6,0,0"/>
         <StackPanel x:Name="SwatchPanel" Orientation="Horizontal" Margin="0,2,0,0"/>
-        <TextBox x:Name="ColorBox" Margin="0,4,0,0" ToolTip="#AARRGGBB or #RRGGBB" LostFocus="ColorBox_LostFocus"/>
-        <TextBlock Text="Thickness" Margin="0,6,0,0"/>
+        <TextBox x:Name="ColorBox" Margin="0,4,0,0" ToolTip="{loc:Loc Timers_CountdownColorHint}" LostFocus="ColorBox_LostFocus"/>
+        <TextBlock Text="{loc:Loc Timers_CountdownThickness}" Margin="0,6,0,0"/>
         <Slider x:Name="ThicknessSlider" Minimum="2" Maximum="40" IsSnapToTickEnabled="True" TickFrequency="1"
                 Margin="0,2,0,0" ValueChanged="ThicknessSlider_ValueChanged"/>
-        <CheckBox x:Name="FlashBox" Content="Flash border when done" Margin="0,6,0,0" Checked="Changed" Unchecked="Changed"/>
-        <TextBlock Text="Sound when done" Margin="0,6,0,0"/>
+        <CheckBox x:Name="FlashBox" Style="{StaticResource ToggleSwitch}" Content="{loc:Loc Timers_CountdownFlash}" Margin="0,6,0,0" Checked="Changed" Unchecked="Changed"/>
+        <TextBlock Text="{loc:Loc Timers_CountdownSoundWhenDone}" Margin="0,6,0,0"/>
         <ComboBox x:Name="SoundBox" DisplayMemberPath="Name" Margin="0,2,0,4" SelectionChanged="SoundBox_SelectionChanged"/>
-        <TextBlock x:Name="SoundWarning" Foreground="DarkOrange" TextWrapping="Wrap" Visibility="Collapsed"/>
+        <StackPanel x:Name="SoundWarningPanel" Orientation="Horizontal" Visibility="Collapsed">
+            <TextBlock Style="{StaticResource Glyph}" Text="{StaticResource Glyph.Warning}" Foreground="{DynamicResource Brush.Warning}" Margin="0,0,4,0" VerticalAlignment="Center"/>
+            <TextBlock x:Name="SoundWarning" Foreground="{DynamicResource Brush.Warning}" TextWrapping="Wrap"/>
+        </StackPanel>
     </StackPanel>
 </UserControl>

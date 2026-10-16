@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" Background="Transparent"
         Topmost="True" ShowInTaskbar="False" ShowActivated="False" Width="10" Height="10">
+    <!-- Overlay on the game: fixed colour on purpose, not a theme token (the bar colour is user-configured). -->
     <Grid x:Name="Root">
         <Rectangle x:Name="Fill" Fill="#FFFF7F00"/>
     </Grid>

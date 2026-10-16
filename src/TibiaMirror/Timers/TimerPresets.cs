@@ -1,3 +1,4 @@
+using TibiaMirror.Localization;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Timers;
@@ -15,12 +16,12 @@ public sealed record TimerPreset(string Label, string Name, double DurationSecon
 
 public static class TimerPresets
 {
-    public static IReadOnlyList<TimerPreset> All { get; } = new[]
+    public static IReadOnlyList<TimerPreset> All => new[]
     {
-        new TimerPreset("Short buff (30 s)", "Short buff", 30, "builtin:ding"),
-        new TimerPreset("Long buff (10 min)", "Long buff", 600, "builtin:chime"),
-        new TimerPreset("Food (5 min, repeat)", "Food", 300, "builtin:low-beep", Repeat: true),
-        new TimerPreset("Mana potion reminder (1 min, repeat)", "Mana potion reminder", 60, "builtin:double-ding", Repeat: true),
-        new TimerPreset("Boss respawn check (20 min)", "Boss respawn check", 1200, "builtin:alert"),
+        new TimerPreset(Loc.Get("Timers_PresetShortBuff"), Loc.Get("Timers_PresetShortBuffName"), 30, "builtin:ding"),
+        new TimerPreset(Loc.Get("Timers_PresetLongBuff"), Loc.Get("Timers_PresetLongBuffName"), 600, "builtin:chime"),
+        new TimerPreset(Loc.Get("Timers_PresetFood"), Loc.Get("Timers_PresetFoodName"), 300, "builtin:low-beep", Repeat: true),
+        new TimerPreset(Loc.Get("Timers_PresetMana"), Loc.Get("Timers_PresetManaName"), 60, "builtin:double-ding", Repeat: true),
+        new TimerPreset(Loc.Get("Timers_PresetBoss"), Loc.Get("Timers_PresetBossName"), 1200, "builtin:alert"),
     };
 }

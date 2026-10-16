@@ -5,6 +5,7 @@ using Microsoft.Win32;
 using TibiaMirror.Abstractions;
 using TibiaMirror.Audio;
 using TibiaMirror.Hotkeys;
+using TibiaMirror.Localization;
 using TibiaMirror.Models;
 
 namespace TibiaMirror.Timers;
@@ -28,8 +29,8 @@ public partial class TimerEditDialog : Window
     {
         InitializeComponent();
         _existing = existing; _hotkeys = hotkeys; _service = service;
-        Title = existing is null ? "Add timer" : "Edit timer";
-        var m = existing ?? template ?? new AudioTimerModel { Name = "Timer" };
+        Title = Loc.Get(existing is null ? "Timers_DialogTitleAdd" : "Timers_DialogTitleEdit");
+        var m = existing ?? template ?? new AudioTimerModel { Name = Loc.Get("Timers_DefaultName") };
         NameBox.Text = m.Name;
         KeyBox.Hotkey = m.Hotkey;
         DurationBox.Text = m.DurationSeconds.ToString("0.##", CultureInfo.CurrentCulture);
@@ -40,6 +41,11 @@ public partial class TimerEditDialog : Window
         foreach (var (id, name) in BuiltInSounds.All) SoundBox.Items.Add(new SoundChoice(id, name));
         SoundBox.Items.Add(CustomChoice);
         SelectSound(m.Sound);
+        // The file may appear or vanish while the dialog is open; re-check the warning every couple of seconds.
+        var recheck = new System.Windows.Threading.DispatcherTimer { Interval = SoundAvailabilityCache.Ttl };
+        recheck.Tick += (_, _) => { if (SoundBox.SelectedItem is SoundChoice c) UpdateSoundWarning(c); };
+        recheck.Start();
+        Closed += (_, _) => recheck.Stop();
     }
 
     void SelectSound(string id)
@@ -59,7 +65,7 @@ public partial class TimerEditDialog : Window
     {
         var text = Countdown.CountdownSoundWarning.For(c == CustomChoice ? null : c.Id, _service.CanPlay);
         SoundWarning.Text = text;
-        SoundWarning.Visibility = text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        SoundWarningPanel.Visibility = text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     void SoundBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -98,12 +104,12 @@ public partial class TimerEditDialog : Window
     void Save_Click(object sender, RoutedEventArgs e)
     {
         var name = NameBox.Text.Trim();
-        if (name.Length is < 1 or > 40) { ErrorText.Text = "Enter a name between 1 and 40 characters"; return; }
-        if (!TryParseDuration(DurationBox.Text, out var secs)) { ErrorText.Text = "Enter a duration between 0.1 and 3600 seconds"; return; }
+        if (name.Length is < 1 or > 40) { ErrorText.Text = Loc.Get("Timers_ErrName"); return; }
+        if (!TryParseDuration(DurationBox.Text, out var secs)) { ErrorText.Text = Loc.Get("Timers_ErrDuration"); return; }
         var repeat = RepeatCheck.IsChecked == true;
         double interval = secs;
-        if (repeat && !TryParseDuration(IntervalBox.Text, out interval)) { ErrorText.Text = "Enter a repeat interval between 0.1 and 3600 seconds"; return; }
-        if (SoundBox.SelectedItem is not SoundChoice sound || sound == CustomChoice) { ErrorText.Text = "Pick a sound"; return; }
+        if (repeat && !TryParseDuration(IntervalBox.Text, out interval)) { ErrorText.Text = Loc.Get("Timers_ErrInterval"); return; }
+        if (SoundBox.SelectedItem is not SoundChoice sound || sound == CustomChoice) { ErrorText.Text = Loc.Get("Timers_ErrPickSound"); return; }
         var hotkey = KeyBox.Hotkey;
         if (hotkey is not null && _hotkeys is not null)
         {
@@ -111,7 +117,7 @@ public partial class TimerEditDialog : Window
             if (others.Count > 0)
             {
                 var names = string.Join(", ", others.Select(o => o is AudioTimerModel t ? t.Name : o.ToString()));
-                if (MessageBox.Show(this, $"This key is already used by: {names}. Use it anyway?", "Key already in use",
+                if (MessageBox.Show(this, Loc.Format("Timers_KeyInUseBody", names), Loc.Get("Timers_KeyInUseTitle"),
                         MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
             }
         }

@@ -1,12 +1,13 @@
 using TibiaMirror.Audio;
+using TibiaMirror.Localization;
 
 namespace TibiaMirror.Countdown;
 
 public static class CountdownSoundWarning
 {
-    /// <summary>Warning text for a countdown whose configured sound cannot be played (playback falls back to the default chime); "" if fine or no sound.</summary>
+    /// <summary>Warning text for a countdown whose configured sound cannot be played (playback falls back to the default chime); "" if fine or no sound. The warning glyph is drawn by the view.</summary>
     public static string For(string? soundId, Func<string, bool> canPlay) =>
         string.IsNullOrEmpty(soundId) || canPlay(soundId)
             ? ""
-            : $"\u26A0 Sound file not found \u2014 using {BuiltInSounds.All.First(s => s.Id == BuiltInSounds.DefaultId).DisplayName}";
+            : Loc.Format("Timers_SoundMissing", BuiltInSounds.All.First(s => s.Id == BuiltInSounds.DefaultId).DisplayName);
 }

@@ -31,5 +31,5 @@ public class CountdownSoundWarningTests
         Assert.Equal("", TibiaMirror.Countdown.CountdownSoundWarning.For("builtin:chime", _ => true));
     }
     [Fact] public void Missing_sound_warns_and_names_the_fallback() =>
-        Assert.StartsWith("\u26A0", TibiaMirror.Countdown.CountdownSoundWarning.For(@"C:\gone.wav", _ => false));
+        Assert.StartsWith("Sound file not found", TibiaMirror.Countdown.CountdownSoundWarning.For(@"C:\gone.wav", _ => false));
 }
