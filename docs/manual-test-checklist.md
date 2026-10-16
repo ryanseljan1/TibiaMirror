@@ -132,7 +132,7 @@ Run this against real Tibia before each release. Tick every box. Items marked (k
 ## Updater + foundation (0.2.0)
 
 ### Themes
-- [ ] Settings > Theme (System / Dark / Light): changing it applies instantly to every open window, no restart.
+- [ ] Settings > Theme (System / Dark / Light): after Save, the new theme applies to every open window at once, no restart.
 - [ ] System follows a live Windows light/dark switch (Settings > Personalization > Colors) while the app is open.
 - [ ] Windows High Contrast on: the app uses the high-contrast colours. Off: it returns to the normal theme.
 - [ ] In Dark, Light and High Contrast every screen is readable: main tabs, Settings, dialogs, mirror context menu, tooltips and the snackbar.
