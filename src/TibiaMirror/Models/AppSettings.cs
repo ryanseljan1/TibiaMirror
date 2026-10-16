@@ -15,4 +15,6 @@ public sealed class AppSettings : TibiaMirror.Persistence.IVersioned
     public string TibiaTitlePrefix { get; set; } = "Tibia";
     public bool TrayHintShown { get; set; }
     public PixelRect? MainWindowBounds { get; set; }
+    public bool? CheckForUpdates { get; set; }
+    public string? SkippedVersion { get; set; }
 }
