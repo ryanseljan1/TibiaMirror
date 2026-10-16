@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using TibiaMirror.Localization;
 using TibiaMirror.Models;
 using TibiaMirror.Persistence;
 
@@ -98,7 +99,7 @@ public sealed class ProfileService(AppPaths paths)
     {
         var n = Existing(name);
         var names = List();
-        if (names.Count <= 1) throw new InvalidOperationException("You need at least one profile.");
+        if (names.Count <= 1) throw new InvalidOperationException(Loc.Get("Profiles_ErrLast"));
         var isCurrent = string.Equals(n, Current.Name, StringComparison.OrdinalIgnoreCase);
         if (isCurrent) SaveCurrent();   // so the snapshot holds the latest in-memory edits
         var file = paths.ProfileFile(n);
@@ -117,7 +118,7 @@ public sealed class ProfileService(AppPaths paths)
     public void Restore(DeletedProfile d)
     {
         if (List().Contains(d.Name, StringComparer.OrdinalIgnoreCase))
-            throw new InvalidOperationException($"A profile named '{d.Name}' already exists, so the deleted one can't be restored.");
+            throw new InvalidOperationException(Loc.Format("Profiles_ErrRestoreExists", d.Name));
         var file = paths.ProfileFile(d.Name);
         File.WriteAllBytes(file, d.Content);
         if (d.Backup is { } b) File.WriteAllBytes(file + ".bak", b);
@@ -145,8 +146,8 @@ public sealed class ProfileService(AppPaths paths)
         Profile? p;
         try { p = JsonSerializer.Deserialize<Profile>(File.ReadAllText(jsonPath), JsonStore.Options); }
         catch (Exception e) when (e is JsonException or NotSupportedException) { p = null; }
-        if (p is null) throw new ArgumentException("That file isn't a valid TibiaMirror profile.");
-        if (SchemaInfo.IsNewer(p)) throw new ArgumentException("That profile was made by a newer version of TibiaMirror. Please update the app to import it.");
+        if (p is null) throw new ArgumentException(Loc.Get("Profiles_ErrInvalidFile"));
+        if (SchemaInfo.IsNewer(p)) throw new ArgumentException(Loc.Get("Profiles_ErrNewerImport"));
         ProfileNormalizer.Normalize(p);
         var name = (string.IsNullOrWhiteSpace(p.Name) ? Path.GetFileNameWithoutExtension(jsonPath) : p.Name).Trim();
         var existing = List();
@@ -174,7 +175,7 @@ public sealed class ProfileService(AppPaths paths)
 
     string Existing(string name) =>
         List().FirstOrDefault(n => string.Equals(n, name?.Trim(), StringComparison.OrdinalIgnoreCase))
-        ?? throw new ArgumentException($"There is no profile named '{name}'.");
+        ?? throw new ArgumentException(Loc.Format("Profiles_ErrNotFound", name));
 
     string ValidateNew(string name)
     {
@@ -206,12 +207,12 @@ public sealed class ProfileService(AppPaths paths)
         r.Value.Name = name;
         ProfileNormalizer.Normalize(r.Value);
         if (SchemaInfo.IsNewer(r.Value))
-            Notice?.Invoke($"Profile '{name}' was made by a newer version of TibiaMirror. You can use it, but changes to it will not be saved.");
+            Notice?.Invoke(Loc.Format("Profiles_NoticeNewer", name));
         if (r.Status == LoadStatus.RestoredFromBackup)
-            Notice?.Invoke($"Profile '{name}' was damaged and has been restored from its backup.");
+            Notice?.Invoke(Loc.Format("Profiles_NoticeRestored", name));
         else if (r.Status == LoadStatus.Corrupt)
         {
-            Notice?.Invoke($"Profile '{name}' was damaged. A fresh copy was started; the damaged file was kept as {Path.GetFileName(r.CorruptPath)}.");
+            Notice?.Invoke(Loc.Format("Profiles_NoticeDamaged", name, Path.GetFileName(r.CorruptPath)));
             JsonStore.Save(paths.ProfileFile(name), r.Value);
         }
         return r.Value;

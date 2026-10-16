@@ -1,7 +1,0 @@
-New
-Duplicate
-Rename
-Delete
-Switch
-Import...
-Export...

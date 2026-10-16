@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using TibiaMirror.Localization;
 using TibiaMirror.Logging;
 using TibiaMirror.Models;
 
@@ -22,12 +23,17 @@ public partial class SettingsWindow : Window
         LockAllBox.Hotkey = s.LockAllHotkey;
         OnlyFocusedCheck.IsChecked = s.OnlyShowWhenTibiaFocused;
         ClickThroughCheck.IsChecked = s.ClickThroughWhileTibiaFocused;
-        ThemeModeCombo.SelectedIndex = (int)(s.ThemeMode ?? ThemeMode.Dark);
+        var mode = s.ThemeMode ?? ThemeMode.Dark;
+        ThemeSystemRadio.IsChecked = mode == ThemeMode.System;
+        ThemeDarkRadio.IsChecked = mode == ThemeMode.Dark;
+        ThemeLightRadio.IsChecked = mode == ThemeMode.Light;
+        CheckUpdatesCheck.IsChecked = s.CheckForUpdates == true;
         _startupWasEnabled = ReadStartupEnabled();
         StartWithWindowsCheck.IsChecked = _startupWasEnabled;
         ProcessBox.Text = s.TibiaProcessName;
         TitleBox.Text = s.TibiaTitlePrefix;
-        VersionText.Text = "Version " + AppInfo.Version;
+        VersionText.Text = Loc.Format("Settings_Version", AppInfo.Version);
+        CheckNowButton.Click += async (_, _) => await CheckNowAsync();
         ProcessBox.TextChanged += (_, _) => Validate();
         TitleBox.TextChanged += (_, _) => Validate();
         OpenFolderButton.Click += (_, _) => OpenDataFolder();
@@ -43,8 +49,8 @@ public partial class SettingsWindow : Window
 
     /// <summary>Process name and title prefix must be non-empty.</summary>
     public static string? ValidateDetection(string? processName, string? titlePrefix) =>
-        string.IsNullOrWhiteSpace(processName) ? "The Tibia process name can't be empty."
-        : string.IsNullOrWhiteSpace(titlePrefix) ? "The Tibia window title prefix can't be empty."
+        string.IsNullOrWhiteSpace(processName) ? Loc.Get("Settings_ErrProcessEmpty")
+        : string.IsNullOrWhiteSpace(titlePrefix) ? Loc.Get("Settings_ErrTitleEmpty")
         : null;
 
     void Validate()
@@ -53,6 +59,19 @@ public partial class SettingsWindow : Window
         ErrorText.Text = error ?? "";
         ErrorText.Visibility = error is null ? Visibility.Collapsed : Visibility.Visible;
         SaveButton.IsEnabled = error is null;
+    }
+
+    async Task CheckNowAsync()
+    {
+        CheckNowButton.IsEnabled = false;
+        UpdateStatusText.Text = "";
+        try
+        {
+            var release = await _host.Updates.CheckNowAsync(CancellationToken.None);
+            UpdateStatusText.Text = release is null ? Loc.Get("Settings_UpToDate") : Loc.Format("Settings_UpdateAvailable", release.Version);
+        }
+        catch (Exception e) { Log.Error("Update check from Settings failed", e); }
+        finally { CheckNowButton.IsEnabled = true; }
     }
 
     void OpenDataFolder()
@@ -84,7 +103,7 @@ public partial class SettingsWindow : Window
             others.AddRange(siblings.Where(b => b.Key == hk).Select(b => b.Owner));
             if (others.Count == 0) continue;
             var names = string.Join(", ", others.Select(o => o is Models.AudioTimerModel t ? t.Name : o.ToString()));
-            if (MessageBox.Show(this, $"This key is already used by: {names}. Use it anyway?", "Key already in use",
+            if (MessageBox.Show(this, Loc.Format("Settings_KeyInUse", names), Loc.Get("Settings_KeyInUseTitle"),
                     MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return false;
         }
         return true;
@@ -99,7 +118,7 @@ public partial class SettingsWindow : Window
         catch (Exception e) when (e is UnauthorizedAccessException or System.Security.SecurityException or IOException)
         {
             Log.Error("Updating the startup entry failed", e);
-            MessageBox.Show(this, "Could not change the Start with Windows setting: " + e.Message, AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Loc.Format("Settings_StartupFailed", e.Message), AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
@@ -113,14 +132,15 @@ public partial class SettingsWindow : Window
         s.LockAllHotkey = LockAllBox.Hotkey;
         s.OnlyShowWhenTibiaFocused = OnlyFocusedCheck.IsChecked == true;
         s.ClickThroughWhileTibiaFocused = ClickThroughCheck.IsChecked == true;
-        s.ThemeMode = (ThemeMode)Math.Max(0, ThemeModeCombo.SelectedIndex);
+        s.ThemeMode = ThemeSystemRadio.IsChecked == true ? ThemeMode.System : ThemeLightRadio.IsChecked == true ? ThemeMode.Light : ThemeMode.Dark;
+        s.CheckForUpdates = CheckUpdatesCheck.IsChecked == true;
         s.TibiaProcessName = ProcessBox.Text.Trim();
         s.TibiaTitlePrefix = TitleBox.Text.Trim();
         try { _host.SettingsService?.Save(); }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             Log.Error("Saving settings failed", e);
-            MessageBox.Show(this, "Your settings were applied but could not be saved to disk: " + e.Message, AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Loc.Format("Settings_SaveFailed", e.Message), AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         ApplyStartup();
         _host.ApplySettings();

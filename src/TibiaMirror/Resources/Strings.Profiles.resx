@@ -6,4 +6,32 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Profiles_Title" xml:space="preserve"><value>Profiles</value></data>
   <data name="Profiles_AddButton" xml:space="preserve"><value>Add</value></data>
+  <data name="Profiles_New" xml:space="preserve"><value>New</value></data>
+  <data name="Profiles_Duplicate" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="Profiles_Rename" xml:space="preserve"><value>Rename</value></data>
+  <data name="Profiles_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Profiles_Switch" xml:space="preserve"><value>Switch</value></data>
+  <data name="Profiles_Import" xml:space="preserve"><value>Import...</value></data>
+  <data name="Profiles_Export" xml:space="preserve"><value>Export...</value></data>
+  <data name="Profiles_NameLabel" xml:space="preserve"><value>Profile name:</value></data>
+  <data name="Profiles_FileFilter" xml:space="preserve"><value>TibiaMirror profile (*.json)|*.json</value></data>
+  <data name="Profiles_NewTitle" xml:space="preserve"><value>New profile</value></data>
+  <data name="Profiles_DuplicateTitle" xml:space="preserve"><value>Duplicate profile</value></data>
+  <data name="Profiles_RenameTitle" xml:space="preserve"><value>Rename profile</value></data>
+  <data name="Profiles_CopyName" xml:space="preserve"><value>{0} copy</value></data>
+  <data name="Profiles_Deleted" xml:space="preserve"><value>Profile '{0}' deleted</value></data>
+  <data name="Profiles_ErrEmpty" xml:space="preserve"><value>Name can't be empty.</value></data>
+  <data name="Profiles_ErrTooLong" xml:space="preserve"><value>Name must be {0} characters or fewer.</value></data>
+  <data name="Profiles_ErrBadChar" xml:space="preserve"><value>Name can't contain the character '{0}'.</value></data>
+  <data name="Profiles_ErrReserved" xml:space="preserve"><value>'{0}' is a reserved Windows name.</value></data>
+  <data name="Profiles_ErrEndsDot" xml:space="preserve"><value>Name can't end with a dot.</value></data>
+  <data name="Profiles_ErrExists" xml:space="preserve"><value>A profile named '{0}' already exists.</value></data>
+  <data name="Profiles_ErrLast" xml:space="preserve"><value>You need at least one profile.</value></data>
+  <data name="Profiles_ErrRestoreExists" xml:space="preserve"><value>A profile named '{0}' already exists, so the deleted one can't be restored.</value></data>
+  <data name="Profiles_ErrInvalidFile" xml:space="preserve"><value>That file isn't a valid TibiaMirror profile.</value></data>
+  <data name="Profiles_ErrNewerImport" xml:space="preserve"><value>That profile was made by a newer version of TibiaMirror. Please update the app to import it.</value></data>
+  <data name="Profiles_ErrNotFound" xml:space="preserve"><value>There is no profile named '{0}'.</value></data>
+  <data name="Profiles_NoticeNewer" xml:space="preserve"><value>Profile '{0}' was made by a newer version of TibiaMirror. You can use it, but changes to it will not be saved.</value></data>
+  <data name="Profiles_NoticeRestored" xml:space="preserve"><value>Profile '{0}' was damaged and has been restored from its backup.</value></data>
+  <data name="Profiles_NoticeDamaged" xml:space="preserve"><value>Profile '{0}' was damaged. A fresh copy was started; the damaged file was kept as {1}.</value></data>
 </root>

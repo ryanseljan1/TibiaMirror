@@ -2,13 +2,14 @@
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
+using TibiaMirror.Localization;
 using TibiaMirror.Profiles;
 
 namespace TibiaMirror.Views;
 
 public partial class ProfilesView : UserControl
 {
-    const string Filter = "TibiaMirror profile (*.json)|*.json";
+    static string Filter => Loc.Get("Profiles_FileFilter");
     ProfilesViewModel? _vm;
     AppHost? _host;
 
@@ -44,21 +45,21 @@ public partial class ProfilesView : UserControl
 
     void New_Click(object s, RoutedEventArgs e) => Run(() =>
     {
-        var n = ProfileNameDialog.Ask(Owner, "New profile", "", Service.List());
+        var n = ProfileNameDialog.Ask(Owner, Loc.Get("Profiles_NewTitle"), "", Service.List());
         if (n != null) Service.Create(n);
     });
 
     void Duplicate_Click(object s, RoutedEventArgs e) => Run(() =>
     {
         if (SelectedName is not { } src) return;
-        var n = ProfileNameDialog.Ask(Owner, "Duplicate profile", src + " copy", Service.List());
+        var n = ProfileNameDialog.Ask(Owner, Loc.Get("Profiles_DuplicateTitle"), Loc.Format("Profiles_CopyName", src), Service.List());
         if (n != null) Service.Duplicate(src, n);
     });
 
     void Rename_Click(object s, RoutedEventArgs e) => Run(() =>
     {
         if (SelectedName is not { } old) return;
-        var n = ProfileNameDialog.Ask(Owner, "Rename profile", old, Service.List(), renamingFrom: old);
+        var n = ProfileNameDialog.Ask(Owner, Loc.Get("Profiles_RenameTitle"), old, Service.List(), renamingFrom: old);
         if (n != null) Service.Rename(old, n);
     });
 
@@ -66,7 +67,7 @@ public partial class ProfilesView : UserControl
     {
         if (SelectedName is not { } n) return;
         var deleted = Service.Delete(n);   // throws for the last profile; nothing is deleted then
-        _host?.Snackbar.Show($"Profile '{deleted.Name}' deleted", () => Run(() => Service.Restore(deleted)));
+        _host?.Snackbar.Show(Loc.Format("Profiles_Deleted", deleted.Name), () => Run(() => Service.Restore(deleted)));
     });
 
     void Switch_Click(object s, RoutedEventArgs e) => Run(() => { if (SelectedName is { } n) Service.Switch(n); });

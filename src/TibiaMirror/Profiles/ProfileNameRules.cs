@@ -1,4 +1,6 @@
-﻿namespace TibiaMirror.Profiles;
+using TibiaMirror.Localization;
+
+namespace TibiaMirror.Profiles;
 
 public static class ProfileNameRules
 {
@@ -15,19 +17,19 @@ public static class ProfileNameRules
     public static string? Validate(string name, IEnumerable<string> existing, string? renamingFrom = null)
     {
         var n = (name ?? "").Trim();
-        if (n.Length == 0) return "Name can't be empty.";
-        if (n.Length > MaxLength) return $"Name must be {MaxLength} characters or fewer.";
+        if (n.Length == 0) return Loc.Get("Profiles_ErrEmpty");
+        if (n.Length > MaxLength) return Loc.Format("Profiles_ErrTooLong", MaxLength);
         var bad = n.IndexOfAny(Path.GetInvalidFileNameChars());
-        if (bad >= 0) return $"Name can't contain the character '{n[bad]}'.";
+        if (bad >= 0) return Loc.Format("Profiles_ErrBadChar", n[bad]);
         var dot = n.IndexOf('.');
         var stem = (dot >= 0 ? n[..dot] : n).TrimEnd();
-        if (Reserved.Contains(stem)) return $"'{stem.ToUpperInvariant()}' is a reserved Windows name.";
-        if (n.EndsWith('.')) return "Name can't end with a dot.";
+        if (Reserved.Contains(stem)) return Loc.Format("Profiles_ErrReserved", stem.ToUpperInvariant());
+        if (n.EndsWith('.')) return Loc.Get("Profiles_ErrEndsDot");
         foreach (var e in existing)
         {
             if (string.Equals(e, n, StringComparison.OrdinalIgnoreCase)
                 && !(renamingFrom != null && string.Equals(e, renamingFrom, StringComparison.OrdinalIgnoreCase)))
-                return $"A profile named '{e}' already exists.";
+                return Loc.Format("Profiles_ErrExists", e);
         }
         return null;
     }

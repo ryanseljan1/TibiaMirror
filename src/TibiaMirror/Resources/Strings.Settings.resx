@@ -6,4 +6,34 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="Settings_Title" xml:space="preserve"><value>Settings</value></data>
   <data name="Settings_Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Settings_ShowHideAll" xml:space="preserve"><value>Show/Hide all mirrors</value></data>
+  <data name="Settings_NextProfile" xml:space="preserve"><value>Next profile</value></data>
+  <data name="Settings_LockAll" xml:space="preserve"><value>Lock/Unlock all mirrors</value></data>
+  <data name="Settings_OnlyFocused" xml:space="preserve"><value>Only show mirrors while Tibia is focused</value></data>
+  <data name="Settings_ClickThrough" xml:space="preserve"><value>Click through mirrors while Tibia is focused</value></data>
+  <data name="Settings_ClickThroughTip" xml:space="preserve"><value>Clicks on a mirror go to Tibia. To move or resize an unlocked mirror, focus another window first.</value></data>
+  <data name="Settings_Theme" xml:space="preserve"><value>Theme</value></data>
+  <data name="Settings_ThemeSystem" xml:space="preserve"><value>System</value></data>
+  <data name="Settings_ThemeDark" xml:space="preserve"><value>Dark</value></data>
+  <data name="Settings_ThemeLight" xml:space="preserve"><value>Light</value></data>
+  <data name="Settings_StartWithWindows" xml:space="preserve"><value>Start with Windows (in the tray)</value></data>
+  <data name="Settings_Advanced" xml:space="preserve"><value>Advanced</value></data>
+  <data name="Settings_ProcessName" xml:space="preserve"><value>Tibia process name (without .exe)</value></data>
+  <data name="Settings_TitlePrefix" xml:space="preserve"><value>Tibia window title prefix</value></data>
+  <data name="Settings_OpenDataFolder" xml:space="preserve"><value>Open data folder</value></data>
+  <data name="Settings_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Settings_Version" xml:space="preserve"><value>Version {0}</value></data>
+  <data name="Settings_CheckUpdates" xml:space="preserve"><value>Check for updates automatically</value></data>
+  <data name="Settings_CheckNow" xml:space="preserve"><value>Check now</value></data>
+  <data name="Settings_UpToDate" xml:space="preserve"><value>You're up to date.</value></data>
+  <data name="Settings_UpdateAvailable" xml:space="preserve"><value>Update {0} available — see the main window.</value></data>
+  <data name="Settings_ErrProcessEmpty" xml:space="preserve"><value>The Tibia process name can't be empty.</value></data>
+  <data name="Settings_ErrTitleEmpty" xml:space="preserve"><value>The Tibia window title prefix can't be empty.</value></data>
+  <data name="Settings_KeyInUse" xml:space="preserve"><value>This key is already used by: {0}. Use it anyway?</value></data>
+  <data name="Settings_KeyInUseTitle" xml:space="preserve"><value>Key already in use</value></data>
+  <data name="Settings_StartupFailed" xml:space="preserve"><value>Could not change the Start with Windows setting: {0}</value></data>
+  <data name="Settings_SaveFailed" xml:space="preserve"><value>Your settings were applied but could not be saved to disk: {0}</value></data>
+  <data name="Settings_HotkeyNone" xml:space="preserve"><value>None</value></data>
+  <data name="Settings_HotkeyPrompt" xml:space="preserve"><value>Press a key…</value></data>
+  <data name="Settings_HotkeyUnavailable" xml:space="preserve"><value>Hotkeys unavailable</value></data>
 </root>

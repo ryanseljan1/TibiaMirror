@@ -4,6 +4,7 @@
         WindowStyle="None" AllowsTransparency="True" Background="Transparent" ResizeMode="NoResize"
         ShowInTaskbar="False" ShowActivated="False" Topmost="True" Focusable="False"
         SizeToContent="WidthAndHeight">
+    <!-- Overlay on the game: fixed dark colours, not theme tokens. -->
     <Border Background="#E6202020" CornerRadius="6" Padding="16,8">
         <TextBlock x:Name="Label" Foreground="White" FontSize="16"/>
     </Border>
